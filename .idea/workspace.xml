@@ -35,7 +35,7 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/main/Code/SoftwareArchitecture/Code/vou-backend/authms",
+    "last_opened_file_path": "D:/main/Code/SoftwareArchitecture/Code/vou-backend/api-gateway",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -64,6 +64,7 @@
       <workItem from="1720023451998" duration="676000" />
       <workItem from="1720079954791" duration="4000" />
       <workItem from="1720233106271" duration="828000" />
+      <workItem from="1721118910266" duration="48000" />
     </task>
     <servers />
   </component>
