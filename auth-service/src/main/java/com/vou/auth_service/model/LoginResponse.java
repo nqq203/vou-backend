@@ -2,12 +2,10 @@ package com.vou.auth_service.model;
 
 public class LoginResponse {
     private String token;
-    private String message;
 
     // Constructors, Getters and Setters
-    public LoginResponse(String token, String message) {
+    public LoginResponse(String token) {
         this.token = token;
-        this.message = message;
     }
 
     public LoginResponse() {
@@ -19,13 +17,5 @@ public class LoginResponse {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

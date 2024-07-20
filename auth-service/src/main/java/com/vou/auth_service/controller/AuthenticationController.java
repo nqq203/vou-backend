@@ -1,5 +1,11 @@
 package com.vou.auth_service.controller;
 
+import com.vou.auth_service.common.BadRequest;
+import com.vou.auth_service.common.CreatedResponse;
+import com.vou.auth_service.common.ErrorResponse;
+import com.vou.auth_service.model.LoginRequest;
+import com.vou.auth_service.model.RegisterRequest;
+import com.vou.auth_service.common.SuccessResponse;
 import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
@@ -20,16 +26,21 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String token = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        System.out.println("Hello login");
         if (token != null) {
-            return ResponseEntity.ok(new LoginResponse(token, "Login successfully"));
+            LoginResponse loginResponse = new LoginResponse(token);
+            return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(null, "Invalid username or password"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(
+                        "Invalid username or password!",
+                        HttpStatus.UNAUTHORIZED, null));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         System.out.println("Attempting to login user: " + registerRequest.getUsername());
 
         User newUser = new User(registerRequest.getUsername(),
@@ -41,9 +52,29 @@ public class AuthenticationController {
 
         boolean result = authenticationService.register(newUser);
         if (result) {
-            return ResponseEntity.ok(new RegisterResponse(true, "User registered successfully"));
+            RegisterResponse registerResponse = new RegisterResponse("User registered successfully");
+            return ResponseEntity.ok(new CreatedResponse(registerResponse));
         } else {
-            return ResponseEntity.badRequest().body(new RegisterResponse(false, "Username already exists"));
+            return ResponseEntity.badRequest().body(new BadRequest("Username already exists"));
+        }
+    }
+
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        boolean result = authenticationService.logout(token);
+        System.out.println("logut boolean:" + result);
+        if (result) {
+            System.out.println("Vao result");
+            LogoutResponse logoutResponse = new LogoutResponse("");
+            return ResponseEntity.ok(new SuccessResponse("Logout successfully", HttpStatus.OK, logoutResponse));
+        } else {
+            System.out.println("Khong vao result");
+            LogoutResponse logoutResponse = new LogoutResponse();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid token", HttpStatus.UNAUTHORIZED, logoutResponse));
         }
     }
 }

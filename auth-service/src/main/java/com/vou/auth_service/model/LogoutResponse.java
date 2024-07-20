@@ -1,14 +1,15 @@
 package com.vou.auth_service.model;
 
-public class RegisterResponse {
+public class LogoutResponse {
     private String message;
 
-    // Constructors
-    public RegisterResponse(String message) {
+    public LogoutResponse(String message) {
         this.message = message;
     }
 
-    // Getters and Setters
+    public LogoutResponse() {
+    }
+
     public String getMessage() {
         return message;
     }

@@ -8,6 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class AuthenticationService {
     @Autowired
@@ -16,6 +19,8 @@ public class AuthenticationService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+
+    private Set<String> blacklistedTokens = new HashSet<>();
 
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username);
@@ -41,5 +46,19 @@ public class AuthenticationService {
         userRepository.save(user);
         System.out.println("91011");
         return true;
+    }
+
+    public boolean logout(String token) {
+        System.out.println(token);
+        if (jwtService.validateTokenAndGetUsername(token) != null) {
+            blacklistedTokens.add(token);
+            System.out.println("blacklist token: " + blacklistedTokens);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isTokenBlackListed(String token) {
+        return blacklistedTokens.contains(token);
     }
 }
