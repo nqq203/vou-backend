@@ -1,4 +1,4 @@
-package com.vou.auth_service.model;
+package com.vou.auth_service.entity;
 
 public class LoginResponse {
     private String token;

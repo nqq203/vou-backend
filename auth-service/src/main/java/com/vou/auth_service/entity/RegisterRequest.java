@@ -1,21 +1,38 @@
-package com.vou.auth_service.model;
+package com.vou.auth_service.entity;
+
+import com.vou.auth_service.constant.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
+    @NotBlank(message = "Full name is mandatory")
     private String fullName;
+    @NotBlank(message = "Username is mandatory")
     private String username;
+    @NotBlank(message = "Password is mandatory")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "Password must contain at least one uppercase letter, one number, and one special character")
     private String password;
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Email should be valid")
     private String email;
     private String phoneNumber;
+    @NotBlank(message = "Role is mandatory")
+    private Role role;
 
     // Constructors
     public RegisterRequest() {}
 
-    public RegisterRequest(String fullName, String username, String password, String email, String phoneNumber) {
+    public RegisterRequest(String fullName, String username, String password, String email, String phoneNumber, Role role) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.role = role;
     }
 
     // Getters and Setters
@@ -57,5 +74,13 @@ public class RegisterRequest {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

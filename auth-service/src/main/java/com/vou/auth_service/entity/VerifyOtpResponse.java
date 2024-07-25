@@ -1,14 +1,12 @@
-package com.vou.auth_service.model;
+package com.vou.auth_service.entity;
 
-public class RegisterResponse {
-    private String message;
+public class VerifyOtpResponse {
+    String message;
 
-    // Constructors
-    public RegisterResponse(String message) {
+    public VerifyOtpResponse(String message) {
         this.message = message;
     }
 
-    // Getters and Setters
     public String getMessage() {
         return message;
     }

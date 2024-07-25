@@ -73,4 +73,17 @@ public class JwtService {
             return null;
         }
     }
+
+    public Date getExpirationDateFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getExpiration();
+        } catch (Exception e) {
+            System.out.println("Could not extract expiration date from token: " + e.toString());
+            return null;
+        }
+    }
 }

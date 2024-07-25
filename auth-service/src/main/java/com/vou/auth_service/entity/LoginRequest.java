@@ -1,4 +1,5 @@
-package com.vou.auth_service.model;
+package com.vou.auth_service.entity;
+
 
 public class LoginRequest {
     private String username;
