@@ -47,9 +47,9 @@ public class UserService {
                         break;
                 }
             });
+            userRepository.save(updatedUser);
         }
 
-        userRepository.save(updatedUser);
         return updatedUser;
     }
 }

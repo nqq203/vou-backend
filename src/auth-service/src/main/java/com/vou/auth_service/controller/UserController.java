@@ -23,9 +23,15 @@ public class UserController {
     public ResponseEntity<User> updateUser(@RequestBody Map<String, Object> updates, @PathVariable Long userId) {
         try {
             User updatedUser = userService.updateUser(userId, updates);
-            return ResponseEntity.ok(updatedUser);
+            if (updatedUser != null) {
+                return ResponseEntity.ok(updatedUser);
+            }
+            else
+                return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
+
 }
