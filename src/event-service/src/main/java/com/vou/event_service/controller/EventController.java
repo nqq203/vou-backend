@@ -1,5 +1,6 @@
 package com.VOU.event_service.controller;
 
+import com.VOU.event_service.common.BadRequest;
 import com.VOU.event_service.common.NotFoundResponse;
 import com.VOU.event_service.common.SuccessResponse;
 import com.VOU.event_service.model.BrandsCoperation;
