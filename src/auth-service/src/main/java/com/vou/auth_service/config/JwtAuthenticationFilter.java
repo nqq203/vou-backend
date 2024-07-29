@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
     @Autowired
     private AuthenticationService authenticationService;
     public JwtAuthenticationFilter(JwtService jwtService) {
@@ -29,7 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> AUTH_WHITELIST = List.of(
             "/api/v1/auth/login",
             "/api/v1/auth/register",
-            "/api/v1/auth/change-password"
+            "/api/v1/auth/change-password",
+            "/api/v1/auth/verify-otp/**",
+            "/api/v1/auth/resend-otp"
     );
 
     @Override
@@ -37,9 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             System.out.println("JwtAuthenticationFilter is called");
             String requestPath = request.getRequestURI();
-            if (AUTH_WHITELIST.contains(requestPath)) {
+
+            // Check if the request URI matches any whitelist pattern
+            boolean isWhitelisted = AUTH_WHITELIST.stream()
+                    .anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
+
+            if (isWhitelisted) {
                 filterChain.doFilter(request, response);
-                return; // Return to exit the method
+                return;
             }
 
             System.out.println("JwtAuthenticationFilter is called");
@@ -56,10 +65,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     filterChain.doFilter(request, response); // Move this outside the if-block
+                } else {
+                    System.out.println("Session is inactive or does not exist.");
+                    SecurityContextHolder.clearContext();  // Clear any existing security context
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    String jsonResponse = "{\"message\":\"Invalid or expired token\", \"code\":401}";
+                    response.getWriter().write(jsonResponse);
+                    response.getWriter().flush();
                 }
             }
         } catch (Exception e) {
-            System.out.println(e);
             throw new RuntimeException("Authentication error", e);
         }
     }

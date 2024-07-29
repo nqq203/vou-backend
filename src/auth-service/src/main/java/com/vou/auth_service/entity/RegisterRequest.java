@@ -21,12 +21,12 @@ public class RegisterRequest {
     private String email;
     private String phoneNumber;
     @NotBlank(message = "Role is mandatory")
-    private Role role;
+    private String role;
 
     // Constructors
     public RegisterRequest() {}
 
-    public RegisterRequest(String fullName, String username, String password, String email, String phoneNumber, Role role) {
+    public RegisterRequest(String fullName, String username, String password, String email, String phoneNumber, String role) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
@@ -76,11 +76,11 @@ public class RegisterRequest {
         this.phoneNumber = phoneNumber;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 }

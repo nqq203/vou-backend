@@ -1,22 +1,23 @@
-package com.vou.auth_service.model;
+package com.vou.user_service.model;
 
+import com.vou.user_service.constant.Status;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "brands")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Brand extends User {
+    @Column(name = "logo_url")
     private String logo_url;
+    @Column(name = "field")
     private String field;
+    @Column(name = "latitude")
     private double latitude;
+    @Column(name = "longitude")
     private double longitude;
-
-    public Brand(User user, String password) {
-        super();
-        this.setUsername(user.getUsername());
-        this.setPassword(password);
-        this.setFullName(user.getFullName());
-        this.setEmail(user.getEmail());
-        this.setPhoneNumber(user.getPhoneNumber());
-        this.setLockedDate(user.getLockedDate());
-        this.setRole(user.getRole());
-        this.setStatus(user.getStatus());
-    }
 
     public String getLogo_url() {
         return logo_url;
@@ -37,7 +38,6 @@ public class Brand extends User {
     public double getLongitude() {
         return longitude;
     }
-
 
     public void setField(String field) {
         this.field = field;
