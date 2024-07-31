@@ -33,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/register",
             "/api/v1/auth/change-password",
             "/api/v1/auth/verify-otp/**",
-            "/api/v1/auth/resend-otp"
+            "/api/v1/auth/resend-otp",
+            "/api/v1/auth/validate-token"
     );
 
     @Override
@@ -51,12 +52,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            System.out.println("JwtAuthenticationFilter is called");
+            System.out.println("JwtAuthenticationFilter is called second");
             String token = request.getHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
                 System.out.println("Token: " + token);
                 boolean isValidToken = !authenticationService.isTokenBlackListed(token);
+                System.out.println(isValidToken);
                 String username = jwtService.validateTokenAndGetUsername(token);
                 System.out.println("In JWT config: " + username + " " + isValidToken);
                 if (username != null && isValidToken) {

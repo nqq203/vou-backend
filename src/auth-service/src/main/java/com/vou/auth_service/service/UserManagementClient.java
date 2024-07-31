@@ -19,7 +19,7 @@ import java.util.Optional;
 public class UserManagementClient {
 
     private final RestTemplate restTemplate;
-    private final String userServiceUrl = "http://localhost:8082/api/v1/user";
+    private final String userServiceUrl = "http://26.95.177.142:8082/api/v1/user";
 
     @Autowired
     public UserManagementClient(RestTemplateBuilder restTemplateBuilder) {

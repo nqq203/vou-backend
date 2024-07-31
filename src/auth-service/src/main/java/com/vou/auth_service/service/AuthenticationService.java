@@ -115,11 +115,13 @@ public class AuthenticationService {
     public boolean isTokenBlackListed(String token) {
         Optional<Session> sessionRes = client.getSessionByToken(token);
         if (!sessionRes.isPresent()) {
+            System.out.println("token false");
             return false;
         }
         else {
             Session session = sessionRes.get();
-            return !session.isActive();
+            System.out.println("token true");
+            return !session.getActive();
         }
     }
 
@@ -149,5 +151,17 @@ public class AuthenticationService {
         user.setPassword(encodedPassword);
         client.updateUserInternal(user);
         return true;
+    }
+
+    public boolean validateToken(String token) {
+        Optional<Session> sessionRes = client.getSessionByToken(token);
+        System.out.println("vao validate token o jwt service 2");
+        boolean isValidToken = jwtService.validateToken(token);
+        if (sessionRes.isPresent() && isValidToken) {
+            Session session = sessionRes.get();
+            System.out.println(session.getId().toString());
+            return session.getActive();
+        }
+        return false;
     }
 }

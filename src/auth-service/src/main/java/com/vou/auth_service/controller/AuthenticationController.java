@@ -10,6 +10,7 @@ import com.vou.auth_service.entity.RegisterRequest;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -149,5 +150,18 @@ public class AuthenticationController {
         else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Changing password failed by server!"));
         }
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
+        System.out.println("In validate token");
+        System.out.println(token);
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        System.out.println(token);
+
+        boolean isValidToken = authenticationService.validateToken(token);
+        return ResponseEntity.ok(isValidToken);
     }
 }

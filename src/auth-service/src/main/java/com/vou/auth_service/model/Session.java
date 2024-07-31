@@ -31,7 +31,7 @@ public class Session {
         this.token = token;
     }
 
-    public boolean isActive() {
+    public boolean getActive() {
         return isActive;
     }
 
