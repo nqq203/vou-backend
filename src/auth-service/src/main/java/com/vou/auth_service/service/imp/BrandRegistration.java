@@ -48,7 +48,7 @@ public class BrandRegistration implements IRegistration {
     }
 
     @Override
-    public String resendOtp(String email) {
+    public String resendOtp(String username, String email) {
         return null;
     }
 }

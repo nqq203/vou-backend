@@ -3,10 +3,7 @@ package com.vou.auth_service.controller;
 import com.vou.auth_service.common.*;
 import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.entity.ChangePasswordRequest;
-import com.vou.auth_service.entity.LoginRequest;
-import com.vou.auth_service.entity.LoginResponse;
-import com.vou.auth_service.entity.RegisterRequest;
+import com.vou.auth_service.entity.*;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -121,9 +118,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<?> resendOtp(@RequestParam String email) {
+    public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
         System.out.println("In resend Otp");
-        String otp = authenticationService.resendOtp(email);
+        String otp = authenticationService.resendOtp(resendOtpRequest.getUsername(), resendOtpRequest.getEmail());
 
         if (otp != null) {
             return ResponseEntity.ok(new SuccessResponse("OTP resend successfully", HttpStatus.OK, null));

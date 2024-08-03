@@ -83,7 +83,10 @@ public class PlayerRegistration implements IRegistration {
     }
 
     @Override
-    public String resendOtp(String email) {
-        return otpService.resendOtp(email);
+    public String resendOtp(String username, String email) {
+        String newOtp = otpService.generateOtp();
+        otpService.storeOtp(username, newOtp);
+        otpService.sendOtpEmail(email, newOtp);
+        return newOtp;
     }
 }

@@ -34,13 +34,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/create-user")
+    @PostMapping("/")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User savedUser = userService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get-user-by-username/{username}")
+    @GetMapping("/by-username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         User user = userService.findByUsername(username);
         if (user != null) {
@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/get-player-by-userid/{userId}")
+    @GetMapping("/players/{userId}")
     public ResponseEntity<Player> getPlayerByIdUser(@PathVariable Long userId) {
         Player player = userService.findPlayerByUserId(userId);
         if (player != null) {
@@ -58,7 +58,7 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/get-user-by-email/{email}")
+    @GetMapping("/by-email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
         User user = userService.findByEmail(email);
         if (user != null){
@@ -67,7 +67,7 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/create-admin")
+    @PostMapping("/admin")
     public ResponseEntity<Boolean> createAdmin(@RequestBody Admin admin) {
         Admin savedAdmin = userService.createAdmin(admin);
         if (savedAdmin != null) {
@@ -78,7 +78,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/create-player")
+    @PostMapping("/player")
     public ResponseEntity<Boolean> createPlayer(@RequestBody Player player) {
         Player savedPlayer = userService.createPlayer(player);
         if (savedPlayer != null) {
@@ -88,7 +88,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/create-brand")
+    @PostMapping("/brand")
     public ResponseEntity<Boolean> createBrand(@RequestBody Brand brand) {
         Brand savedBrand = userService.createBrand(brand);
         if (savedBrand != null) {
@@ -99,15 +99,34 @@ public class UserController {
         }
     }
 
-    @GetMapping("/update-player")
-    public ResponseEntity<?> updatePlayer(@RequestBody Player player) {
+    @PutMapping("/player/{userId}")
+    public ResponseEntity<?> updatePlayer(@PathVariable Long userId, @RequestBody Player player) {
+        User existUser = userService.findByIdUser(userId);
+        if (existUser == null) {
+            return ResponseEntity.notFound().build();
+        }
         Player savedPlayer = userService.updatePlayer(player);
         return new ResponseEntity<>(savedPlayer, HttpStatus.OK);
     }
 
-    @PostMapping("/update-user-internal")
-    public ResponseEntity<Boolean> updateUserInternal(@RequestBody User user) {
-        User savedUser = userService.updateUserInternal(user);
+    @PutMapping("/{userId}/internal-update")
+    public ResponseEntity<Boolean> updateUserInternal(@PathVariable Long userId, @RequestBody User user) {
+        User existUser = userService.findByIdUser(userId);
+        if (existUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        existUser.setIdUser(user.getIdUser());
+        existUser.setUsername(user.getUsername());
+        existUser.setPassword(user.getPassword());
+        existUser.setFullName(user.getFullName());
+        existUser.setEmail(user.getEmail());
+        existUser.setPhoneNumber(user.getPhoneNumber());
+        existUser.setLockedDate(user.getLockedDate());
+        existUser.setRole(user.getRole());
+        existUser.setStatus(user.getStatus());
+
+        User savedUser = userService.updateUserInternal(existUser);
         if (savedUser != null) {
             return ResponseEntity.ok(true);
         }
@@ -116,13 +135,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/create-session")
+    @PostMapping("/session")
     public ResponseEntity<?> createSession(@RequestBody Session session) {
         Session savedSession = userService.createSession(session);
         return new ResponseEntity<>(savedSession, HttpStatus.OK);
     }
 
-    @GetMapping("/get-token/{token}")
+    @GetMapping("/session/{token}")
     public ResponseEntity<?> getSessionByToken(@PathVariable String token) {
         Session session = userService.findSessionByToken(token);
         if (session != null) {
@@ -131,13 +150,17 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/update-session")
-    public ResponseEntity<?> updateSession(@RequestBody Session session) {
+    @PutMapping("/session/{token}")
+    public ResponseEntity<?> updateSession(@PathVariable String token, @RequestBody Session session) {
+        Session existSession = userService.findSessionByToken(token);
+        if (existSession == null) {
+            return ResponseEntity.notFound().build();
+        }
         Session savedSession = userService.updateSession(session);
         return new ResponseEntity<>(savedSession, HttpStatus.OK);
     }
 
-    @GetMapping("/get-all-sessions")
+    @GetMapping("/session")
     public ResponseEntity<?> getListSession() {
         List<Session> sessions = userService.findAll();
         return new ResponseEntity<>(sessions, HttpStatus.OK);

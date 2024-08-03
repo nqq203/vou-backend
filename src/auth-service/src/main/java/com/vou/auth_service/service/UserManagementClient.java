@@ -5,6 +5,7 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class UserManagementClient {
 
     public Boolean createAdmin(Admin admin) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-admin", admin, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/admin", admin, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -47,7 +48,7 @@ public class UserManagementClient {
 
     public Boolean createBrand(Brand brand) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-brand", brand, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/brand", brand, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -62,7 +63,7 @@ public class UserManagementClient {
 
     public Boolean createPlayer(Player player) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-player", player, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/player", player, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -75,9 +76,16 @@ public class UserManagementClient {
         }
     }
 
+//    note lai o day chut /create-player
     public Boolean updateUserInternal(User user) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-player", user, Boolean.class);
+            HttpEntity<User> requestEntity = new HttpEntity<>(user);
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                    userServiceUrl + "/" + user.getIdUser() + "/internal-update",
+                    HttpMethod.PUT,
+                    requestEntity,
+                    Boolean.class);
+//            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/" + user.getIdUser() + "/internal-update", user, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             }
@@ -94,7 +102,7 @@ public class UserManagementClient {
 
     public Optional<User> getUserByUsername(String username) {
         try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/get-user-by-username/" + username, User.class);
+            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/by-username/" + username, User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
             }
@@ -120,7 +128,7 @@ public class UserManagementClient {
 
     public Optional<User> getUserByEmail(String email) {
         try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/get-user-by-email/" + email, User.class);
+            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/by-email/" + email, User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable((response.getBody()));
             }
@@ -132,12 +140,12 @@ public class UserManagementClient {
     }
 
     public Session createSession(Session session) {
-        return restTemplate.postForObject(userServiceUrl + "/create-session", session, Session.class);
+        return restTemplate.postForObject(userServiceUrl + "/session", session, Session.class);
     }
 
     public Optional<Session> getSessionByToken(String token) {
         try {
-            ResponseEntity<Session> response = restTemplate.getForEntity(userServiceUrl + "/get-token/" + token, Session.class);
+            ResponseEntity<Session> response = restTemplate.getForEntity(userServiceUrl + "/session/" + token, Session.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
             }
@@ -149,13 +157,31 @@ public class UserManagementClient {
     }
 
     public Session updateSession(Session session) {
-        return restTemplate.postForObject(userServiceUrl + "/update-session", session, Session.class);
+//        return restTemplate.postForObject(userServiceUrl + "/session/" + session.getToken(), session, Session.class);
+        try {
+            HttpEntity<Session> requestEntity = new HttpEntity<>(session);
+            ResponseEntity<Session> response = restTemplate.exchange(
+                    userServiceUrl + "/session/" + session.getToken(),
+                    HttpMethod.PUT,
+                    requestEntity,
+                    Session.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                System.err.println("Failed to update session, status code: " + response.getStatusCode());
+                return null;
+            }
+        } catch (RestClientException e) {
+            System.err.println("RestClientException when updating session: " + e.getMessage());
+            return null;
+        }
     }
 
     public Optional<List<Session>> getListSession() {
         try {
             ResponseEntity<List<Session>> response = restTemplate.exchange(
-                    userServiceUrl + "/get-all-sessions",
+                    userServiceUrl + "/session",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<Session>>() {}

@@ -36,7 +36,7 @@ public class AuthenticationService {
         User user = response.get();
 
         if (user.getStatus() != Status.ACTIVE) {
-            otpService.resendOtp(user.getEmail());
+            resendOtp(user.getUsername(), user.getEmail());
             return "invalid";
         }
 
@@ -135,9 +135,9 @@ public class AuthenticationService {
         return registrationService.verifyOtp(username, otp);
     }
 
-    public String resendOtp(String email) {
+    public String resendOtp(String username, String email) {
         IRegistration registrationService = registrationFactory.getRegistration("player");
-        return registrationService.resendOtp(email);
+        return registrationService.resendOtp(username, email);
     }
 
     public boolean changePassword(String email, String newPassword) {
