@@ -1,25 +1,17 @@
 package com.vou.auth_service.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "sessions")
 public class Session {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String token;
-
-    @Column(nullable = false)
     private boolean isActive;
 
     @Column
     private LocalDateTime logoutAt;
 
-    @Column(nullable = false)
     private LocalDateTime expiration;
 
     // Getters and Setters

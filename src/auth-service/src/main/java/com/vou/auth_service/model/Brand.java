@@ -1,23 +1,13 @@
 package com.vou.auth_service.model;
 
-import com.vou.auth_service.constant.Status;
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "brands")
 public class Brand extends User {
-    @Column(name = "brand_name")
-    private String brandName;
-    @Column(name = "field")
+    private String logo_url;
     private String field;
-    @Column(name = "latitude")
     private double latitude;
-    @Column(name = "longitude")
     private double longitude;
-    @Enumerated(EnumType.STRING)
-    private Status status;
 
-    public Brand(User user, String password, Status status) {
+    public Brand(User user, String password) {
+        super();
         this.setUsername(user.getUsername());
         this.setPassword(password);
         this.setFullName(user.getFullName());
@@ -25,11 +15,15 @@ public class Brand extends User {
         this.setPhoneNumber(user.getPhoneNumber());
         this.setLockedDate(user.getLockedDate());
         this.setRole(user.getRole());
-        this.status = status;
+        this.setStatus(user.getStatus());
     }
 
-    public String getBrandName() {
-        return brandName;
+    public String getLogo_url() {
+        return logo_url;
+    }
+
+    public void setLogo_url(String logo_url) {
+        this.logo_url = logo_url;
     }
 
     public String getField() {
@@ -44,9 +38,6 @@ public class Brand extends User {
         return longitude;
     }
 
-    public void setBrandName(String brandName) {
-        this.brandName = brandName;
-    }
 
     public void setField(String field) {
         this.field = field;
@@ -58,13 +49,5 @@ public class Brand extends User {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 }

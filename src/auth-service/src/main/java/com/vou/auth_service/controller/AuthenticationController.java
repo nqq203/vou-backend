@@ -1,6 +1,8 @@
 package com.vou.auth_service.controller;
 
 import com.vou.auth_service.common.*;
+import com.vou.auth_service.constant.Role;
+import com.vou.auth_service.constant.Status;
 import com.vou.auth_service.entity.ChangePasswordRequest;
 import com.vou.auth_service.entity.LoginRequest;
 import com.vou.auth_service.entity.LoginResponse;
@@ -26,36 +28,48 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        System.out.println("Attempting to log in user: " + loginRequest.getUsername());
         String token = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        System.out.println("In login controller");
-        if (token != null && !token.equals("invalid")) {
-            LoginResponse loginResponse = new LoginResponse(token);
-            return ResponseEntity.ok(
-                    new SuccessResponse(
-                            "Login successfully",
-                            HttpStatus.OK, loginResponse));
-        }
-        if (token != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new ErrorResponse("Invalid token",
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid username or password!",
                             HttpStatus.UNAUTHORIZED, null));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                new ErrorResponse(
-                        "Invalid username or password!",
-                        HttpStatus.UNAUTHORIZED, null));
+
+        if (token.equals("invalid")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Unverified account, please verify OTP",
+                            HttpStatus.UNAUTHORIZED, null));
+        }
+
+        LoginResponse loginResponse = new LoginResponse(token);
+        return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         System.out.println("Attempting to login user: " + registerRequest.getUsername());
 
+//        implement logic to check role
+        Role role;
+        if (registerRequest.getRole().equalsIgnoreCase("player")) {
+            role = Role.PLAYER;
+        }
+        else if (registerRequest.getRole().equalsIgnoreCase("admin")) {
+            role = Role.ADMIN;
+        }
+        else {
+            role = Role.BRAND;
+        }
+
         User newUser = new User(registerRequest.getUsername(),
                                 registerRequest.getPassword(),
                                 registerRequest.getFullName(),
                                 registerRequest.getEmail(),
                                 registerRequest.getPhoneNumber(),
-                                registerRequest.getRole());
+                                role,
+                                Status.PENDING);
 
         boolean result = authenticationService.register(newUser);
         if (result) {
@@ -63,7 +77,7 @@ public class AuthenticationController {
                     "User registered successfully",
                     HttpStatus.CREATED, null));
         } else {
-            return ResponseEntity.badRequest().body(new BadRequest("Username already exists"));
+            return ResponseEntity.badRequest().body(new BadRequest("Username or email already exists"));
         }
     }
 
@@ -74,7 +88,7 @@ public class AuthenticationController {
             token = token.substring(7);
         }
         boolean result = authenticationService.logout(token);
-        System.out.println("logut boolean:" + result);
+        System.out.println("logout boolean:" + result);
         if (result) {
             System.out.println("Vao result");
             return ResponseEntity.ok(new SuccessResponse("Logout successfully", HttpStatus.OK, null));
@@ -91,7 +105,14 @@ public class AuthenticationController {
         boolean isVerified = authenticationService.verifyOtp(username, otp);
         System.out.println(isVerified);
         if (isVerified) {
-            return ResponseEntity.ok(new SuccessResponse("OTP verified successfully. Your account is now active.", HttpStatus.ACCEPTED, null));
+            String token = authenticationService.loginWithoutPassword(username);
+            if (token != null) {
+                LoginResponse loginResponse = new LoginResponse(token);
+                return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Create token failed"));
+            }
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new BadRequest("Invalid OTP"));

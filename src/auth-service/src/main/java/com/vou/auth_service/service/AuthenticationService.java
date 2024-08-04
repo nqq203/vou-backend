@@ -1,60 +1,45 @@
 package com.vou.auth_service.service;
 
 import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.model.Player;
 import com.vou.auth_service.model.Session;
 import com.vou.auth_service.model.User;
-import com.vou.auth_service.repository.PlayerRepository;
-import com.vou.auth_service.repository.SessionRepository;
-import com.vou.auth_service.repository.UserRepository;
-import com.vou.auth_service.service.JwtService;
-import com.vou.auth_service.service.imp.PlayerRegistration;
 import com.vou.auth_service.service.registration_factory.RegistrationFactory;
 import com.vou.auth_service.service.registration_interface.IRegistration;
-import com.vou.auth_service.strategy.TokenStrategy;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PlayerRepository playerRepository;
-    @Autowired
-    private SessionRepository sessionRepository;
+    UserManagementClient client;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
     @Autowired
     private RegistrationFactory registrationFactory;
+    @Autowired
+    private OtpService otpService;
 
 
     public String login(String username, String password) {
-        User user = userRepository.findByUsername(username);
-        if (user != null ) {
-            System.out.println(user.getUsername());
-        }
-        else {
+        Optional<User> response = client.getUserByUsername(username);
+
+        if (!response.isPresent()) {
             return null;
         }
-        Player player = playerRepository.findByIdUser(user.getIdUser());
-        if (player == null) {
-            return null;
-        }
-        if (player.getStatus() != Status.ACTIVE) {
+        User user = response.get();
+
+        if (user.getStatus() != Status.ACTIVE) {
+            otpService.resendOtp(user.getEmail());
             return "invalid";
         }
+
         if (passwordEncoder.matches(password, user.getPassword())) {
             String token = jwtService.generateToken(user);
             Date expirationDate = jwtService.getExpirationDateFromToken(token);
@@ -62,10 +47,36 @@ public class AuthenticationService {
             session.setToken(token);
             session.setActive(true);
             session.setExpiration(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-            sessionRepository.save(session);
+            Session savedSession = client.createSession(session);
+            if (savedSession == null) {
+                return null;
+            }
             return token;
         }
         return null;
+    }
+
+    // After verified otp, we will use this function to log in
+    public String loginWithoutPassword(String username) {
+        Optional<User> response = client.getUserByUsername(username);
+
+        if (!response.isPresent()) {
+            return null;
+        }
+        User user = response.get();
+
+        String token = jwtService.generateToken(user);
+        Date expirationDate = jwtService.getExpirationDateFromToken(token);
+        Session session = new Session();
+        session.setToken(token);
+        session.setActive(true);
+        session.setExpiration(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+        Session savedSession = client.createSession(session);
+        if (savedSession == null) {
+            return null;
+        }
+
+        return token;
     }
 
     public boolean register(User user) {
@@ -85,24 +96,36 @@ public class AuthenticationService {
     public boolean logout(String token) {
         System.out.println(token);
         if (jwtService.validateTokenAndGetUsername(token) != null) {
-            Session session = sessionRepository.findByToken(token).orElse(null);
-            if (session != null) {
-                session.setActive(false);
-                session.setLogoutAt(LocalDateTime.now());
-                sessionRepository.save(session);
-                return true;
+            Optional<Session> sessionRes = client.getSessionByToken(token);
+            if (!sessionRes.isPresent()) {
+                return false;
             }
+            Session session = sessionRes.get();
+            session.setActive(false);
+            session.setLogoutAt(LocalDateTime.now());
+            Session updatedSession = client.updateSession(session);
+            if (updatedSession == null) {
+                return false;
+            }
+            return true;
         }
         return false;
     }
 
     public boolean isTokenBlackListed(String token) {
-        Session session = sessionRepository.findByToken(token).orElse(null);
-        return session != null && !session.isActive();
+        Optional<Session> sessionRes = client.getSessionByToken(token);
+        if (!sessionRes.isPresent()) {
+            return false;
+        }
+        else {
+            Session session = sessionRes.get();
+            return !session.isActive();
+        }
     }
 
     public User loadUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        Optional<User> userRes = client.getUserByUsername(username);
+        return userRes.get();
     }
 
     public boolean verifyOtp(String username, String otp) {
@@ -116,14 +139,15 @@ public class AuthenticationService {
     }
 
     public boolean changePassword(String email, String newPassword) {
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            user.setPassword(encodedPassword);
-            userRepository.save(user);
-            return true;
+        Optional<User> userRes = client.getUserByEmail(email);
+        if (!userRes.isPresent()) {
+            return false;
         }
 
-        return false;
+        User user = userRes.get();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        client.updateUserInternal(user);
+        return true;
     }
 }
