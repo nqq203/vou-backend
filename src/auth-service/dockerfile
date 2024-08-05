@@ -1,0 +1,14 @@
+# Use Eclipse Temurin JDK as the base image
+FROM eclipse-temurin:21-jdk
+
+# Set the working directory inside the container
+WORKDIR /auth-service
+
+# Copy the JAR file from the build context into the container
+COPY target/auth-service-*.jar auth-service.jar
+
+# Expose port 8761 to match the docker-compose settings
+EXPOSE 8761
+
+# Set the command to execute the JAR file
+ENTRYPOINT ["java", "-jar", "auth-service.jar"]
