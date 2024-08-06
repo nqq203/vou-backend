@@ -25,8 +25,13 @@ public class SecurityConfig  {
        System.out.println("123");
        http
                .authorizeHttpRequests(authz -> authz
-                       .requestMatchers("/api/**").permitAll()
-                       .anyRequest().authenticated())
+                       .requestMatchers("/api/v1/auth/login",
+                               "/api/v1/auth/register",
+                               "/api/v1/auth/resend-otp",
+                               "/api/v1/auth/validate-token",
+                               "/api/v1/auth/verify-otp/**").permitAll()
+                       .requestMatchers("/api/v1/auth/change-password",
+                               "/api/v1/auth/logout").authenticated())
                .csrf(csrf -> csrf.disable())
                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .oauth2Login(oauth2Login ->

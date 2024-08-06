@@ -100,6 +100,9 @@ public class AuthenticationController {
 //    public ResponseEntity<?> verifyOtp(@RequestParam String username, @RequestParam String otp) {
     public ResponseEntity<?> verifyOtp(@RequestParam String username, @RequestParam String otp) {
         System.out.println("vao verity-otp");
+        if (otp.length() != 6) {
+            return ResponseEntity.badRequest().body(new BadRequest("Invalid OTP"));
+        }
         boolean isVerified = authenticationService.verifyOtp(username, otp);
         System.out.println(isVerified);
         if (isVerified) {
@@ -120,7 +123,7 @@ public class AuthenticationController {
     @PostMapping("/resend-otp")
     public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
         System.out.println("In resend Otp");
-        String otp = authenticationService.resendOtp(resendOtpRequest.getUsername(), resendOtpRequest.getEmail());
+        String otp = authenticationService.resendOtp(resendOtpRequest.getUsername(), null);
 
         if (otp != null) {
             return ResponseEntity.ok(new SuccessResponse("OTP resend successfully", HttpStatus.OK, null));

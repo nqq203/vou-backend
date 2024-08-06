@@ -1,11 +1,24 @@
-# Use Eclipse Temurin JDK as the base image
-FROM eclipse-temurin:21-jdk
-
-# Set the working directory inside the container
+# Stage 1: Build the application
+FROM maven:3.9.8-eclipse-temurin-21 AS build
 WORKDIR /service-registry
 
-# Copy the JAR file from the build context into the container
-COPY target/service-registry-*.jar service-registry.jar
+# Copy the pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy the source code and build the application
+COPY src ./src
+RUN mvn clean install -DskipTests
+
+# Check to list the JAR file (for debugging purposes)
+RUN ls /service-registry/target
+
+# Start a new stage for the final image
+FROM eclipse-temurin:21
+WORKDIR /service-registry
+
+# Copy the JAR file from the build stage to the final image
+COPY --from=build /service-registry/target/service-registry-*.jar service-registry.jar
 
 # Expose port 8761 to match the docker-compose settings
 EXPOSE 8761

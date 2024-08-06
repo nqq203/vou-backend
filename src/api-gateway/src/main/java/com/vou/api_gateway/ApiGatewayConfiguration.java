@@ -1,12 +1,14 @@
 package com.vou.api_gateway;
 
-import org.apache.http.impl.client.AutoRetryHttpClient;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.pattern.PathPatternParser;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class ApiGatewayConfiguration {
@@ -50,5 +52,21 @@ public class ApiGatewayConfiguration {
     @Bean
     public AuthenticationFilter customFilter(WebClient.Builder webClientBuilder) {
         return new AuthenticationFilter(webClientBuilder);
+    }
+
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:8000");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
+
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
     }
 }
