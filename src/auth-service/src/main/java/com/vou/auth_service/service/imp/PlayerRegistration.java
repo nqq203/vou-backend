@@ -1,12 +1,8 @@
 package com.vou.auth_service.service.imp;
 
 import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.model.Admin;
 import com.vou.auth_service.model.Player;
-import com.vou.auth_service.model.Session;
 import com.vou.auth_service.model.User;
-import com.vou.auth_service.service.AuthenticationService;
-import com.vou.auth_service.service.JwtService;
 import com.vou.auth_service.service.OtpService;
 import com.vou.auth_service.service.UserManagementClient;
 import com.vou.auth_service.service.registration_interface.IRegistration;
@@ -14,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -44,19 +39,20 @@ public class PlayerRegistration implements IRegistration {
         try {
             boolean isSaved = client.createPlayer(player);
 
-            //Generate and send OTP
-            String otp = otpService.generateOtp();
-            otpService.storeOtp(player.getUsername(), otp);
+            if (isSaved) {
+                //Generate and send OTP
+                String otp = otpService.generateOtp();
+                otpService.storeOtp(player.getUsername(), otp);
 
-            if (player.getEmail() != null) {
-                otpService.sendOtpEmail(player.getEmail(), otp);
+                if (player.getEmail() != null) {
+                    otpService.sendOtpEmail(player.getEmail(), otp);
+                }
             }
 
-//            return savedPlayer != null && savedPlayer.getIdUser() != null;
             return isSaved;
         } catch (Exception e) {
 
-            System.err.println("Failed to create admin: " + e.getMessage());
+            System.err.println("Failed to create player: " + e.getMessage());
             return false;
         }
     }

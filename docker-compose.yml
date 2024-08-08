@@ -80,7 +80,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/authdb
       SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_DATASOURCE_PASSWORD: admin
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -188,12 +188,26 @@ services:
   #   networks: 
   #     - microservices-network
 
+  pgadmin:
+    image: elestio/pgadmin:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8888:80"
+    depends_on:
+      - authdb
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - microservices-network
+      
   authdb:
-    image: postgres:13
+    image: postgres:16.3-bullseye
     environment:
       POSTGRES_DB: authdb
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 12345
+      POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
@@ -256,6 +270,7 @@ volumes:
   # game-service-data:
   # inventory-and-reward-service-data:
   authdb-data:
+  pgadmin-data:
   # eventdb-data:
   # gamedb-data:
   # inventory-and-reward-db-data:
