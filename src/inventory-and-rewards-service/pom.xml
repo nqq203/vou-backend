@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.vou</groupId>
-    <artifactId>reward-service</artifactId>
+    <artifactId>inventory-and-rewards-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>reward-service</name>
     <description>VOU Reward Management Service</description>
