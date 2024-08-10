@@ -8,5 +8,5 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     @Override
     List<Item> findAll();
-    Item findItemById(Long id);
+    Item findItemByIdItem(Long id_item);
 }

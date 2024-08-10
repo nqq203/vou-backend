@@ -18,6 +18,7 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+    // TODO: handle id_item = 0;
     public int createItem(CreateItemRequest createItemRequest) {
         try {
             Item item = new Item();
@@ -34,7 +35,7 @@ public class ItemService {
 
     public Item getItemById(Long id) {
         try {
-            Item itemFound = itemRepository.findItemById(id);
+            Item itemFound = itemRepository.findItemByIdItem(id);
             if (itemFound == null) {
                 return null;
             }
@@ -46,7 +47,7 @@ public class ItemService {
 
     public Integer updateItemById(Long id, CreateItemRequest createItemRequest) {
         try {
-            Item itemFound = itemRepository.findItemById(id);
+            Item itemFound = itemRepository.findItemByIdItem(id);
             if (itemFound == null) {
                 return HttpStatus.NOT_FOUND;
             } else {
@@ -69,9 +70,10 @@ public class ItemService {
         }
     }
 
+    // TODO: Delete from itemrepo first
     public Integer deleteItemById(Long id) {
         try {
-            Item itemFound = itemRepository.findItemById(id);
+            Item itemFound = itemRepository.findItemByIdItem(id);
             if (itemFound == null) {
                 return HttpStatus.NOT_FOUND;
             }
