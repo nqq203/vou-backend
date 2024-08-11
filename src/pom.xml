@@ -14,7 +14,7 @@
         <module>event-service</module>
         <module>game-service</module>
         <module>notification-service</module>
-        <module>reward-service</module>
+        <module>inventory-and-rewards-service</module>
         <module>statistics-service</module>
         <module>streaming-service</module>
         <module>turn-service</module>
