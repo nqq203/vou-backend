@@ -1,4 +1,4 @@
-package com.VOU.event_service.common;
+package com.vou.event_service.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,11 @@ public class SuccessResponse {
         this.message = message;
         this.code = status.value();
         this.metadata = metadata;
+    }
+
+    public SuccessResponse(String message, HttpStatus status) {
+        this.message = message;
+        this.code = status.value();
     }
 
     // Getters and Setters
