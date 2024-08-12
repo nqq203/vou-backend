@@ -1,4 +1,4 @@
-package com.VOU.event_service.repository;
+package com.vou.event_service.repository;
 
 import com.VOU.event_service.model.FavouriteEvent;
 import org.springframework.data.jpa.repository.JpaRepository;

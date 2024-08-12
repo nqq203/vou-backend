@@ -1,9 +1,12 @@
-package com.VOU.event_service.model;
+package com.vou.event_service.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import java.sql.Timestamp;
 
-import java.util.Date;
-
+@Getter
+@Setter
 @Entity
 @Table(name = "event")
 public class Event {
@@ -22,68 +25,8 @@ public class Event {
     private Integer numberOfVouchers;
 
     @Column(name = "start_date", nullable = false)
-    private Date startDate;
+    private Timestamp startDate;
 
     @Column(name = "end_date", nullable = false)
-    private Date endDate;
-
-    public Event() {
-    }
-
-    public Event(Long idEvent, String eventName, String imageUrl, Integer numberOfVouchers, Date startDate, Date endDate) {
-        this.idEvent = idEvent;
-        this.eventName = eventName;
-        this.imageUrl = imageUrl;
-        this.numberOfVouchers = numberOfVouchers;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
-    public Long getIdEvent() {
-        return idEvent;
-    }
-
-    public void setIdEvent(Long idEvent) {
-        this.idEvent = idEvent;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Integer getNumberOfVouchers() {
-        return numberOfVouchers;
-    }
-
-    public void setNumberOfVouchers(Integer numberOfVouchers) {
-        this.numberOfVouchers = numberOfVouchers;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
+    private Timestamp endDate;
 }
