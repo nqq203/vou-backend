@@ -5,33 +5,29 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 public class Session {
-    private Long id;
-    private String token;
+    private String idSession;
+    private Long idUser;
     private boolean isActive;
-
-    @Column
     private LocalDateTime logoutAt;
+    private LocalDateTime expirationTime;
 
-    private LocalDateTime expiration;
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    public String getIdSession() {
+        return idSession;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdSession(String idSession) {
+        this.idSession = idSession;
     }
 
-    public String getToken() {
-        return token;
+    public Long getIdUser() {
+        return idUser;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
     }
 
-    public boolean getActive() {
+    public boolean isActive() {
         return isActive;
     }
 
@@ -47,11 +43,11 @@ public class Session {
         this.logoutAt = logoutAt;
     }
 
-    public LocalDateTime getExpiration() {
-        return expiration;
+    public LocalDateTime getExpirationTime() {
+        return expirationTime;
     }
 
-    public void setExpiration(LocalDateTime expiration) {
-        this.expiration = expiration;
+    public void setExpirationTime(LocalDateTime expirationTime) {
+        this.expirationTime = expirationTime;
     }
 }

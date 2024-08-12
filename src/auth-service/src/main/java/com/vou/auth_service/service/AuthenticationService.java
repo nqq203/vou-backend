@@ -44,9 +44,10 @@ public class AuthenticationService {
             String token = jwtService.generateToken(user);
             Date expirationDate = jwtService.getExpirationDateFromToken(token);
             Session session = new Session();
-            session.setToken(token);
+            session.setIdSession(token);
+            session.setIdUser(user.getIdUser());
             session.setActive(true);
-            session.setExpiration(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+            session.setExpirationTime(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
             Session savedSession = client.createSession(session);
             if (savedSession == null) {
                 return null;
@@ -68,9 +69,10 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
         Date expirationDate = jwtService.getExpirationDateFromToken(token);
         Session session = new Session();
-        session.setToken(token);
+        session.setIdSession(token);
+        session.setIdUser(user.getIdUser());
         session.setActive(true);
-        session.setExpiration(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+        session.setExpirationTime(expirationDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
         Session savedSession = client.createSession(session);
         if (savedSession == null) {
             return null;
@@ -93,7 +95,7 @@ public class AuthenticationService {
         return registrationService.register(user);
     }
 
-    public boolean logout(String token) {
+    public boolean logout(String token, Long idUser) {
         System.out.println(token);
         if (jwtService.validateTokenAndGetUsername(token) != null) {
             Optional<Session> sessionRes = client.getSessionByToken(token);
@@ -101,6 +103,9 @@ public class AuthenticationService {
                 return false;
             }
             Session session = sessionRes.get();
+            if (!session.getIdUser().toString().equals(idUser.toString())) {
+                return false;
+            }
             session.setActive(false);
             session.setLogoutAt(LocalDateTime.now());
             Session updatedSession = client.updateSession(session);
@@ -121,7 +126,7 @@ public class AuthenticationService {
         else {
             Session session = sessionRes.get();
             System.out.println("token true");
-            return !session.getActive();
+            return !session.isActive();
         }
     }
 
@@ -159,8 +164,8 @@ public class AuthenticationService {
         boolean isValidToken = jwtService.validateToken(token);
         if (sessionRes.isPresent() && isValidToken) {
             Session session = sessionRes.get();
-            System.out.println(session.getId().toString());
-            return session.getActive();
+            System.out.println(session.getIdSession());
+            return session.isActive();
         }
         return false;
     }

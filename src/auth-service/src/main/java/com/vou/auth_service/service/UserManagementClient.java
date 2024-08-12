@@ -161,7 +161,7 @@ public class UserManagementClient {
         try {
             HttpEntity<Session> requestEntity = new HttpEntity<>(session);
             ResponseEntity<Session> response = restTemplate.exchange(
-                    userServiceUrl + "/session/" + session.getToken(),
+                    userServiceUrl + "/session/" + session.getIdSession(),
                     HttpMethod.PUT,
                     requestEntity,
                     Session.class);

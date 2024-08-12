@@ -7,7 +7,7 @@ public class ResendOtpRequest {
 
     }
 
-    public ResendOtpRequest(String username, String email) {
+    public ResendOtpRequest(String username) {
         this.username = username;
     }
 

@@ -27,11 +27,15 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         System.out.println("Attempting to log in user: " + loginRequest.getUsername());
+        if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(new BadRequest("Not found username or password"));
+        }
+
         String token = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Invalid username or password!",
+                    .body(new ErrorResponse("Invalid username or password",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
@@ -41,7 +45,14 @@ public class AuthenticationController {
                             HttpStatus.UNAUTHORIZED, null));
         }
 
-        LoginResponse loginResponse = new LoginResponse(token);
+
+        User user = authenticationService.loadUserByUsername(loginRequest.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
+        }
+
+        Long id = user.getIdUser();
+        LoginResponse loginResponse = new LoginResponse(token, id);
         return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
     }
 
@@ -80,12 +91,12 @@ public class AuthenticationController {
     }
 
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token, @RequestBody LogoutRequest logoutRequest) {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        boolean result = authenticationService.logout(token);
+        boolean result = authenticationService.logout(token, logoutRequest.getIdUser());
         System.out.println("logout boolean:" + result);
         if (result) {
             System.out.println("Vao result");
@@ -107,8 +118,13 @@ public class AuthenticationController {
         System.out.println(isVerified);
         if (isVerified) {
             String token = authenticationService.loginWithoutPassword(username);
+            User user = authenticationService.loadUserByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
+            }
+            Long id = user.getIdUser();
             if (token != null) {
-                LoginResponse loginResponse = new LoginResponse(token);
+                LoginResponse loginResponse = new LoginResponse(token, id);
                 return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
             }
             else {

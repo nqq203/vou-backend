@@ -92,6 +92,9 @@ services:
       SPRING_MAIL_PASSWORD: ljkwzpvsurwnejai
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
+      SPRING_PROFILES_ACTIVE: prod
     networks:  
       - microservices-network
 

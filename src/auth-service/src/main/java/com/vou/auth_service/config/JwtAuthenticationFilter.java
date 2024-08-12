@@ -21,35 +21,35 @@ import java.util.List;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-//    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
     @Autowired
     private AuthenticationService authenticationService;
     public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
-//    private static final List<String> AUTH_WHITELIST = List.of(
-//            "/api/v1/auth/login",
-//            "/api/v1/auth/register",
-//            "/api/v1/auth/verify-otp/**",
-//            "/api/v1/auth/resend-otp",
-//            "/api/v1/auth/validate-token"
-//    );
+    private static final List<String> AUTH_WHITELIST = List.of(
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/api/v1/auth/verify-otp/**",
+            "/api/v1/auth/resend-otp",
+            "/api/v1/auth/validate-token"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-//            System.out.println("JwtAuthenticationFilter is called");
-//            String requestPath = request.getRequestURI();
-//
-//            // Check if the request URI matches any whitelist pattern
-//            boolean isWhitelisted = AUTH_WHITELIST.stream()
-//                    .anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
-//
-//            if (isWhitelisted) {
-//                filterChain.doFilter(request, response);
-//                return;
-//            }
+            System.out.println("JwtAuthenticationFilter is called");
+            String requestPath = request.getRequestURI();
+
+            // Check if the request URI matches any whitelist pattern
+            boolean isWhitelisted = AUTH_WHITELIST.stream()
+                    .anyMatch(pattern -> pathMatcher.match(pattern, requestPath));
+
+            if (isWhitelisted) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             System.out.println("JwtAuthenticationFilter is called second");
             String token = request.getHeader("Authorization");
@@ -83,7 +83,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.getWriter().flush();
                     return;
                 }
+            } else {
+                // Handle missing token
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json");
+                String jsonResponse = "{\"error\":\"Access denied\", \"message\": \"Not found endpoint\", \"code\":400}";
+                response.getWriter().write(jsonResponse);
+                response.getWriter().flush();
+                return; // Stop filter chain, do not continue to other filters
             }
+
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             throw new RuntimeException("Authentication error", e);

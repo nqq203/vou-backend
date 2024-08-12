@@ -105,7 +105,7 @@ public class UserService {
     }
 
     public Session findSessionByToken(String token) {
-        return sessionRepository.findByToken(token).orElse(null);
+        return sessionRepository.findByIdSession(token).orElse(null);
     }
 
     public Session updateSession(Session session) {
