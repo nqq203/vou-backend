@@ -1,7 +1,6 @@
 package com.vou.auth_service.model;
 import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     private Long idUser;
     private String username;
@@ -26,9 +24,7 @@ public class User {
     private String email;
     private String phoneNumber;
     private LocalDateTime lockedDate;
-    @Enumerated(EnumType.STRING)
     private Role role;
-    @Enumerated(EnumType.STRING)
     private Status status;
 
     public User() {

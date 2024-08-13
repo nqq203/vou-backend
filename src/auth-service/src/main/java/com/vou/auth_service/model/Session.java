@@ -1,7 +1,5 @@
 package com.vou.auth_service.model;
 
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 public class Session {

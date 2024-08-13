@@ -18,7 +18,7 @@ public class ApiGatewayConfiguration {
                 .route("auth-service", r -> r.path("/api/v1/auth/**")
                         .uri("lb://auth-service")
                 )
-                .route("user-service", r -> r.path("/api/v1/user/**")
+                .route("user-service", r -> r.path("/api/v1/users/**")
                         .filters(f -> f.filter(new AuthenticationFilter(webClientBuilder)))
                         .uri("lb://user-service")
                 )

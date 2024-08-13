@@ -23,12 +23,9 @@ public class AuthenticationService {
     private JwtService jwtService;
     @Autowired
     private RegistrationFactory registrationFactory;
-    @Autowired
-    private OtpService otpService;
-
 
     public String login(String username, String password) {
-        Optional<User> response = client.getUserByUsername(username);
+        Optional<User> response = client.getUserByIdentifier(username);
 
         if (!response.isPresent()) {
             return null;
@@ -59,7 +56,7 @@ public class AuthenticationService {
 
     // After verified otp, we will use this function to log in
     public String loginWithoutPassword(String username) {
-        Optional<User> response = client.getUserByUsername(username);
+        Optional<User> response = client.getUserByIdentifier(username);
 
         if (!response.isPresent()) {
             return null;
@@ -97,42 +94,37 @@ public class AuthenticationService {
 
     public boolean logout(String token, Long idUser) {
         System.out.println(token);
+        System.out.println(jwtService.validateTokenAndGetUsername(token));
         if (jwtService.validateTokenAndGetUsername(token) != null) {
-            Optional<Session> sessionRes = client.getSessionByToken(token);
-            if (!sessionRes.isPresent()) {
+            Session session = client.getSessionByToken(token);
+            System.out.println("valide token");
+            System.out.println(session);
+            if (session == null) {
                 return false;
             }
-            Session session = sessionRes.get();
             if (!session.getIdUser().toString().equals(idUser.toString())) {
                 return false;
             }
             session.setActive(false);
             session.setLogoutAt(LocalDateTime.now());
             Session updatedSession = client.updateSession(session);
-            if (updatedSession == null) {
-                return false;
-            }
-            return true;
+            return updatedSession != null;
         }
         return false;
     }
 
     public boolean isTokenBlackListed(String token) {
-        Optional<Session> sessionRes = client.getSessionByToken(token);
-        if (!sessionRes.isPresent()) {
+        Session session = client.getSessionByToken(token);
+        if (session == null) {
             System.out.println("token false");
             return false;
         }
-        else {
-            Session session = sessionRes.get();
-            System.out.println("token true");
-            return !session.isActive();
-        }
+        System.out.println("token true");
+        return !session.isActive();
     }
 
     public User loadUserByUsername(String username) {
-        Optional<User> userRes = client.getUserByUsername(username);
-        return userRes.get();
+        return client.getUserByIdentifier(username).orElse(null);
     }
 
     public boolean verifyOtp(String username, String otp) {
@@ -146,7 +138,7 @@ public class AuthenticationService {
     }
 
     public boolean changePassword(String email, String newPassword) {
-        Optional<User> userRes = client.getUserByEmail(email);
+        Optional<User> userRes = client.getUserByIdentifier(email);
         if (!userRes.isPresent()) {
             return false;
         }
@@ -154,16 +146,15 @@ public class AuthenticationService {
         User user = userRes.get();
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
-        client.updateUserInternal(user);
-        return true;
+        User updatedUser = client.updateUserInternal(user);
+        return updatedUser != null;
     }
 
     public boolean validateToken(String token) {
-        Optional<Session> sessionRes = client.getSessionByToken(token);
+        Session session = client.getSessionByToken(token);
         System.out.println("vao validate token o jwt service 2");
         boolean isValidToken = jwtService.validateToken(token);
-        if (sessionRes.isPresent() && isValidToken) {
-            Session session = sessionRes.get();
+        if (session != null && isValidToken) {
             System.out.println(session.getIdSession());
             return session.isActive();
         }

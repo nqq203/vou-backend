@@ -23,8 +23,8 @@ public class PlayerRegistration implements IRegistration {
 
     @Override
     public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByUsername(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByEmail(user.getEmail());
+        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
+        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
         if (existingUserByUsername.isPresent()) {
             return false;
         }
@@ -67,7 +67,7 @@ public class PlayerRegistration implements IRegistration {
         }
 
         // Retrieve the user using the username
-        Optional<User> optionalUser = client.getUserByUsername(username);
+        Optional<User> optionalUser = client.getUserByIdentifier(username);
         if (!optionalUser.isPresent()) {
             System.out.println("No user found with username: " + username);
             return false;
@@ -75,12 +75,12 @@ public class PlayerRegistration implements IRegistration {
 
         User user = optionalUser.get();
         user.setStatus(Status.ACTIVE);
-        return client.updateUserInternal(user);
+        return client.updateUserInternal(user) != null;
     }
 
     @Override
     public String resendOtp(String username, String email) {
-        Optional<User> existingUserByUsername = client.getUserByUsername(username);
+        Optional<User> existingUserByUsername = client.getUserByIdentifier(username);
         User user = null;
         if (existingUserByUsername.isPresent()) {
             user = existingUserByUsername.get();

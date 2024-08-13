@@ -35,12 +35,10 @@ public class UserService {
         } catch (Exception e) {
             throw new Exception("Error updating user", e);
         }
+        System.out.println("User updating: " + updates);
         if (updatedUser != null) {
             updates.forEach((key, value) -> {
                 switch(key) {
-                    case "idUser":
-                        updatedUser.setIdUser((Long) value);
-                        break;
                     case "username":
                         updatedUser.setUsername((String) value);
                         break;
@@ -60,10 +58,12 @@ public class UserService {
                         updatedUser.setLockedDate((LocalDateTime) value);
                         break;
                     case "role":
-                        updatedUser.setRole((Role) value);
+                        Role role = checkRole((String) value);
+                        updatedUser.setRole(role);
                         break;
                     case "status":
-                        updatedUser.setStatus((Status) value);
+                        Status status = checkStatus((String) value);
+                        updatedUser.setStatus(status);
                     default:
                         break;
                 }
@@ -74,6 +74,22 @@ public class UserService {
 
         userRepository.save(updatedUser);
         return updatedUser;
+    }
+
+    private Role checkRole(String role) {
+        if (role.equals("BRAND"))
+            return Role.BRAND;
+        else if (role.equals("ADMIN"))
+            return Role.ADMIN;
+        return Role.PLAYER;
+    }
+
+    private Status checkStatus(String status) {
+        if (status.equals("PENDING"))
+            return Status.PENDING;
+        else if (status.equals("INACTIVE"))
+            return Status.INACTIVE;
+        return Status.ACTIVE;
     }
 
     public User createUser(User user) throws Exception {

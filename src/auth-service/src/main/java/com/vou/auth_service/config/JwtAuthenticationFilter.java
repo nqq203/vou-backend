@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -72,7 +73,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (isValidToken) {
                     System.out.println("In JWT config: valid token and username");
                     User user = authenticationService.loadUserByUsername(username);
-                    UserCredential userCredential = new UserCredential(user.getUsername(), user.getPassword());
+                    List<String> roles = Collections.<String> emptyList();
+                    UserCredential userCredential = new UserCredential(user.getUsername(), user.getPassword(), roles);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, userCredential.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {

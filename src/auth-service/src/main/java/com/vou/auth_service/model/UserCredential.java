@@ -1,7 +1,4 @@
 package com.vou.auth_service.model;
-
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.FetchType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,12 +12,12 @@ import java.util.stream.Collectors;
 public class UserCredential implements UserDetails {
     private String username;
     private String password;
-    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
-    public UserCredential(String username, String password) {
+    public UserCredential(String username, String password, List<String> roles) {
         this.username = username;
         this.password = password;
+        this.roles = roles;
     }
 
     public void addRole(String role) {
