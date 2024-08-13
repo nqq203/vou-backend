@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User implements UserDetails {
+public class User {
     private Long idUser;
     private String username;
     private String password;
@@ -41,13 +41,9 @@ public class User implements UserDetails {
         this.status = status;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles;
+
 
     // Getters and setters...
-    public void addRole(String role) {
-        this.roles.add(role);
-    }
 
     public Long getIdUser() {
         return idUser;
@@ -113,43 +109,12 @@ public class User implements UserDetails {
         this.status = status;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Optional.ofNullable(roles)
-                .orElseGet(Collections::emptyList)
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public String getPassword() {
         return password;
     }
 
-    @Override
     public String getUsername() {
         return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.vou.auth_service.config;
 
 import com.vou.auth_service.model.User;
+import com.vou.auth_service.model.UserCredential;
 import com.vou.auth_service.service.AuthenticationService;
 import com.vou.auth_service.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -71,7 +72,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (isValidToken) {
                     System.out.println("In JWT config: valid token and username");
                     User user = authenticationService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, user.getAuthorities());
+                    UserCredential userCredential = new UserCredential(user.getUsername(), user.getPassword());
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, userCredential.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     System.out.println("Session is inactive or does not exist.");
