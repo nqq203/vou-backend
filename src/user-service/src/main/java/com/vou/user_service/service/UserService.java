@@ -1,5 +1,7 @@
 package com.vou.user_service.service;
 
+import com.vou.user_service.common.NotFoundException;
+import com.vou.user_service.constant.Regex;
 import com.vou.user_service.constant.Role;
 import com.vou.user_service.constant.Status;
 import com.vou.user_service.model.*;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -24,8 +28,13 @@ public class UserService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    public User updateUser(Long userId, Map<String, Object> updates) {
-        User updatedUser = userRepository.findById(userId).orElse(null);
+    public User updateUser(Long userId, Map<String, Object> updates) throws Exception{
+        User updatedUser;
+        try {
+            updatedUser = userRepository.findById(userId).orElse(null);
+        } catch (Exception e) {
+            throw new Exception("Error updating user", e);
+        }
         if (updatedUser != null) {
             updates.forEach((key, value) -> {
                 switch(key) {
@@ -59,49 +68,104 @@ public class UserService {
                         break;
                 }
             });
+        } else {
+            throw new NotFoundException("User not found");
         }
 
         userRepository.save(updatedUser);
         return updatedUser;
     }
 
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public User createUser(User user) throws Exception {
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new Exception("Error creating new user", e);
+        }
     }
 
-    public Admin createAdmin(Admin admin) {
-        return adminRepository.save(admin);
+    public Admin createAdmin(Admin admin) throws Exception {
+        try {
+            return adminRepository.save(admin);
+        } catch (Exception e) {
+            throw new Exception("Error creating new admin");
+        }
     }
 
-    public Player createPlayer(Player player) {
-        return playerRepository.save(player);
+    public Player createPlayer(Player player) throws Exception {
+        try {
+            return playerRepository.save(player);
+        } catch (Exception e) {
+            throw new Exception("Error creating new player");
+        }
     }
 
-    public Brand createBrand(Brand brand) {
-        return brandRepository.save(brand);
+    public Brand createBrand(Brand brand) throws Exception {
+        try {
+            return brandRepository.save(brand);
+        } catch (Exception e) {
+            throw new Exception("Error creating new brand");
+        }
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByIdentifier(String identifier) throws Exception{
+        Pattern emailPattern = Pattern.compile(Regex.EMAIL_REGEX);
+        Matcher matcher = emailPattern.matcher(identifier);
+        User userFound = null;
+        try {
+            if (matcher.matches()) {
+                userFound = userRepository.findByEmail(identifier);
+            } else {
+                userFound = userRepository.findByUsername(identifier);
+            }
+        } catch (Exception e) {
+            throw new Exception("Error finding user by email or username", e);
+        }
+        if (userFound != null) {
+            return userFound;
+        } else
+            throw new NotFoundException("User not found");
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-    public User findByIdUser(Long userId){
-        return userRepository.findByIdUser(userId);
+    public User findByIdUser(Long userId) throws Exception {
+        User userFound;
+        try {
+            userFound = userRepository.findByIdUser(userId);
+
+        } catch (Exception e) {
+            throw new Exception("Error finding user by id", e);
+        }
+        if (userFound == null)
+            throw new NotFoundException("User not found");
+        return userFound;
     }
 
-    public Player findPlayerByUserId(Long id) {
-        return playerRepository.findByIdUser(id);
+    public Player findPlayerByUserId(Long id) throws Exception {
+        Player playerFound;
+        try {
+            playerFound = playerRepository.findByIdUser(id);
+        } catch (Exception e) {
+            throw new Exception("Error finding player");
+        }
+        if (playerFound == null)
+            throw new NotFoundException("Player not found");
+        return playerFound;
     }
 
-    public Player updatePlayer(Player player) {
-        return playerRepository.save(player);
+    public Player updatePlayer(Player player) throws Exception {
+        try {
+            return playerRepository.save(player);
+        } catch (Exception e) {
+            throw new Exception("Error update player", e);
+        }
     }
 
-    public Session createSession(Session session) {
-        return sessionRepository.save(session);
+    public Session createSession(Session session) throws Exception {
+        try {
+            return sessionRepository.save(session);
+        } catch (Exception e) {
+            throw new Exception("Error creating new session", e);
+        }
     }
 
     public Session findSessionByToken(String token) {
