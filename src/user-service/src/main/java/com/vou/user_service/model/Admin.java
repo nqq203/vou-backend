@@ -1,4 +1,5 @@
-package com.vou.user_service.model;
+us
+        package com.vou.user_service.model;
 
 import com.vou.user_service.constant.Status;
 import jakarta.persistence.Entity;

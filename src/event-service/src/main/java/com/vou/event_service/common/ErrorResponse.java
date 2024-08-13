@@ -1,4 +1,4 @@
-package com.VOU.event_service.common;
+package com.vou.event_service.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
