@@ -29,7 +29,7 @@ public class SessionCleanupService {
 
         List<Session> sessions = optionalSessions.get();
         for (Session session : sessions) {
-            if (session.getExpiration().isBefore(now) && session.isActive()) {
+            if (session.getExpirationTime().isBefore(now) && session.isActive()) {
                 session.setActive(false);
                 client.updateSession(session);
             }

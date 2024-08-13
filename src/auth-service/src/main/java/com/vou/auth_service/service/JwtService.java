@@ -1,5 +1,6 @@
 package com.vou.auth_service.service;
 
+import com.vou.auth_service.model.Session;
 import com.vou.auth_service.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,10 +12,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Base64;
+import java.util.*;
+
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -84,6 +83,18 @@ public class JwtService {
         } catch (Exception e) {
             System.out.println("Could not extract expiration date from token: " + e.toString());
             return null;
+        }
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getKey())
+                    .parseClaimsJws(token)
+                    .getBody();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

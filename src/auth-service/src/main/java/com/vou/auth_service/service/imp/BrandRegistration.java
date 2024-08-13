@@ -22,8 +22,8 @@ public class BrandRegistration implements IRegistration {
 
     @Override
     public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByUsername(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByEmail(user.getEmail());
+        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
+        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
         if (existingUserByUsername.isPresent()) {
             return false;
         }
@@ -48,7 +48,7 @@ public class BrandRegistration implements IRegistration {
     }
 
     @Override
-    public String resendOtp(String email) {
+    public String resendOtp(String username, String email) {
         return null;
     }
 }

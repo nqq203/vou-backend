@@ -3,13 +3,11 @@ package com.vou.auth_service.controller;
 import com.vou.auth_service.common.*;
 import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.entity.ChangePasswordRequest;
-import com.vou.auth_service.entity.LoginRequest;
-import com.vou.auth_service.entity.LoginResponse;
-import com.vou.auth_service.entity.RegisterRequest;
+import com.vou.auth_service.entity.*;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +27,15 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         System.out.println("Attempting to log in user: " + loginRequest.getUsername());
+        if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(new BadRequest("Not found username or password"));
+        }
+
         String token = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Invalid username or password!",
+                    .body(new ErrorResponse("Invalid username or password",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
@@ -43,7 +45,14 @@ public class AuthenticationController {
                             HttpStatus.UNAUTHORIZED, null));
         }
 
-        LoginResponse loginResponse = new LoginResponse(token);
+
+        User user = authenticationService.loadUserByUsername(loginRequest.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
+        }
+
+        Long id = user.getIdUser();
+        LoginResponse loginResponse = new LoginResponse(token, id);
         return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
     }
 
@@ -82,12 +91,12 @@ public class AuthenticationController {
     }
 
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token, @RequestBody LogoutRequest logoutRequest) {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        boolean result = authenticationService.logout(token);
+        boolean result = authenticationService.logout(token, logoutRequest.getIdUser());
         System.out.println("logout boolean:" + result);
         if (result) {
             System.out.println("Vao result");
@@ -102,12 +111,20 @@ public class AuthenticationController {
 //    public ResponseEntity<?> verifyOtp(@RequestParam String username, @RequestParam String otp) {
     public ResponseEntity<?> verifyOtp(@RequestParam String username, @RequestParam String otp) {
         System.out.println("vao verity-otp");
+        if (otp.length() != 6) {
+            return ResponseEntity.badRequest().body(new BadRequest("Invalid OTP"));
+        }
         boolean isVerified = authenticationService.verifyOtp(username, otp);
         System.out.println(isVerified);
         if (isVerified) {
             String token = authenticationService.loginWithoutPassword(username);
+            User user = authenticationService.loadUserByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
+            }
+            Long id = user.getIdUser();
             if (token != null) {
-                LoginResponse loginResponse = new LoginResponse(token);
+                LoginResponse loginResponse = new LoginResponse(token, id);
                 return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
             }
             else {
@@ -120,9 +137,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<?> resendOtp(@RequestParam String email) {
+    public ResponseEntity<?> resendOtp(@RequestBody ResendOtpRequest resendOtpRequest) {
         System.out.println("In resend Otp");
-        String otp = authenticationService.resendOtp(email);
+        String otp = authenticationService.resendOtp(resendOtpRequest.getUsername(), null);
 
         if (otp != null) {
             return ResponseEntity.ok(new SuccessResponse("OTP resend successfully", HttpStatus.OK, null));
@@ -149,5 +166,18 @@ public class AuthenticationController {
         else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Changing password failed by server!"));
         }
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
+        System.out.println("In validate token");
+        System.out.println(token);
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        System.out.println(token);
+
+        boolean isValidToken = authenticationService.validateToken(token);
+        return ResponseEntity.ok(isValidToken);
     }
 }
