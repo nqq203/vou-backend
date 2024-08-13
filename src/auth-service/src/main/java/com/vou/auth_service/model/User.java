@@ -2,6 +2,8 @@ package com.vou.auth_service.model;
 import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails {
     private Long idUser;

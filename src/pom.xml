@@ -20,5 +20,6 @@
         <module>turn-service</module>
         <module>api-gateway</module>
         <module>service-registry</module>
+        <module>user-service</module>
     </modules>
 </project>
