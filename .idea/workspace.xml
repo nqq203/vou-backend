@@ -4,13 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cafa6a5-6547-4aad-bfda-6dcc5dbb656c" name="Changes" comment="" />
+    <list default="true" id="4cafa6a5-6547-4aad-bfda-6dcc5dbb656c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/notification-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/notification-service/pom.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="KubernetesApiProvider">{
@@ -38,7 +45,8 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "dev",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/main/Code/SoftwareArchitecture/Code/vou-backend/src",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/huyna/Documents/VOU_Backend/vou-backend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

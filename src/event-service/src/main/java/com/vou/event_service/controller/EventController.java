@@ -3,6 +3,7 @@ package com.vou.event_service.controller;
 import com.vou.event_service.common.*;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.service.EventProducer;
 import com.vou.event_service.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @GetMapping("")
     public ResponseEntity<?> fetchEvent(){
         try {
@@ -26,6 +30,23 @@ public class EventController {
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
         }
+    }
+
+//    @PostMapping("")
+//    public ResponseEntity<?> createEvent(@RequestBody CreateEventRequest request){
+//        try {
+//            Event result = eventService.createEvent(request);
+//            eventReposotory.save(event);
+//            //handle send message to notification
+//            // catch table
+//
+//            eventProducer.sendMessage("Event is created!!!");
+//
+//            return ResponseEntity.ok(new SuccessResponse("Create event successfully", HttpStatus.OK,"" ));
+//            return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
+//        }
     }
 
     @PostMapping("")

@@ -17,4 +17,5 @@ public class CreateEventRequest {
     private Timestamp startDate;
 
     private Timestamp endDate;
+
 }
