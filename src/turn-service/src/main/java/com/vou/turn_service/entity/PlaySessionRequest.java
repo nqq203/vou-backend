@@ -1,6 +1,11 @@
 package com.vou.turn_service.entity;
 
-public class CreateTurnRequest {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class PlaySessionRequest {
     Long idPlayer;
     Long idGame;
     int score;
