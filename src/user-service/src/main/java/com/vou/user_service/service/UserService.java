@@ -1,6 +1,7 @@
 package com.vou.user_service.service;
 
 import com.vou.user_service.common.NotFoundException;
+import com.vou.user_service.constant.Gender;
 import com.vou.user_service.constant.Regex;
 import com.vou.user_service.constant.Role;
 import com.vou.user_service.constant.Status;
@@ -28,7 +29,7 @@ public class UserService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    public User updateUser(Long userId, Map<String, Object> updates) throws Exception{
+    public User updateUser(Long userId, Map<String, Object> updates) throws Exception {
         User updatedUser;
         try {
             updatedUser = userRepository.findById(userId).orElse(null);
@@ -38,7 +39,7 @@ public class UserService {
         System.out.println("User updating: " + updates);
         if (updatedUser != null) {
             updates.forEach((key, value) -> {
-                switch(key) {
+                switch (key) {
                     case "username":
                         updatedUser.setUsername((String) value);
                         break;
@@ -64,6 +65,43 @@ public class UserService {
                     case "status":
                         Status status = checkStatus((String) value);
                         updatedUser.setStatus(status);
+                        // Các trường đặc thù cho Brand
+                    case "logo_url":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setLogo_url((String) value);
+                        }
+                        break;
+                    case "field":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setField((String) value);
+                        }
+                        break;
+                    case "latitude":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setLatitude((Double) value);
+                        }
+                        break;
+                    case "longitude":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setLongitude((Double) value);
+                        }
+                        break;
+                    // Các trường đặc thù cho Player
+                    case "avatarUrl":
+                        if (updatedUser instanceof Player) {
+                            ((Player) updatedUser).setAvatarUrl((String) value);
+                        }
+                        break;
+                    case "gender":
+                        if (updatedUser instanceof Player) {
+                            ((Player) updatedUser).setGender(Gender.valueOf((String) value));
+                        }
+                        break;
+                    case "facebookUrl":
+                        if (updatedUser instanceof Player) {
+                            ((Player) updatedUser).setFacebookUrl((String) value);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -72,7 +110,16 @@ public class UserService {
             throw new NotFoundException("User not found");
         }
 
-        userRepository.save(updatedUser);
+        if (updatedUser instanceof Player && updatedUser.getRole() == Role.PLAYER) {
+            playerRepository.save((Player) updatedUser);
+        } else if (updatedUser instanceof Brand && updatedUser.getRole() == Role.BRAND) {
+            brandRepository.save((Brand) updatedUser);
+        } else if (updatedUser instanceof Admin && updatedUser.getRole() == Role.ADMIN) {
+            adminRepository.save((Admin) updatedUser);
+        } else {
+            userRepository.save(updatedUser);
+        }
+
         return updatedUser;
     }
 
@@ -124,7 +171,7 @@ public class UserService {
         }
     }
 
-    public User findByIdentifier(String identifier) throws Exception{
+    public User findByIdentifier(String identifier) throws Exception {
         Pattern emailPattern = Pattern.compile(Regex.EMAIL_REGEX);
         Matcher matcher = emailPattern.matcher(identifier);
         User userFound = null;

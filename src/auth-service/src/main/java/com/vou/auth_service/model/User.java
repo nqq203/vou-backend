@@ -41,6 +41,16 @@ public class User {
         this.status = status;
     }
 
+    public User(User user) {
+        this.idUser = user.getIdUser();
+        this.username = user.getUsername();
+        this.fullName = user.getFullName();
+        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
+        this.role = user.getRole();
+        this.status = user.getStatus();
+    }
+
 
 
     // Getters and setters...

@@ -1,5 +1,6 @@
 package com.vou.auth_service.service;
 
+import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
 import com.vou.auth_service.model.Session;
 import com.vou.auth_service.model.User;
@@ -33,7 +34,9 @@ public class AuthenticationService {
         User user = response.get();
 
         if (user.getStatus() != Status.ACTIVE) {
-            resendOtp(user.getUsername(), user.getEmail());
+            if (user.getRole() == Role.PLAYER) {
+                resendOtp(user.getUsername(), user.getEmail());
+            }
             return "invalid";
         }
 

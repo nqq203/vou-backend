@@ -7,7 +7,6 @@ import com.vou.auth_service.entity.*;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,8 +50,7 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
         }
 
-        Long id = user.getIdUser();
-        LoginResponse loginResponse = new LoginResponse(token, id);
+        LoginResponse loginResponse = new LoginResponse(token, new User(user));
         return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
     }
 
@@ -122,9 +120,8 @@ public class AuthenticationController {
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
             }
-            Long id = user.getIdUser();
             if (token != null) {
-                LoginResponse loginResponse = new LoginResponse(token, id);
+                LoginResponse loginResponse = new LoginResponse(token, new User(user));
                 return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
             }
             else {
