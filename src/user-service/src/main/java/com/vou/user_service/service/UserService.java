@@ -215,6 +215,30 @@ public class UserService {
         return playerFound;
     }
 
+    public Admin findAdminByUserId(Long id) throws Exception {
+        Admin adminFound;
+        try {
+            adminFound = adminRepository.findByIdUser(id);
+        } catch (Exception e) {
+            throw new Exception("Error finding player");
+        }
+        if (adminFound == null)
+            throw new NotFoundException("Player not found");
+        return adminFound;
+    }
+
+    public Brand findBrandByUserId(Long id) throws Exception {
+        Brand brandFound;
+        try {
+            brandFound = brandRepository.findByIdUser(id);
+        } catch (Exception e) {
+            throw new Exception("Error finding player");
+        }
+        if (brandFound == null)
+            throw new NotFoundException("Player not found");
+        return brandFound;
+    }
+
     public Player updatePlayer(Player player) throws Exception {
         try {
             return playerRepository.save(player);
@@ -246,5 +270,4 @@ public class UserService {
     public User updateUserInternal(User user) {
         return userRepository.save(user);
     }
-
 }

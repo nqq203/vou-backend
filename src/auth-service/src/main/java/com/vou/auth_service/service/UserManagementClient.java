@@ -20,7 +20,12 @@ import java.util.Optional;
 public class UserManagementClient {
 
     private final RestTemplate restTemplate;
-    private final String userServiceUrl = "http://user-service:8082/api/v1/users";
+    private final String userUrl = "http://user-service:8082/api/v1/users";
+    private final String playerUrl = "http://user-service:8082/api/v1/players";
+    private final String brandUrl = "http://user-service:8082/api/v1/brands";
+    private final String adminUrl = "http://user-service:8082/api/v1/admins";
+    private final String sessionUrl = "http://user-service:8082/api/v1/sessions";
+
 
     @Autowired
     public UserManagementClient(RestTemplateBuilder restTemplateBuilder) {
@@ -33,7 +38,7 @@ public class UserManagementClient {
 
     public Boolean createAdmin(Admin admin) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/admins", admin, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl + "/", admin, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -48,7 +53,7 @@ public class UserManagementClient {
 
     public Boolean createBrand(Brand brand) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/brands", brand, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl + "/", brand, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -63,7 +68,7 @@ public class UserManagementClient {
 
     public Boolean createPlayer(Player player) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/players", player, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(playerUrl + "/", player, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -81,7 +86,7 @@ public class UserManagementClient {
         try {
             HttpEntity<User> requestEntity = new HttpEntity<>(user);
             ResponseEntity<User> response = restTemplate.exchange(
-                    userServiceUrl + "/" + user.getIdUser(),
+                    userUrl + "/" + user.getIdUser(),
                     HttpMethod.PUT,
                     requestEntity,
                     User.class);
@@ -101,7 +106,7 @@ public class UserManagementClient {
 
     public Optional<User> getUserByIdentifier(String identifier) {
         try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/" + identifier, User.class);
+            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/" + identifier, User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
             }
@@ -140,12 +145,12 @@ public class UserManagementClient {
 //    }
 
     public Session createSession(Session session) {
-        return restTemplate.postForObject(userServiceUrl + "/sessions", session, Session.class);
+        return restTemplate.postForObject(sessionUrl + "/", session, Session.class);
     }
 
     public Session getSessionByToken(String token) {
         try {
-            ResponseEntity<Session> response = restTemplate.getForEntity(userServiceUrl + "/sessions/" + token, Session.class);
+            ResponseEntity<Session> response = restTemplate.getForEntity(sessionUrl + "/" + token, Session.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();
             }
@@ -161,7 +166,7 @@ public class UserManagementClient {
         try {
             HttpEntity<Session> requestEntity = new HttpEntity<>(session);
             ResponseEntity<Session> response = restTemplate.exchange(
-                    userServiceUrl + "/sessions/" + session.getIdSession(),
+                    sessionUrl + "/" + session.getIdSession(),
                     HttpMethod.PUT,
                     requestEntity,
                     Session.class);
@@ -181,7 +186,7 @@ public class UserManagementClient {
     public Optional<List<Session>> getListSession() {
         try {
             ResponseEntity<List<Session>> response = restTemplate.exchange(
-                    userServiceUrl + "/sessions",
+                    sessionUrl + "/",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<Session>>() {}

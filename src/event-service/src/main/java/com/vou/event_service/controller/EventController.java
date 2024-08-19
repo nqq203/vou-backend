@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/events")
+@CrossOrigin
 public class EventController {
 
     @Autowired
@@ -23,7 +24,7 @@ public class EventController {
     @Autowired
     private QuizService quizService;
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<?> fetchEvent(){
         try {
             List<Event> allEvents = eventService.getAllEvents();
@@ -33,7 +34,7 @@ public class EventController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
         List<QuizDTO> quizzes = event.getQuiz();
         CreateEventRequest request = new CreateEventRequest(
