@@ -19,7 +19,7 @@ public class QuizService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://localhost:8084/api/v1/game/quiz/create";
+    private final String QUIZ_SERVICE_URL = "http://game-streaming-service:8084/api/v1/game/quiz/create";
 
     public void createQuiz(List<QuizDTO> quizDTOList) {
         HttpHeaders headers = new HttpHeaders();
