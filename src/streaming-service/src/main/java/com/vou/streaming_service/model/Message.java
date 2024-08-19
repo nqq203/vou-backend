@@ -5,6 +5,8 @@
  */
 package com.vou.streaming_service.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +32,18 @@ public class Message extends BaseModel {
 
     private String username;
 
+
+    @Override
+    public String toString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Convert this object to a JSON string
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            // Handle error if conversion fails
+            e.printStackTrace();
+            return super.toString(); // Fallback to default toString if JSON conversion fails
+        }
+    }
 
 }
