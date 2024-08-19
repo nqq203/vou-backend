@@ -1,9 +1,12 @@
 package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
+import com.vou.event_service.dto.EventDTO;
+import com.vou.event_service.dto.QuizDTO;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.service.EventService;
+import com.vou.event_service.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,8 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+    @Autowired
+    private QuizService quizService;
 
     @GetMapping("")
     public ResponseEntity<?> fetchEvent(){
@@ -29,9 +34,18 @@ public class EventController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createEvent(@RequestBody CreateEventRequest request){
+    public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
+        List<QuizDTO> quizzes = event.getQuiz();
+        CreateEventRequest request = new CreateEventRequest(
+                event.getEventName(),
+                event.getImageUrl(),
+                event.getNumberOfVouchers(),
+                event.getStartDate(),
+                event.getEndDate()
+        );
         try {
             Event result = eventService.createEvent(request);
+            quizService.createQuiz(quizzes);
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());

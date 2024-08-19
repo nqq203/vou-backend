@@ -1,4 +1,4 @@
-package com.VOU.event_service.model;
+package com.vou.event_service.model;
 
 import jakarta.persistence.*;
 
