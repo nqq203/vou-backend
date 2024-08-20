@@ -3,8 +3,11 @@ package com.vou.event_service.controller;
 import com.vou.event_service.common.*;
 import com.vou.event_service.dto.EventDTO;
 import com.vou.event_service.dto.QuizDTO;
+import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
+import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.service.BrandsCooperationService;
 import com.vou.event_service.service.EventService;
 import com.vou.event_service.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private QuizService quizService;
+    @Autowired
+    private BrandsCooperationService brandsCooperationService;
 
     @GetMapping("/")
     public ResponseEntity<?> fetchEvent(){
@@ -44,8 +49,11 @@ public class EventController {
                 event.getStartDate(),
                 event.getEndDate()
         );
+        long brand_id = event.getBrandId();
         try {
             Event result = eventService.createEvent(request);
+            CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), brand_id);
+            brandsCooperationService.createBrandsCooperation(brandsCooperation);
             quizService.createQuiz(quizzes);
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
         } catch (Exception e) {

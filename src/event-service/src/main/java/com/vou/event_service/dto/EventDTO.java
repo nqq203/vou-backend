@@ -17,5 +17,6 @@ public class EventDTO {
     private int numberOfVouchers;
     private Timestamp startDate;
     private Timestamp endDate;
+    private int brandId;
     private List<QuizDTO> quiz;
 }
