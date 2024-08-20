@@ -15,6 +15,7 @@ import com.vou.streaming_service.model.Quiz;
 import com.vou.streaming_service.model.UserResult;
 import com.vou.streaming_service.socket.SocketService;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,7 @@ public class MessageService {
         List<String> players = list.keySet().stream()
                 .filter(key -> key.startsWith(room + "_"))
                 .map(key -> key.split("_")[1])
+                .filter(key -> !"SERVER".equals(key))
                 .collect(Collectors.toList());
 
         log.info("Players in room {}: {}", room, players);
@@ -98,11 +100,6 @@ public class MessageService {
 
     public void sendMessage(String room, String message, String senderUsername, String targetUsername,String TOPIC){
         socketService.sendMessage(room,message,senderUsername,targetUsername,TOPIC);
-    }
-
-
-    public void sendQuestion(String room, String ID){
-
     }
 
     public String startGame(){
@@ -204,10 +201,14 @@ public class MessageService {
 
         // Schedule the next question after 15 seconds
         ZonedDateTime nextQuestionTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(15);
-        eventSchedulerService.scheduleJob(nextQuestionTime.toLocalDateTime(),  () -> handleQuestionTimeout(room));
+        eventSchedulerService.scheduleJob(nextQuestionTime.toLocalDateTime(),  () -> {
+            log.info("Result");
+            handleQuestionTimeout(room);
+        });
     }
     private void handleQuestionTimeout(String room) {
         List<UserResult> results = calculateResults(room);
+        log.info ("Result {}",results.toString());
         sendMessage(room, results.toString(), "SERVER", null, "results");
         List<Quiz> quizzes = getQuizzes();
         if (quizzes.isEmpty()) {
@@ -219,63 +220,41 @@ public class MessageService {
         // Schedule sending question after 5 seconds
         ZonedDateTime sendResultsTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(5);
         eventSchedulerService.scheduleJob(sendResultsTime.toLocalDateTime(), () -> {
-            // Send the next question immediately after sending results
             sendNextQuestion(room);
         });
     }
     private List<UserResult> calculateResults(String room) {
         List<UserResult> results = new ArrayList<>();
         List<String> userIds = getPlayers(room);
-        Quiz currentQuiz = getCurrentQuiz();
 
         for (String userId : userIds) {
-            String answer = redisCache.get(room + "_" + userId);
-            boolean correct = isAnswerCorrect(answer, currentQuiz);
-            int score = calculateScore(correct); // You need to implement this method
-            long responseTime = getResponseTime(userId); // You need to implement this method
-
-            UserResult userResult = new UserResult(userId, score, answer, correct, responseTime);
+            String score = redisCache.get(room + "_" + userId);
+            log.info("{}: {}", userId, score);
+            UserResult userResult = new UserResult(userId, score);
             results.add(userResult);
         }
 
         return results;
     }
-    private int calculateScore(boolean correct) {
-        return correct ? 10 : 0; // 10 points for correct answer, 0 for incorrect
-    }
-    private long getResponseTime(String userId) {
-        String responseTimeKey = "responseTime:" + userId;
-        String responseTimeStr = redisCache.get(responseTimeKey);
-        if (responseTimeStr == null) {
-            return -1; // Indicates no response was recorded
+
+    public void calculateScore(JSONObject jsonObject){
+        String content = jsonObject.getString("content");
+        JSONObject contentJson = new JSONObject(content);
+        System.out.println("Data answer: " + contentJson);
+
+        // Extract the value of "isCorrect"
+        boolean isCorrect = contentJson.getBoolean("isCorrect");
+        System.out.println("Is Correct: " + isCorrect);
+        Integer timer = contentJson.getInt("timer");
+        Integer score =timer;
+        if (isCorrect){
+            score += 100;
         }
-        long responseTime = Long.parseLong(responseTimeStr);
-        redisCache.delete(responseTimeKey); // Clear the response time for the next question
-        return responseTime;
-    }
-    public void handleUserAnswer(String userId, String answer) {
-        // Save the user's answer in Redis
-        redisCache.set("answer:" + userId, answer);
+        String room = jsonObject.getString("room");
+        String username = jsonObject.getString("username");
+        String key = room + '_' + username;
 
-        // Save the response time
-        long responseTime = System.currentTimeMillis() - getQuestionStartTime();
-        redisCache.set("responseTime:" + userId, String.valueOf(responseTime));
-    }
-
-    private long getQuestionStartTime() {
-        String startTimeStr = redisCache.get("questionStartTime");
-        return startTimeStr != null ? Long.parseLong(startTimeStr) : 0;
-    }
-
-    private Quiz getCurrentQuiz() {
-        List<Quiz> quizzes = getQuizzes();
-        if (quizzes.isEmpty()) {
-            throw new IllegalStateException("No quizzes available");
-        }
-        return quizzes.get(0);
-    }
-    private boolean isAnswerCorrect(String answer, Quiz quiz) {
-        if (answer == null) return false;
-        return answer.equals(String.valueOf(quiz.getCorrectAnswerIndex()));
+        log.info("SCORE: {}", String.valueOf(score));
+        redisCache.set(key, String.valueOf(score));
     }
 }

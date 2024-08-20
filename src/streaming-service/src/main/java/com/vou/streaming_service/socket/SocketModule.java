@@ -48,19 +48,8 @@ public class SocketModule {
 
                 // Correct way to compare strings
                 if (jsonObject.getString("messageType").equals("ANSWER_QUIZ")) {
-                    String content = jsonObject.getString("content");
-                    JSONObject contentJson = new JSONObject(content);
-                    System.out.println("Data answer: " + contentJson);
-
-                    // Extract the value of "isCorrect"
-                    boolean isCorrect = contentJson.getBoolean("isCorrect");
-                    System.out.println("Is Correct: " + isCorrect);
-
-                    // You can handle `isCorrect` further if needed
+                    serviceService.calculateScore(jsonObject);
                 }
-
-                // Save the message (assuming your saveMessage method handles JSONObject data)
-                serviceService.saveMessage(jsonObject.getString("room"), jsonObject.getString("username"), jsonObject.getString("content"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,9 +64,7 @@ public class SocketModule {
             String username = params.get("username").stream().collect(Collectors.joining());
             client.joinRoom(room);
             log.info("Socket ID [{}] - room [{}] - username [{}] Connected to chat module", client.getSessionId(), room, username);
-
             serviceService.saveMessage(room, username, "0");
-
             serviceService.sendUserListUpdate(room);
         };
     }
