@@ -65,12 +65,14 @@ public class UserService {
                     case "status":
                         Status status = checkStatus((String) value);
                         updatedUser.setStatus(status);
-                        // Các trường đặc thù cho Brand
-                    case "logo_url":
-                        if (updatedUser instanceof Brand) {
-                            ((Brand) updatedUser).setLogo_url((String) value);
-                        }
                         break;
+                    case "avatarUrl":
+                        updatedUser.setAvatarUrl((String) value);
+                        break;
+                    case "address":
+                        updatedUser.setAddress((String) value);
+                        break;
+                        // Các trường đặc thù cho Brand
                     case "field":
                         if (updatedUser instanceof Brand) {
                             ((Brand) updatedUser).setField((String) value);
@@ -87,11 +89,6 @@ public class UserService {
                         }
                         break;
                     // Các trường đặc thù cho Player
-                    case "avatarUrl":
-                        if (updatedUser instanceof Player) {
-                            ((Player) updatedUser).setAvatarUrl((String) value);
-                        }
-                        break;
                     case "gender":
                         if (updatedUser instanceof Player) {
                             ((Player) updatedUser).setGender(Gender.valueOf((String) value));
@@ -244,6 +241,30 @@ public class UserService {
             return playerRepository.save(player);
         } catch (Exception e) {
             throw new Exception("Error update player", e);
+        }
+    }
+
+    public Boolean updateAvatarUser(Long idUser, String url) {
+        User updatedUser;
+        try {
+            updatedUser = userRepository.findById(idUser).orElse(null);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return false;
+        }
+        if (updatedUser != null) {
+            updatedUser.setAvatarUrl(url);
+            return true;
+        }
+        return false;
+    }
+
+    public List<User> findAllUsers() {
+        try {
+            return userRepository.findAll();
+        }
+        catch (Exception e) {
+            return null;
         }
     }
 

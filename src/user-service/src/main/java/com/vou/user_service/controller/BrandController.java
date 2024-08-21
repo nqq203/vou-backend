@@ -36,7 +36,7 @@ public class BrandController {
     public ResponseEntity<?> getBrandByUserId(@PathVariable Long userId) {
         try {
             Brand brand = userService.findBrandByUserId(userId);
-            return ResponseEntity.ok().body(new SuccessResponse("Get brand successfully", HttpStatus.OK, brand));
+            return ResponseEntity.ok(brand);
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Not found brand"));
         } catch (Exception e) {

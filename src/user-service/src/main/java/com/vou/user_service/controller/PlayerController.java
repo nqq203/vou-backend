@@ -25,7 +25,7 @@ public class PlayerController {
     public ResponseEntity<?> getPlayerByUserId(@PathVariable Long userId) {
         try {
             Player player = userService.findPlayerByUserId(userId);
-            return ResponseEntity.ok().body(new SuccessResponse("Get player successfully", HttpStatus.OK, player));
+            return ResponseEntity.ok(player);
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Not found player"));
         } catch (Exception e) {
