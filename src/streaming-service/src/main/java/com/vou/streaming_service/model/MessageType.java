@@ -6,5 +6,5 @@
 package com.vou.streaming_service.model;
 
 public enum MessageType {
-    CLIENT, SERVER
+    CLIENT, SERVER, ANSWER_QUIZ
 }

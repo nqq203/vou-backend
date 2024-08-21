@@ -90,6 +90,11 @@
             <artifactId>lettuce-core</artifactId>
             <version>6.4.0.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
 
     </dependencies>
     <dependencyManagement>

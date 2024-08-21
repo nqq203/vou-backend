@@ -52,21 +52,4 @@ public class SocketService {
 
 
 
-//    public void addUserToRoom(String room, String username) {
-//        String key = generateKey(room, username);
-//        messageService.addUserToRoom(key);
-////    }
-//
-//    public void sendUserListUpdate(String room) {
-//        List<String> users = messageService.getPlayers(room);
-//        log.info("Users: [{}]", users.size(),room );
-//        sendMessage(room, String.valueOf(users.size()), "SERVER",null,Constants.AMOUNT);
-//    }
-//
-//    public void sendResults(String room){
-//        Map<String,String> result = messageService.getResult(room);
-//        log.info("GET RESULT: [{}]", result.toString());
-//        sendMessage(room, result.toString(),"SERVER", null, Constants.RESULT);
-//    }
-
 }

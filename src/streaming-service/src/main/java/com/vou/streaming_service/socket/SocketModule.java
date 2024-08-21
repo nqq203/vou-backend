@@ -11,12 +11,17 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.streaming_service.model.Message;
 import com.vou.streaming_service.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
+
+import static io.lettuce.core.pubsub.PubSubOutput.Type.message;
+
 @Component
 @Slf4j
 public class SocketModule {
@@ -35,10 +40,22 @@ public class SocketModule {
 
     private DataListener<Message> onChatReceived() {
         return (senderClient, data, ackSender) -> {
-            log.info("Received message: {}", data);
-            serviceService.saveMessage(data.getRoom(), data.getUsername(), data.getContent());
+            try {
+                String message = data.toString();
+                JSONObject jsonObject = new JSONObject(message);
+
+                System.out.println("Data jsonObject: " + jsonObject.toString());
+
+                // Correct way to compare strings
+                if (jsonObject.getString("messageType").equals("ANSWER_QUIZ")) {
+                    serviceService.calculateScore(jsonObject);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         };
     }
+
 
     private ConnectListener onConnected() {
         return (client) -> {
@@ -47,9 +64,7 @@ public class SocketModule {
             String username = params.get("username").stream().collect(Collectors.joining());
             client.joinRoom(room);
             log.info("Socket ID [{}] - room [{}] - username [{}] Connected to chat module", client.getSessionId(), room, username);
-
             serviceService.saveMessage(room, username, "0");
-
             serviceService.sendUserListUpdate(room);
         };
     }
