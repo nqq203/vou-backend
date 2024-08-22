@@ -1,5 +1,6 @@
 package com.vou.event_service.dto;
 
+import com.vou.event_service.model.Game;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,5 +19,7 @@ public class EventDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private int brandId;
-    private List<QuizDTO> quiz;
+    private String gameType;
+    private GameInfoDTO gameInfoDTO;
+
 }

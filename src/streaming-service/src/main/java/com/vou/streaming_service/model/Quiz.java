@@ -7,6 +7,7 @@ package com.vou.streaming_service.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vou.streaming_service.dto.QuizDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -23,15 +24,26 @@ public class Quiz {
 
     private String question;
 
-    private String a;
+    private String ans1;
 
-    private String b;
+    private String ans2;
 
-    private String c;
+    private String ans3;
 
-    int correctAnswerIndex;
+    private Long id_game;
 
-//    public Quiz(String question, List<Option> options, int correctAnswerIndex) {
+    private int correctAnswerIndex;
+
+    public Quiz(QuizDTO quizDTO, Long id_game) {
+        this.question = quizDTO.getQuestion();
+        this.ans1= quizDTO.getAns1();
+        this.ans2= quizDTO.getAns2();
+        this.ans3= quizDTO.getAns3();
+        this.id_game=id_game;
+        this.correctAnswerIndex = quizDTO.getCorrectAnswerIndex();
+    }
+
+    //    public Quiz(String question, List<Option> options, int correctAnswerIndex) {
 //        this.question = question;
 //        this.options = options;
 //        this.correctAnswerIndex = correctAnswerIndex;

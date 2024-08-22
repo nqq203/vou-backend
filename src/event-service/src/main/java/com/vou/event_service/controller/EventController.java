@@ -2,6 +2,7 @@ package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
 import com.vou.event_service.dto.EventDTO;
+import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.QuizDTO;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -41,7 +44,9 @@ public class EventController {
 
     @PostMapping("/")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
-        List<QuizDTO> quizzes = event.getQuiz();
+        GameInfoDTO gameInfoDTO = event.getGameInfoDTO();
+
+        List<QuizDTO> quizzes = gameInfoDTO.getQuiz();
         CreateEventRequest request = new CreateEventRequest(
                 event.getEventName(),
                 event.getImageUrl(),
@@ -54,7 +59,7 @@ public class EventController {
             Event result = eventService.createEvent(request);
             CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), brand_id);
             brandsCooperationService.createBrandsCooperation(brandsCooperation);
-            quizService.createQuiz(quizzes);
+            quizService.createQuiz(gameInfoDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());

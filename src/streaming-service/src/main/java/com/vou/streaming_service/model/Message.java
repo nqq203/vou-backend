@@ -17,7 +17,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

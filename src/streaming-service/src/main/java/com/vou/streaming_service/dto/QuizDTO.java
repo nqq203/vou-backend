@@ -1,4 +1,4 @@
-package com.vou.event_service.dto;
+package com.vou.streaming_service.dto;
 
 
 import lombok.AllArgsConstructor;

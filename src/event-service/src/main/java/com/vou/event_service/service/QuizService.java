@@ -1,5 +1,6 @@
 package com.vou.event_service.service;
 
+import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.QuizDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,12 @@ public class QuizService {
 
     private final String QUIZ_SERVICE_URL = "http://streaming-service:8086/api/v1/game/quiz/create";
 
-    public void createQuiz(List<QuizDTO> quizDTOList) {
+    public void createQuiz(GameInfoDTO gameInfoDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
 
         // Wrap the List<QuizDTO> in an HttpEntity
-        HttpEntity<List<QuizDTO>> request = new HttpEntity<>(quizDTOList, headers);
+        HttpEntity<GameInfoDTO> request = new HttpEntity<>(gameInfoDTO, headers);
 
         // Make the POST request
         ResponseEntity<Void> response = restTemplate.exchange(
