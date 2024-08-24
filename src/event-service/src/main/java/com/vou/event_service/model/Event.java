@@ -18,6 +18,8 @@ public class Event {
     @Column(name = "event_name", nullable = false)
     private String eventName;
 
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Column(name = "number_of_vouchers")
     private Integer numberOfVouchers;
