@@ -30,8 +30,8 @@ public class Voucher {
     @Column(name = "description")
     String description;
 
-    @Column(name = "status")
-    String status;
+    @Column(name = "type")
+    String type;
 
     @Column(name = "id_item1")
     Long idItem1;

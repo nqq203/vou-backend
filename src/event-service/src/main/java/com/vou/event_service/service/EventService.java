@@ -26,7 +26,6 @@ public class EventService {
 
     public Event createEvent(CreateEventRequest request) throws Exception{
         Event newEvent = new Event();
-        newEvent.setImageUrl(request.getImageUrl());
         newEvent.setEventName(request.getEventName());
         newEvent.setNumberOfVouchers(request.getNumberOfVouchers());
         newEvent.setStartDate(request.getStartDate());
@@ -53,7 +52,6 @@ public class EventService {
             if (event == null)
                 throw new NotFoundException("Event not found");
             else {
-                Optional.ofNullable(request.getImageUrl()).ifPresent(action -> event.setImageUrl(request.getImageUrl()));
                 Optional.ofNullable(request.getEventName()).ifPresent(action -> event.setEventName(request.getEventName()));
                 Optional.ofNullable(request.getEndDate()).ifPresent(action -> event.setEndDate(request.getEndDate()));
                 Optional.ofNullable(request.getStartDate()).ifPresent(action -> event.setStartDate(request.getStartDate()));

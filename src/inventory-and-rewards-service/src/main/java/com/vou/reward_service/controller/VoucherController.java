@@ -1,5 +1,6 @@
 package com.vou.reward_service.controller;
 
+import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.entity.CreateItemRequest;
 import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.model.Item;
@@ -28,8 +29,35 @@ public class VoucherController {
     }
 
     @PostMapping("")
-    public ResponseEntity<HashMap<String, Object>>  createVoucher(@RequestBody CreateVoucherRequest request) {
+    public ResponseEntity<HashMap<String, Object>>  createVoucher(@RequestBody InventoryDTO inventoryDTO) {
         try {
+            CreateVoucherRequest request;
+            if (inventoryDTO.getGameType().equals("shake-game")) {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getItems(),
+                        inventoryDTO.getAim_coin(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+            else {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
             int result = voucherService.createVoucher(request);
             HashMap<String, Object> response = new HashMap<>();
             if (result == HttpStatus.CREATED) {

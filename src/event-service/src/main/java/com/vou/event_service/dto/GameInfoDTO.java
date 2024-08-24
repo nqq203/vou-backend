@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuizDTO {
-    private String question;
-    private String ans1;
-    private String ans2;
-    private String ans3;
-    private int correctAnswerIndex;
+public class GameInfoDTO {
+    private String name;
+    private String gameType;
+    private List<QuizDTO> quiz;
+    private Long eventId;
 }

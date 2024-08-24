@@ -2,16 +2,24 @@ package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
 import com.vou.event_service.dto.EventDTO;
+import com.vou.event_service.dto.GameInfoDTO;
+import com.vou.event_service.dto.InventoryDTO;
 import com.vou.event_service.dto.QuizDTO;
+import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
+import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.service.BrandsCooperationService;
 import com.vou.event_service.service.EventService;
+import com.vou.event_service.service.InventoryService;
 import com.vou.event_service.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,6 +31,11 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private QuizService quizService;
+    @Autowired
+    private BrandsCooperationService brandsCooperationService;
+    @Autowired
+    private InventoryService inventoryService;
+
 
     @GetMapping("/")
     public ResponseEntity<?> fetchEvent(){
@@ -36,17 +49,26 @@ public class EventController {
 
     @PostMapping("/")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
-        List<QuizDTO> quizzes = event.getQuiz();
+        GameInfoDTO gameInfoDTO = event.getGameInfoDTO();
+        InventoryDTO inventoryDTO = event.getInventoryInfo();
         CreateEventRequest request = new CreateEventRequest(
                 event.getEventName(),
-                event.getImageUrl(),
                 event.getNumberOfVouchers(),
                 event.getStartDate(),
                 event.getEndDate()
         );
+        List<Long> brand_id = event.getBrandId();
         try {
             Event result = eventService.createEvent(request);
-            quizService.createQuiz(quizzes);
+            for(int i = 0;i< brand_id.size();i++){
+                CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), (long) i);
+                brandsCooperationService.createBrandsCooperation(brandsCooperation);
+            }
+            gameInfoDTO.setEventId(result.getIdEvent());
+            inventoryDTO.setEvent_id(result.getIdEvent());
+            quizService.createQuiz(gameInfoDTO);
+            inventoryService.createInventory(inventoryDTO);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
