@@ -1,14 +1,9 @@
 package com.vou.reward_service.controller;
 
-import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.entity.CreateItemRequest;
-import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.model.Item;
-import com.vou.reward_service.model.Voucher;
-import com.vou.reward_service.repository.VoucherRepository;
 import com.vou.reward_service.service.ItemService;
 import com.vou.reward_service.constant.HttpStatus;
-import com.vou.reward_service.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,48 +12,21 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/inventory-and-reward/items")
 @CrossOrigin
-@RequestMapping("/api/v1/inventory-and-rewards/vouchers")
-public class VoucherController {
+public class ItemController {
     @Autowired
-    private VoucherService voucherService;
+    private ItemService itemService;
 
     @GetMapping("")
-    public ResponseEntity<List<Voucher>> getVouchers() {
-        return ResponseEntity.status(HttpStatus.OK).body(voucherService.getAllVouchers());
+    public ResponseEntity<List<Item>> getItem() {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.getAllItems());
     }
 
     @PostMapping("")
-    public ResponseEntity<HashMap<String, Object>>  createVoucher(@RequestBody InventoryDTO inventoryDTO) {
+    public ResponseEntity<HashMap<String, Object>>  createItem(@RequestBody CreateItemRequest request) {
         try {
-            CreateVoucherRequest request;
-            if (inventoryDTO.getGameType().equals("shake-game")) {
-                request = new CreateVoucherRequest(
-                        inventoryDTO.getVoucher_code(),
-                        null,
-                        inventoryDTO.getVoucher_name(),
-                        null,
-                        inventoryDTO.getExpiration_date(),
-                        inventoryDTO.getVoucher_description(),
-                        inventoryDTO.getVoucher_type(),
-                        inventoryDTO.getItems(),
-                        inventoryDTO.getAim_coin(),
-                        inventoryDTO.getEvent_id()
-                );
-            }
-            else {
-                request = new CreateVoucherRequest(
-                        inventoryDTO.getVoucher_code(),
-                        null,
-                        inventoryDTO.getVoucher_name(),
-                        null,
-                        inventoryDTO.getExpiration_date(),
-                        inventoryDTO.getVoucher_description(),
-                        inventoryDTO.getVoucher_type(),
-                        inventoryDTO.getEvent_id()
-                );
-            }
-            int result = voucherService.createVoucher(request);
+            int result = itemService.createItem(request);
             HashMap<String, Object> response = new HashMap<>();
             if (result == HttpStatus.CREATED) {
                 response.put("status", HttpStatus.CREATED);
@@ -76,19 +44,19 @@ public class VoucherController {
         }
     }
 
-    @GetMapping("/{code}")
-    public ResponseEntity<HashMap<String, Object>> getVoucher(@PathVariable("code") String code) {
+    @GetMapping("/{id_item}")
+    public ResponseEntity<HashMap<String, Object>> getItemById(@PathVariable Long id_item) {
         try {
-            Voucher voucher = voucherService.findVoucherByCode(code);
+            Item result = itemService.getItemById(id_item);
             HashMap<String, Object> response = new HashMap<>();
-            if (voucher == null) {
+            if (result == null) {
                 response.put("status", HttpStatus.NOT_FOUND);
-                response.put("description", "Voucher not found");
+                response.put("description", "Item not found");
             }
             else {
                 response.put("status", HttpStatus.OK);
-                response.put("description", "Voucher details");
-                response.put("content", voucher);
+                response.put("description", "Item details");
+                response.put("content", result);
             }
             return ResponseEntity.status((int) response.get("status")).body(response);
         } catch (Exception e) {
@@ -99,10 +67,10 @@ public class VoucherController {
         }
     }
 
-    @PutMapping("/{code}")
-    public ResponseEntity<HashMap<String, Object>> updateItemById(@PathVariable String code, @RequestBody CreateVoucherRequest request) {
+    @PutMapping("/{id_item}")
+    public ResponseEntity<HashMap<String, Object>> updateItemById(@PathVariable Long id_item, @RequestBody CreateItemRequest request) {
         try {
-            Integer result = voucherService.updateVoucherByCode(code, request);
+            Integer result = itemService.updateItemById(id_item, request);
             HashMap<String, Object> response = new HashMap<>();
             if (result == HttpStatus.NOT_FOUND) {
                 response.put("status", HttpStatus.NOT_FOUND);
@@ -123,10 +91,10 @@ public class VoucherController {
         }
     }
 
-    @DeleteMapping("/{code}")
-    public ResponseEntity<HashMap<String, Object>> deleteItemById(@PathVariable String code) {
+    @DeleteMapping("/{id_item}")
+    public ResponseEntity<HashMap<String, Object>> deleteItemById(@PathVariable Long id_item) {
         try {
-            Integer result = voucherService.deleteVoucherByCode(code);
+            Integer result = itemService.deleteItemById(id_item);
             HashMap<String, Object> response = new HashMap<>();
             if (result == HttpStatus.NOT_FOUND) {
                 response.put("status", HttpStatus.NOT_FOUND);
@@ -146,5 +114,4 @@ public class VoucherController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
 }

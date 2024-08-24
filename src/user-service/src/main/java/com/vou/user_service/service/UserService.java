@@ -254,6 +254,7 @@ public class UserService {
         }
         if (updatedUser != null) {
             updatedUser.setAvatarUrl(url);
+            userRepository.save(updatedUser);
             return true;
         }
         return false;

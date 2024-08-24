@@ -18,7 +18,7 @@ public class InventoryService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://inventory-and-reward-service:8087/api/v1/inventory-and-rewards/vouchers";
+    private final String QUIZ_SERVICE_URL = "http://inventory-and-reward-service:8087/api/v1/inventory-and-reward/vouchers";
 
     public void createInventory(InventoryDTO inventoryDTO) {
         HttpHeaders headers = new HttpHeaders();

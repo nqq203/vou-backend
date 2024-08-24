@@ -53,7 +53,6 @@ services:
       - service-registry
       - auth-service
       - user-service
-      # - notification-service
       - event-service
       # - statistics-service
       # - turn-service
@@ -123,19 +122,6 @@ services:
     networks:  
       - microservices-network
 
-  notification-service: 
-    image: notification-service:latest
-    build:
-      context: ./src/notification-service
-    ports: 
-      - "8082:8082"
-    depends_on:
-      - service-registry
-    volumes:
-      - notification-service-data:/var/notification-service
-    networks: 
-      - microservices-network
-
   event-service: 
     image: event-service:latest
     build:
@@ -162,31 +148,31 @@ services:
     networks: 
       - microservices-network
 
-  statistics-service: 
-    image: statistics-service:latest
-    build:
-      context: ./src/statistics-service
-    ports: 
-      - "8084:8084"
-    depends_on:
-      - service-registry
-    volumes:
-      - statistics-service-data:/var/statistics-service
-    networks: 
-      - microservices-network
+  # statistics-service: 
+  #   image: statistics-service:latest
+  #   build:
+  #     context: ./src/statistics-service
+  #   ports: 
+  #     - "8084:8084"
+  #   depends_on:
+  #     - service-registry
+  #   volumes:
+  #     - statistics-service-data:/var/statistics-service
+  #   networks: 
+  #     - microservices-network
 
-  turn-service: 
-    image: turn-service:latest
-    build:
-      context: ./src/turn-service
-    ports: 
-      - "8085:8085"
-    depends_on:
-      - service-registry
-    volumes:
-      - turn-service-data:/var/turn-service
-    networks: 
-      - microservices-network
+  # turn-service: 
+  #   image: turn-service:latest
+  #   build:
+  #     context: ./src/turn-service
+  #   ports: 
+  #     - "8085:8085"
+  #   depends_on:
+  #     - service-registry
+  #   volumes:
+  #     - turn-service-data:/var/turn-service
+  #   networks: 
+  #     - microservices-network
 
   streaming-service: 
     image: streaming-service:latest
@@ -231,11 +217,19 @@ services:
       - "8087:8087"
     depends_on:
       - service-registry
-      - inventory-and-reward-db
+      - inventoryandrewarddb
     environment: 
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventory-and-reward-db:5432/inventoryrewarddb
-      - SPRING_DATASOURCE_USERNAME=inventoryuser
-      - SPRING_DATASOURCE_PASSWORD=inventorypassword
+      SPRING_APPLICATION_NAME: inventory-and-reward-service
+      SERVER_PORT: 8087
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://inventoryandrewarddb:5432/inventoryrewarddb
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_GENERATE_DDL: true
     volumes:
       - inventory-and-reward-service-data:/var/inventory-and-reward-service
     networks: 
@@ -292,7 +286,7 @@ services:
     networks:
       - microservices-network
 
-  inventory-and-reward-db:
+  inventoryandrewarddb:
     image: postgres:16.3-bullseye
     environment:
       POSTGRES_DB: inventoryrewarddb
@@ -301,7 +295,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - inventory-and-reward-db-data:/var/lib/postgresql/data
+      - inventoryandrewarddb-data:/var/lib/postgresql/data
     networks:
       - microservices-network
 
@@ -314,15 +308,14 @@ volumes:
   api-gateway-data:
   auth-service-data:
   user-service-data:
-  notification-service-data:
   event-service-data:
-  statistics-service-data:
-  turn-service-data:
+  # statistics-service-data:
+  # turn-service-data:
   streaming-service-data:
   inventory-and-reward-service-data:
   authdb-data:
   pgadmin-data:
   eventdb-data:
   gamedb-data:
-  inventory-and-reward-db-data:
+  inventoryandrewarddb-data:
   redis-data:
