@@ -13,13 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 public class EventDTO {
     private String eventName;
-    private String imageUrl;
-
     private int numberOfVouchers;
     private Timestamp startDate;
     private Timestamp endDate;
-    private int brandId;
-    private String gameType;
+    private List<Long> brandId;
     private GameInfoDTO gameInfoDTO;
-
+    private InventoryDTO inventoryInfo;
 }

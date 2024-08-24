@@ -13,5 +13,6 @@ import java.util.List;
 public class GameInfoDTO {
     private String name;
     private String gameType;
+    private Long eventId;
     private List<QuizDTO> quiz;
 }
