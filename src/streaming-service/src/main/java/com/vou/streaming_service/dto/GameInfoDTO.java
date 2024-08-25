@@ -14,4 +14,6 @@ public class GameInfoDTO {
     private String name;
     private String gameType;
     private List<QuizDTO> quiz;
+
+
 }

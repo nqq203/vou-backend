@@ -10,8 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.streaming_service.constants.Constants;
+import com.vou.streaming_service.dto.QuizDTO;
 import com.vou.streaming_service.libs.RedisCache;
-import com.vou.streaming_service.model.Option;
 import com.vou.streaming_service.model.Quiz;
 import com.vou.streaming_service.model.UserResult;
 import com.vou.streaming_service.socket.SocketService;
@@ -104,160 +104,168 @@ public class MessageService {
     public void sendMessage(String room, String message, String senderUsername, String targetUsername, String TOPIC) {
         socketService.sendMessage(room, message, senderUsername, targetUsername, TOPIC);
     }
-}
-//    public String startGame(){
-//        String room = "1";
-//        List<Quiz> quizz = Arrays.asList(
-//                new Quiz(
-//                        "In what continent is Indonesia?",
-//                        Arrays.asList(
-//                                new Option("0", "A", "South America"),
-//                                new Option("1", "B", "Europe"),
-//                                new Option("2", "C", "Asia")
-//                        ),
-//                        2
-//                ),
-//                new Quiz(
-//                        "Which continent has the highest population density?",
-//                        Arrays.asList(
-//                                new Option("0", "A", "Asia"),
-//                                new Option("1", "B", "South Africa"),
-//                                new Option("2", "C", "Australia")
-//                        ),
-//                        0
-//                ),
-//                new Quiz(
-//                        "What is 5x5?",
-//                        Arrays.asList(
-//                                new Option("0", "A", "20"),
-//                                new Option("1", "B", "25"),
-//                                new Option("2", "C", "10")
-//                        ),
-//                        1
-//                ),
-//                new Quiz(
-//                        "What is the square root of 169?",
-//                        Arrays.asList(
-//                                new Option("0", "A", "20"),
-//                                new Option("1", "B", "23"),
-//                                new Option("2", "C", "13")
-//                        ),
-//                        2
-//                ),
-//                new Quiz(
-//                        "What is the smallest ocean?",
-//                        Arrays.asList(
-//                                new Option("0", "A", "Atlantic Ocean"),
-//                                new Option("1", "B", "Pacific Ocean"),
-//                                new Option("2", "C", "Arctic Ocean")
-//                        ),
-//                        2
-//                )
-//        );
-//        saveQuizzes(quizz);
-//        List<Quiz> questions = getQuizzes();
-//        System.out.println("Question: " + questions.toString());
-//        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-//        ZonedDateTime newTimePlus = zonedDateTime.plusSeconds(10);
-//        eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
-//            sendMessage(room, quizz.get(0).toString(), "SERVER", null,"start_game");
-//            ZonedDateTime zonedDateTime1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-//            ZonedDateTime newTimePlus1 = zonedDateTime1.plusSeconds(3);
-//            eventSchedulerService.scheduleJob(newTimePlus1.toLocalDateTime(),()->{
-//                sendNextQuestion(room);
+
+    public String startGame(Long id_game){
+        String room = "1";
+        List<Quiz> quizz = Arrays.asList(
+                new Quiz(
+                        new QuizDTO("In what continent is Indonesia?", "South America", "Europe", "Asia", 2),
+                        id_game
+                ),
+                new Quiz(
+                        new QuizDTO("Which continent has the highest population density?", "Asia", "South Africa", "Australia", 0),
+                        id_game
+                ),
+                new Quiz(
+                        new QuizDTO("What is 5x5?", "20", "25", "10", 1),
+                        id_game
+                ),
+                new Quiz(
+                        new QuizDTO("What is the square root of 169?", "20", "23", "13", 2),
+                        id_game
+                ),
+                new Quiz(
+                        new QuizDTO("What is the smallest ocean?", "Atlantic Ocean", "Pacific Ocean", "Arctic Ocean", 2),
+                        id_game
+                )
+        );
+
+        saveQuizzes(quizz);
+        List<Quiz> questions = getQuizzes();
+        System.out.println("Question: " + questions.toString());
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ZonedDateTime newTimePlus = zonedDateTime.plusSeconds(10);
+        eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
+            sendMessage(room, quizz.get(0).toString(), "SERVER", null,"start_game");
+            ZonedDateTime zonedDateTime1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+            ZonedDateTime newTimePlus1 = zonedDateTime1.plusSeconds(3);
+            eventSchedulerService.scheduleJob(newTimePlus1.toLocalDateTime(),()->{
+                sendNextQuestion(room);
+            });
+
+        });
+        return newTimePlus.toString();
+    }
+    public void saveQuizzes(List<Quiz> quizzes) {
+        try {
+            String quizzesJson = objectMapper.writeValueAsString(quizzes);
+            log.info("Quzzzzz: {}", quizzesJson );
+
+
+            redisCache.set("quizzes", quizzesJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Quiz> getQuizzes() {
+        String quizzesJson = redisCache.get("quizzes");
+        if (quizzesJson != null) {
+            try {
+                List<Quiz> quizzes = objectMapper.readValue(quizzesJson, new TypeReference<List<Quiz>>() {});
+                return quizzes;
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private void sendNextQuestion(String room) {
+        List<Quiz> quizzes = getQuizzes();
+        if (quizzes.isEmpty()) {
+//            sendMessage(room, "Game has ended", "SERVER", null, "game_end");
+//            sendMessage(room, results.toString() , "SERVER", null, "results");
+            return;
+        }
+        Quiz currentQuiz = quizzes.get(0);
+        System.out.println("Question: " + currentQuiz.toString());
+        sendMessage(room, currentQuiz.toString(), "SERVER", null, "question");
+
+        // Schedule the next question after 15 seconds
+        ZonedDateTime nextQuestionTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(15);
+        eventSchedulerService.scheduleJob(nextQuestionTime.toLocalDateTime(),  () -> {
+            log.info("Result");
+            handleQuestionTimeout(room);
+        });
+    }
+    private void handleQuestionTimeout(String room) {
+        List<Quiz> quizzes = getQuizzes();
+        List<UserResult> results = calculateResults(room);
+        quizzes.remove(0);
+        if (quizzes.isEmpty()) {
+//            sendMessage(room, "Game has ended", "SERVER", null, "game_end");
+//            ZonedDateTime sendResultsTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(2);
+//            eventSchedulerService.scheduleJob(sendResultsTime.toLocalDateTime(), () -> {
+                sendMessage(room, results.toString() , "SERVER", null, "results");
 //            });
-//
-//        });
-//        return newTimePlus.toString();
-//    }
-//    public void saveQuizzes(List<Quiz> quizzes) {
-//        try {
-//            String quizzesJson = objectMapper.writeValueAsString(quizzes);
-//            redisCache.set("quizzes", quizzesJson);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public List<Quiz> getQuizzes() {
-//        String quizzesJson = redisCache.get("quizzes");
-//        if (quizzesJson != null) {
-//            try {
-//                List<Quiz> quizzes = objectMapper.readValue(quizzesJson, new TypeReference<List<Quiz>>() {});
-//                return quizzes;
-//            } catch (JsonProcessingException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return new ArrayList<>();
-//    }
-//
-//    private void sendNextQuestion(String room) {
-//        List<Quiz> quizzes = getQuizzes();
-//        if (quizzes.isEmpty()) {
-//            sendMessage(room, "Game has ended", "SERVER", null, "game_end");
-//            return;
-//        }
-//        Quiz currentQuiz = quizzes.get(0);
-//        System.out.println("Question: " + currentQuiz.toString());
-//        sendMessage(room, currentQuiz.toString(), "SERVER", null, "question");
-//
-//        // Schedule the next question after 15 seconds
-//        ZonedDateTime nextQuestionTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(15);
-//        eventSchedulerService.scheduleJob(nextQuestionTime.toLocalDateTime(),  () -> {
-//            log.info("Result");
-//            handleQuestionTimeout(room);
-//        });
-//    }
-//    private void handleQuestionTimeout(String room) {
-//        List<UserResult> results = calculateResults(room);
-//        log.info ("Result {}",results.toString());
-//        sendMessage(room, results.toString(), "SERVER", null, "results");
-//        List<Quiz> quizzes = getQuizzes();
-//        if (quizzes.isEmpty()) {
-//            sendMessage(room, "Game has ended", "SERVER", null, "game_end");
-//            return;
-//        }
-//        quizzes.remove(0);
-//        saveQuizzes(quizzes);
-//        // Schedule sending question after 5 seconds
-//        ZonedDateTime sendResultsTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(5);
-//        eventSchedulerService.scheduleJob(sendResultsTime.toLocalDateTime(), () -> {
-//            sendNextQuestion(room);
-//        });
-//    }
-//    private List<UserResult> calculateResults(String room) {
-//        List<UserResult> results = new ArrayList<>();
-//        List<String> userIds = getPlayers(room);
-//
-//        for (String userId : userIds) {
-//            String score = redisCache.get(room + "_" + userId);
-//            log.info("{}: {}", userId, score);
-//            UserResult userResult = new UserResult(userId, score);
-//            results.add(userResult);
-//        }
-//
-//        return results;
-//    }
-//
-//    public void calculateScore(JSONObject jsonObject){
-//        String content = jsonObject.getString("content");
-//        JSONObject contentJson = new JSONObject(content);
-//        System.out.println("Data answer: " + contentJson);
-//
-//        // Extract the value of "isCorrect"
-//        boolean isCorrect = contentJson.getBoolean("isCorrect");
-//        System.out.println("Is Correct: " + isCorrect);
-//        Integer timer = contentJson.getInt("timer");
-//        Integer score =timer;
-//        if (isCorrect){
-//            score += 100;
-//        }
-//        String room = jsonObject.getString("room");
-//        String username = jsonObject.getString("username");
-//        String key = room + '_' + username;
-//
-//        log.info("SCORE: {}", String.valueOf(score));
-//        redisCache.set(key, String.valueOf(score));
-//    }
-//}
+            return;
+        }
+
+        for (int i = 0; i < results.size(); i++) {
+            UserResult userResult = results.get(i);
+            String userId = userResult.getUserId();
+            String score = userResult.getScore();
+            int rank = i + 1;
+
+            String message = String.format("Điểm của bạn là %s. Bạn đang ở hạng thứ %d/%d.",
+                    score, rank, results.size());
+            log.info("User: {}, message: {}", userId, message);
+
+            // GỬI CHO userId nha
+            sendMessage(room, message, "SERVER", null, "score");
+        }
+        log.info ("Result {}",results.toString());
+
+
+
+
+        saveQuizzes(quizzes);
+        // Schedule sending question after 5 seconds
+        ZonedDateTime sendResultsTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(5);
+        eventSchedulerService.scheduleJob(sendResultsTime.toLocalDateTime(), () -> {
+            sendNextQuestion(room);
+        });
+    }
+    private List<UserResult> calculateResults(String room) {
+        List<UserResult> results = new ArrayList<>();
+        List<String> userIds = getPlayers(room);
+
+        for (String userId : userIds) {
+            String score = redisCache.get(room + "_" + userId);
+            log.info("{}: {}", userId, score);
+            UserResult userResult = new UserResult(userId, score);
+            results.add(userResult);
+        }
+        results.sort((r1, r2) -> {
+            int score1 = Integer.parseInt(r1.getScore());
+            int score2 = Integer.parseInt(r2.getScore());
+            return Integer.compare(score2, score1);
+        });
+        return results;
+    }
+
+    public void calculateScore(JSONObject jsonObject){
+        String content = jsonObject.getString("content");
+        JSONObject contentJson = new JSONObject(content);
+        System.out.println("Data answer: " + contentJson);
+
+        // Extract the value of "isCorrect"
+        boolean isCorrect = contentJson.getBoolean("isCorrect");
+        System.out.println("Is Correct: " + isCorrect);
+        Integer timer = contentJson.getInt("timer");
+        Integer score =timer;
+        if (isCorrect){
+            score += 100;
+        }
+        String room = jsonObject.getString("room");
+        String username = jsonObject.getString("username");
+        String key = room + '_' + username;
+
+        String value = redisCache.get(key);
+        score += Integer.valueOf(value);
+
+        log.info("SCORE: {}", String.valueOf(score));
+        redisCache.set(key, String.valueOf(score));
+    }
+}
