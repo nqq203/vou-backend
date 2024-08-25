@@ -34,7 +34,7 @@ public class VoucherService {
             voucher.setIdItem3(request.getIdItem3());
             voucher.setIdItem4(request.getIdItem4());
             voucher.setIdItem5(request.getIdItem5());
-            voucher.setAmCoin(request.getAimCoin());
+            voucher.setAimCoin(request.getAimCoin());
             voucher.setIdEvent(request.getIdEvent());
             voucherRepository.save(voucher);
 
@@ -92,7 +92,7 @@ public class VoucherService {
                     voucherFound.setIdItem5(request.getIdItem5());
                 }
                 if (request.getAimCoin() != null) {
-                    voucherFound.setAmCoin(request.getAimCoin());
+                    voucherFound.setAimCoin(request.getAimCoin());
                 }
                 if (request.getIdEvent() != null) {
                     voucherFound.setIdEvent(request.getIdEvent());

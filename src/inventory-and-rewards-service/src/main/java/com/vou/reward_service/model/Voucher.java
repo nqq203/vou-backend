@@ -1,10 +1,15 @@
 package com.vou.reward_service.model;
 
+import com.vou.reward_service.repository.ItemRepository;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -20,6 +25,9 @@ public class Voucher {
 
     @Column(name = "voucher_name")
     String voucherName;
+
+    @Column(name= "voucher_price")
+    Long voucherPrice;
 
     @Column(name = "image_url")
     String imageUrl;
@@ -48,9 +56,12 @@ public class Voucher {
     @Column(name = "id_item5")
     Long idItem5;
 
-    @Column(name = "am_coin")
-    Long amCoin;
+    @Column(name = "aim_coin")
+    Long aimCoin;
 
     @Column(name = "id_event")
     Long idEvent;
+
+
+
 }

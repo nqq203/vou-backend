@@ -1,14 +1,13 @@
 package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
-import com.vou.event_service.dto.EventDTO;
-import com.vou.event_service.dto.GameInfoDTO;
-import com.vou.event_service.dto.InventoryDTO;
-import com.vou.event_service.dto.QuizDTO;
+import com.vou.event_service.dto.*;
+
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.service.BrandsCooperationService;
 import com.vou.event_service.service.EventService;
 import com.vou.event_service.service.InventoryService;
@@ -18,9 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Collections;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -34,20 +33,26 @@ public class EventController {
     @Autowired
     private BrandsCooperationService brandsCooperationService;
     @Autowired
+    private BrandsCooperationRepository brandsCooperationRepository;
+
+    @Autowired
     private InventoryService inventoryService;
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> fetchEvent(){
         try {
             List<Event> allEvents = eventService.getAllEvents();
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, allEvents));
+            List<ListEventDTO> listEventDTOs = allEvents.stream()
+                    .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
         GameInfoDTO gameInfoDTO = event.getGameInfoDTO();
         InventoryDTO inventoryDTO = event.getInventoryInfo();
@@ -79,10 +84,25 @@ public class EventController {
     public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
         try {
             Event event = eventService.findEventById(id_event);
+            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
+            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
+            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
+
+            EventDetailDTO eventDetailDTO = new EventDetailDTO(
+                    event.getIdEvent(),
+                    event.getEventName(),
+                    event.getNumberOfVouchers(),
+                    event.getStartDate(),
+                    event.getEndDate(),
+                    brandsCooperations,
+                    gameInfoDTO,
+                    inventoryDetailDTO
+            );
+
             if (event == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
             }
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, event));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, eventDetailDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }
