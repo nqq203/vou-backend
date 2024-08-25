@@ -61,7 +61,7 @@ public class PlayerRegistration implements IRegistration {
 
     @Override
     public boolean verifyOtp(String username, String otp) {
-        System.out.print("In Player Registration: " + username + " " + otp);
+        System.out.println("In Player Registration: " + username + " " + otp);
         // Validate the OTP first
         if (!otpService.validateOtp(username, otp)) {
             System.out.println("OTP validation failed for username: " + username);

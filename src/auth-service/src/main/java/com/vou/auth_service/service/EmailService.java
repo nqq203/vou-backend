@@ -14,6 +14,7 @@ public class EmailService {
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
+        System.out.println("OTP: "+text);
         javaMailSender.send(message);
     }
 }
