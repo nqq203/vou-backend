@@ -1,20 +1,18 @@
 package com.vou.user_service.controller;
 
-import com.vou.user_service.common.ErrorResponse;
-import com.vou.user_service.common.NotFoundException;
-import com.vou.user_service.common.NotFoundResponse;
-import com.vou.user_service.common.SuccessResponse;
-import com.vou.user_service.model.Admin;
-import com.vou.user_service.model.Brand;
-import com.vou.user_service.model.Player;
+import com.vou.user_service.common.*;
 import com.vou.user_service.model.User;
-import com.vou.user_service.model.Session;
+import com.vou.user_service.service.StorageService;
 import com.vou.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +21,12 @@ import java.util.Map;
 @CrossOrigin
 public class UserController {
     private final UserService userService;
+    private final StorageService storageService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, StorageService storageService) {
         this.userService = userService;
+        this.storageService = storageService;
     }
 
     @PutMapping("/{id_user}")
@@ -38,6 +38,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("User not found"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, e));
+        }
+    }
+
+    @PatchMapping ("/{id_user}/avatar")
+    public ResponseEntity<?> updateAvatar(@PathVariable Long id_user, @RequestParam("avatar") MultipartFile avatarFile) {
+        if (!avatarFile.getContentType().startsWith("image/")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Invalid file type", HttpStatus.BAD_REQUEST, "Only image files are allowed"));
+        }
+        try {
+            String avatarUrl = storageService.uploadImage(avatarFile);
+            if (avatarUrl == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Error uploading", HttpStatus.INTERNAL_SERVER_ERROR, null));
+            }
+            Boolean isUpdated = userService.updateAvatarUser(id_user, avatarUrl);
+            if (!isUpdated) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Error updating avatar url", HttpStatus.INTERNAL_SERVER_ERROR, null));
+            }
+            return ResponseEntity.ok(new SuccessResponse("Avatar updated successfully", HttpStatus.OK, avatarUrl));
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Database error", HttpStatus.INTERNAL_SERVER_ERROR, null));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("File upload error", HttpStatus.INTERNAL_SERVER_ERROR, null));
         }
     }
 
@@ -63,103 +85,25 @@ public class UserController {
         }
     }
 
-    @GetMapping("/players/{userId}")
-    public ResponseEntity<Player> getPlayerByIdUser(@PathVariable Long userId) {
+    @GetMapping("")
+    public ResponseEntity<?> getListUser(@RequestParam("id_user") Long id_user) {
+        User user;
         try {
-            Player player = userService.findPlayerByUserId(userId);
-            return ResponseEntity.ok(player);
-        } catch (NotFoundException notFoundException) {
-            return ResponseEntity.notFound().build();
+            user = userService.findByIdUser(id_user);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Bad Request: Invalid user id"));
         }
-    }
-
-    // TODO: replaced by get by identifier api above
-//    @GetMapping("/by-email/{email}")
-//    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-//        User user = userService.findByEmail(email);
-//        if (user != null){
-//            return ResponseEntity.ok(user);
-//        }
-//        return ResponseEntity.notFound().build();
-//    }
-
-    @PostMapping("/admins")
-    public ResponseEntity<Boolean> createAdmin(@RequestBody Admin admin) {
+        if (!user.getRole().toString().equalsIgnoreCase("admin")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ForbiddenResponse("Access Denied: Just admin can get list users"));
+        }
         try {
-            Admin savedAdmin = userService.createAdmin(admin);
-            return ResponseEntity.ok(true);
+            List<User> users = userService.findAllUsers();
+            if (users == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Empty users list"));
+            }
+            return ResponseEntity.ok().body(new SuccessResponse("Get list users successfully", HttpStatus.OK, users));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Get list users failed by server"));
         }
-    }
-
-    @PostMapping("/players")
-    public ResponseEntity<Boolean> createPlayer(@RequestBody Player player) {
-        try {
-            Player savedPlayer = userService.createPlayer(player);
-            return ResponseEntity.ok(true);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/brands")
-    public ResponseEntity<Boolean> createBrand(@RequestBody Brand brand) {
-        try {
-            Brand savedBrand = userService.createBrand(brand);
-            return ResponseEntity.ok(true);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PutMapping("/players/{userId}")
-    public ResponseEntity<?> updatePlayer(@PathVariable Long userId, @RequestBody Player player) {
-        try {
-            User existUser = userService.findByIdUser(userId);
-            Player savedPlayer = userService.updatePlayer(player);
-            return new ResponseEntity<>(savedPlayer, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/sessions")
-    public ResponseEntity<?> createSession(@RequestBody Session session) {
-        try {
-            Session savedSession = userService.createSession(session);
-            return new ResponseEntity<>(savedSession, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/sessions/{token}")
-    public ResponseEntity<?> getSessionByToken(@PathVariable String token) {
-        Session session = userService.findSessionByToken(token);
-        if (session != null) {
-            return ResponseEntity.ok(session);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/sessions/{token}")
-    public ResponseEntity<?> updateSession(@PathVariable String token, @RequestBody Session session) {
-        Session existSession = userService.findSessionByToken(token);
-        if (existSession == null) {
-            return ResponseEntity.notFound().build();
-        }
-        Session savedSession = userService.updateSession(session);
-        return new ResponseEntity<>(savedSession, HttpStatus.OK);
-    }
-
-    @GetMapping("/sessions")
-    public ResponseEntity<?> getListSession() {
-        List<Session> sessions = userService.findAll();
-        return new ResponseEntity<>(sessions, HttpStatus.OK);
     }
 }

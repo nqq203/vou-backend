@@ -10,11 +10,16 @@ import java.sql.Timestamp;
 public class CreateEventRequest {
     private String eventName;
 
-    private String imageUrl;
-
     private Integer numberOfVouchers;
 
     private Timestamp startDate;
 
     private Timestamp endDate;
+
+    public CreateEventRequest(String eventName, Integer numberOfVouchers, Timestamp startDate, Timestamp endDate) {
+        this.eventName = eventName;
+        this.numberOfVouchers = numberOfVouchers;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

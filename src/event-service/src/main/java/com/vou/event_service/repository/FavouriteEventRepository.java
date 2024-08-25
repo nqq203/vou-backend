@@ -1,6 +1,6 @@
 package com.vou.event_service.repository;
 
-import com.VOU.event_service.model.FavouriteEvent;
+import com.vou.event_service.model.FavouriteEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

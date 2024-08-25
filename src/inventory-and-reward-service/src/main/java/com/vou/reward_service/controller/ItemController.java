@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/inventory-and-rewards/items")
+@RequestMapping("/api/v1/inventory-and-reward/items")
 @CrossOrigin
 public class ItemController {
     @Autowired

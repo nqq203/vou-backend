@@ -7,7 +7,6 @@ import com.vou.auth_service.entity.*;
 import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.AuthenticationService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,20 +38,37 @@ public class AuthenticationController {
                             HttpStatus.UNAUTHORIZED, null));
         }
 
-        if (token.equals("invalid")) {
+        if (token.equals("1")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("Unverified account, please verify OTP",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
+        if (token.equals("2")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Unverified account, please waiting for account approval",
+                            HttpStatus.UNAUTHORIZED, null));
+        }
+
 
         User user = authenticationService.loadUserByUsername(loginRequest.getUsername());
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
         }
 
-        Long id = user.getIdUser();
-        LoginResponse loginResponse = new LoginResponse(token, id);
+        Object account;
+        if (user.getRole().toString().equalsIgnoreCase("admin")) {
+            account = authenticationService.getAdminById(user.getIdUser());
+        }
+        else if (user.getRole().toString().equalsIgnoreCase("player")) {
+            account = authenticationService.getPlayerById(user.getIdUser());
+        }
+        else {
+            account = authenticationService.getBrandById(user.getIdUser());
+        }
+
+        LoginResponse loginResponse = new LoginResponse(token, account);
         return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
     }
 
@@ -122,9 +138,9 @@ public class AuthenticationController {
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
             }
-            Long id = user.getIdUser();
             if (token != null) {
-                LoginResponse loginResponse = new LoginResponse(token, id);
+                Object account = authenticationService.getPlayerById(user.getIdUser());
+                LoginResponse loginResponse = new LoginResponse(token, account);
                 return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
             }
             else {

@@ -1,8 +1,8 @@
 package com.vou.auth_service.service;
 
+import com.vou.auth_service.constant.Role;
 import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.model.Session;
-import com.vou.auth_service.model.User;
+import com.vou.auth_service.model.*;
 import com.vou.auth_service.service.registration_factory.RegistrationFactory;
 import com.vou.auth_service.service.registration_interface.IRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,11 @@ public class AuthenticationService {
         User user = response.get();
 
         if (user.getStatus() != Status.ACTIVE) {
-            resendOtp(user.getUsername(), user.getEmail());
-            return "invalid";
+            if (user.getRole() == Role.PLAYER) {
+                resendOtp(user.getUsername(), user.getEmail());
+                return "1";
+            }
+            return "2";
         }
 
         if (passwordEncoder.matches(password, user.getPassword())) {
@@ -79,15 +82,6 @@ public class AuthenticationService {
     }
 
     public boolean register(User user) {
-//        System.out.println("789");
-//        if (userRepository.existsByUsername(user.getUsername())) {
-//            return false;
-//        }
-//        System.out.println("789");
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//        System.out.println("91011");
-//        return true;
         IRegistration registrationService = registrationFactory.getRegistration(user.getRole().toString());
         return registrationService.register(user);
     }
@@ -159,5 +153,32 @@ public class AuthenticationService {
             return session.isActive();
         }
         return false;
+    }
+
+    public Object getPlayerById(Long id) {
+        try {
+            return client.getPlayerByIdUser(id).orElse(null);
+        } catch (Exception e) {
+            System.out.println("Error retrieving player in client" + e);
+            return null;
+        }
+    }
+
+    public Object getAdminById(Long id) {
+        try {
+            return client.getAdminByIdUser(id).orElse(null);
+        } catch (Exception e) {
+            System.out.println("Error retrieving admin in client" + e);
+            return null;
+        }
+    }
+
+    public Object getBrandById(Long id) {
+        try {
+            return client.getBrandByIdUser(id).orElse(null);
+        } catch (Exception e) {
+            System.out.println("Error retrieving brand in client" + e);
+            return null;
+        }
     }
 }

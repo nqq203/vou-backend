@@ -69,6 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String jsonResponse = "{\"message\":\"Internal server error when validate token\", \"code\":500}";
                     response.getWriter().write(jsonResponse);
                     response.getWriter().flush();
+                    return;
                 }
                 if (isValidToken) {
                     System.out.println("In JWT config: valid token and username");

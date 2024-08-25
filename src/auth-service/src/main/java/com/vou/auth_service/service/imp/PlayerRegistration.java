@@ -32,13 +32,14 @@ public class PlayerRegistration implements IRegistration {
             return false;
         }
 
+        System.out.println("Qua day 1");
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         Player player = new Player(user, encodedPassword);
         // Set other specific fields for Admin
 
         try {
             boolean isSaved = client.createPlayer(player);
-
+            System.out.println("Qua day 2");
             if (isSaved) {
                 //Generate and send OTP
                 String otp = otpService.generateOtp();
@@ -46,6 +47,7 @@ public class PlayerRegistration implements IRegistration {
 
                 if (player.getEmail() != null) {
                     otpService.sendOtpEmail(player.getEmail(), otp);
+                    System.out.println("Qua day 3");
                 }
             }
 

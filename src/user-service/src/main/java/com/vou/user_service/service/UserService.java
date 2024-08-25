@@ -1,6 +1,7 @@
 package com.vou.user_service.service;
 
 import com.vou.user_service.common.NotFoundException;
+import com.vou.user_service.constant.Gender;
 import com.vou.user_service.constant.Regex;
 import com.vou.user_service.constant.Role;
 import com.vou.user_service.constant.Status;
@@ -28,7 +29,7 @@ public class UserService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    public User updateUser(Long userId, Map<String, Object> updates) throws Exception{
+    public User updateUser(Long userId, Map<String, Object> updates) throws Exception {
         User updatedUser;
         try {
             updatedUser = userRepository.findById(userId).orElse(null);
@@ -38,7 +39,7 @@ public class UserService {
         System.out.println("User updating: " + updates);
         if (updatedUser != null) {
             updates.forEach((key, value) -> {
-                switch(key) {
+                switch (key) {
                     case "username":
                         updatedUser.setUsername((String) value);
                         break;
@@ -64,6 +65,40 @@ public class UserService {
                     case "status":
                         Status status = checkStatus((String) value);
                         updatedUser.setStatus(status);
+                        break;
+                    case "avatarUrl":
+                        updatedUser.setAvatarUrl((String) value);
+                        break;
+                    case "address":
+                        updatedUser.setAddress((String) value);
+                        break;
+                        // Các trường đặc thù cho Brand
+                    case "field":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setField((String) value);
+                        }
+                        break;
+                    case "latitude":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setLatitude((Double) value);
+                        }
+                        break;
+                    case "longitude":
+                        if (updatedUser instanceof Brand) {
+                            ((Brand) updatedUser).setLongitude((Double) value);
+                        }
+                        break;
+                    // Các trường đặc thù cho Player
+                    case "gender":
+                        if (updatedUser instanceof Player) {
+                            ((Player) updatedUser).setGender(Gender.valueOf((String) value));
+                        }
+                        break;
+                    case "facebookUrl":
+                        if (updatedUser instanceof Player) {
+                            ((Player) updatedUser).setFacebookUrl((String) value);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -72,7 +107,16 @@ public class UserService {
             throw new NotFoundException("User not found");
         }
 
-        userRepository.save(updatedUser);
+        if (updatedUser instanceof Player && updatedUser.getRole() == Role.PLAYER) {
+            playerRepository.save((Player) updatedUser);
+        } else if (updatedUser instanceof Brand && updatedUser.getRole() == Role.BRAND) {
+            brandRepository.save((Brand) updatedUser);
+        } else if (updatedUser instanceof Admin && updatedUser.getRole() == Role.ADMIN) {
+            adminRepository.save((Admin) updatedUser);
+        } else {
+            userRepository.save(updatedUser);
+        }
+
         return updatedUser;
     }
 
@@ -124,7 +168,7 @@ public class UserService {
         }
     }
 
-    public User findByIdentifier(String identifier) throws Exception{
+    public User findByIdentifier(String identifier) throws Exception {
         Pattern emailPattern = Pattern.compile(Regex.EMAIL_REGEX);
         Matcher matcher = emailPattern.matcher(identifier);
         User userFound = null;
@@ -168,11 +212,60 @@ public class UserService {
         return playerFound;
     }
 
+    public Admin findAdminByUserId(Long id) throws Exception {
+        Admin adminFound;
+        try {
+            adminFound = adminRepository.findByIdUser(id);
+        } catch (Exception e) {
+            throw new Exception("Error finding player");
+        }
+        if (adminFound == null)
+            throw new NotFoundException("Player not found");
+        return adminFound;
+    }
+
+    public Brand findBrandByUserId(Long id) throws Exception {
+        Brand brandFound;
+        try {
+            brandFound = brandRepository.findByIdUser(id);
+        } catch (Exception e) {
+            throw new Exception("Error finding player");
+        }
+        if (brandFound == null)
+            throw new NotFoundException("Player not found");
+        return brandFound;
+    }
+
     public Player updatePlayer(Player player) throws Exception {
         try {
             return playerRepository.save(player);
         } catch (Exception e) {
             throw new Exception("Error update player", e);
+        }
+    }
+
+    public Boolean updateAvatarUser(Long idUser, String url) {
+        User updatedUser;
+        try {
+            updatedUser = userRepository.findById(idUser).orElse(null);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return false;
+        }
+        if (updatedUser != null) {
+            updatedUser.setAvatarUrl(url);
+            userRepository.save(updatedUser);
+            return true;
+        }
+        return false;
+    }
+
+    public List<User> findAllUsers() {
+        try {
+            return userRepository.findAll();
+        }
+        catch (Exception e) {
+            return null;
         }
     }
 
@@ -199,5 +292,4 @@ public class UserService {
     public User updateUserInternal(User user) {
         return userRepository.save(user);
     }
-
 }
