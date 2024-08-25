@@ -27,14 +27,18 @@ public class Game {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "event_id")
+    private Long idEvent;
+
     @Column(name = "instruction")
     private String instruction;
 
     @Column(name = "started_at")
     private Timestamp startedAt;
 
-    public Game(String name, String type) {
+    public Game(String name, String type, Long idEvent) {
         this.name = name;
         this.type = type;
+        this.idEvent = idEvent;
     }
 }

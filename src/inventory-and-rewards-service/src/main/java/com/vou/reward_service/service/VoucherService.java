@@ -28,13 +28,13 @@ public class VoucherService {
             voucher.setImageUrl(request.getImageUrl());
             voucher.setDescription(request.getDescription());
             voucher.setExpirationDate(request.getExpirationDate());
-            voucher.setStatus("active");
+            voucher.setType("active");
             voucher.setIdItem1(request.getIdItem1());
             voucher.setIdItem2(request.getIdItem2());
             voucher.setIdItem3(request.getIdItem3());
             voucher.setIdItem4(request.getIdItem4());
             voucher.setIdItem5(request.getIdItem5());
-            voucher.setAmCoin(request.getAmCoin());
+            voucher.setAmCoin(request.getAimCoin());
             voucher.setIdEvent(request.getIdEvent());
             voucherRepository.save(voucher);
 
@@ -73,8 +73,8 @@ public class VoucherService {
                 if (request.getExpirationDate() != null) {
                     voucherFound.setExpirationDate(request.getExpirationDate());
                 }
-                if (request.getStatus() != null) {
-                    voucherFound.setStatus(request.getStatus());
+                if (request.getType() != null) {
+                    voucherFound.setType(request.getType());
                 }
                 if (request.getIdItem1() != null) {
                     voucherFound.setIdItem1(request.getIdItem1());
@@ -91,8 +91,8 @@ public class VoucherService {
                 if (request.getIdItem5() != null) {
                     voucherFound.setIdItem5(request.getIdItem5());
                 }
-                if (request.getAmCoin() != null) {
-                    voucherFound.setAmCoin(request.getAmCoin());
+                if (request.getAimCoin() != null) {
+                    voucherFound.setAmCoin(request.getAimCoin());
                 }
                 if (request.getIdEvent() != null) {
                     voucherFound.setIdEvent(request.getIdEvent());
