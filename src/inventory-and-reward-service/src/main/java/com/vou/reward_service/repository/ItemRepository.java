@@ -9,4 +9,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Override
     List<Item> findAll();
     Item findItemByIdItem(Long id_item);
+
 }

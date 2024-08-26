@@ -9,5 +9,4 @@ public class InventoryAndRewardsService {
     public static void main(String[] args) {
         SpringApplication.run(InventoryAndRewardsService.class, args);
     }
-
 }

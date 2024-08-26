@@ -3,6 +3,7 @@ package com.vou.event_service.service;
 
 import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.InventoryDTO;
+import com.vou.event_service.dto.InventoryDetailDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -41,5 +42,14 @@ public class InventoryService {
         } else {
             System.out.println("Failed to create quizzes: " + response.getStatusCode());
         }
+    }
+    public InventoryDetailDTO getInventoryInfo(Long eventId) {
+        String url = "http://inventory-and-reward-service:8087/api/v1/inventory-and-rewards/vouchers/voucher-info?eventId=" + eventId;
+
+        // Make the GET request
+        ResponseEntity<InventoryDetailDTO> response = restTemplate.getForEntity(url, InventoryDetailDTO.class);
+
+        // Return the body of the response
+        return response.getBody();
     }
 }

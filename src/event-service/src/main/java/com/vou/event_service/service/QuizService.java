@@ -44,4 +44,13 @@ public class QuizService {
             System.out.println("Failed to create quizzes: " + response.getStatusCode());
         }
     }
+    public GameInfoDTO getGameInfo(Long eventId) {
+        String url = "http://streaming-service:8086/api/v1/game/game-info?eventId=" + eventId;
+
+        // Make the GET request
+        ResponseEntity<GameInfoDTO> response = restTemplate.getForEntity(url, GameInfoDTO.class);
+
+        // Return the body of the response
+        return response.getBody();
+    }
 }
