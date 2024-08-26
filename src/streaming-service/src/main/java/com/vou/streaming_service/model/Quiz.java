@@ -30,7 +30,7 @@ public class Quiz {
 
     private String ans3;
 
-    private Long id_game;
+    private Long idGame;
 
     private int correctAnswerIndex;
 
@@ -39,10 +39,12 @@ public class Quiz {
         this.ans1= quizDTO.getAns1();
         this.ans2= quizDTO.getAns2();
         this.ans3= quizDTO.getAns3();
-        this.id_game=id_game;
+        this.idGame=id_game;
         this.correctAnswerIndex = quizDTO.getCorrectAnswerIndex();
     }
 
+    public Quiz() {
+    }
     //    public Quiz(String question, List<Option> options, int correctAnswerIndex) {
 //        this.question = question;
 //        this.options = options;

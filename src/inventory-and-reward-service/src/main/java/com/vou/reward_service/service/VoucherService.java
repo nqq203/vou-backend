@@ -1,9 +1,12 @@
 package com.vou.reward_service.service;
 
+import com.vou.reward_service.common.NotFoundException;
 import com.vou.reward_service.constant.HttpStatus;
 import com.vou.reward_service.entity.CreateVoucherRequest;
+import com.vou.reward_service.entity.UserVoucher;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
+import com.vou.reward_service.repository.VoucherRepoRepository;
 import com.vou.reward_service.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,8 @@ import java.util.List;
 public class VoucherService {
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private VoucherRepoRepository voucherRepoRepository;
 
     public List<Voucher> getAllVouchers() {
         return voucherRepository.findAll();
@@ -22,7 +27,7 @@ public class VoucherService {
     public Integer createVoucher(CreateVoucherRequest request) {
         try {
             Voucher voucher = new Voucher();
-            voucher.setCode(request.getCode());
+            voucher.setCode(request.getCode().toUpperCase());
             voucher.setQrCode(request.getQrCode());
             voucher.setVoucherName(request.getVoucherName());
             voucher.setImageUrl(request.getImageUrl());
@@ -34,7 +39,7 @@ public class VoucherService {
             voucher.setIdItem3(request.getIdItem3());
             voucher.setIdItem4(request.getIdItem4());
             voucher.setIdItem5(request.getIdItem5());
-            voucher.setAmCoin(request.getAimCoin());
+            voucher.setAimCoin(request.getAimCoin());
             voucher.setIdEvent(request.getIdEvent());
             voucherRepository.save(voucher);
 
@@ -46,7 +51,7 @@ public class VoucherService {
 
     public Voucher findVoucherByCode(String code) {
         try {
-            return voucherRepository.findByCode(code);
+            return voucherRepository.findByCode(code.toUpperCase());
         } catch (Exception e) {
             return null;
         }
@@ -54,7 +59,7 @@ public class VoucherService {
 
     public Integer updateVoucherByCode(String code, CreateVoucherRequest request) {
         try {
-            Voucher voucherFound = voucherRepository.findByCode(code);
+            Voucher voucherFound = voucherRepository.findByCode(code.toUpperCase());
             if (voucherFound == null) {
                 return HttpStatus.NOT_FOUND;
             } else {
@@ -92,7 +97,7 @@ public class VoucherService {
                     voucherFound.setIdItem5(request.getIdItem5());
                 }
                 if (request.getAimCoin() != null) {
-                    voucherFound.setAmCoin(request.getAimCoin());
+                    voucherFound.setAimCoin(request.getAimCoin());
                 }
                 if (request.getIdEvent() != null) {
                     voucherFound.setIdEvent(request.getIdEvent());
@@ -108,7 +113,7 @@ public class VoucherService {
     // TODO: Delete from voucherrepo first
     public Integer deleteVoucherByCode(String code) {
         try {
-            Voucher voucherFound = voucherRepository.findByCode(code);
+            Voucher voucherFound = voucherRepository.findByCode(code.toUpperCase());
             if (voucherFound == null) {
                 return HttpStatus.NOT_FOUND;
             }
@@ -116,6 +121,20 @@ public class VoucherService {
             return HttpStatus.OK;
         } catch (Exception e) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    public List<UserVoucher> getVouchersByUserId(Long id) throws Exception{
+        try {
+            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id);
+            if (vouchersFound == null || vouchersFound.isEmpty()) {
+                throw new NotFoundException("Not found any vouchers of this user");
+            }
+            return vouchersFound;
+        } catch (NotFoundException notFoundException) {
+            throw notFoundException;
+        } catch (Exception e) {
+            throw new Exception("Internal Error getting vouchers of user");
         }
     }
 }
