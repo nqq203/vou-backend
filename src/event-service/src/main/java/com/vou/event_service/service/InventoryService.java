@@ -25,7 +25,7 @@ public class InventoryService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://inventory-and-reward-service:8087/api/v1/inventory-and-reward/vouchers";
+    private final String QUIZ_SERVICE_URL = "http://localhost:8081/api/v1/inventory-and-reward/vouchers";
 
     public void createInventory(InventoryDTO inventoryDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -50,7 +50,7 @@ public class InventoryService {
         }
     }
     public InventoryDetailDTO getInventoryInfo(Long eventId) {
-        String url = "http://inventory-and-reward-service:8087/api/v1/inventory-and-rewards/vouchers/voucher-info?eventId=" + eventId;
+        String url = "http://localhost:8081/api/v1/inventory-and-reward/vouchers/voucher-info?eventId=" + eventId;
 
         // Make the GET request
         ResponseEntity<InventoryDetailDTO> response = restTemplate.getForEntity(url, InventoryDetailDTO.class);

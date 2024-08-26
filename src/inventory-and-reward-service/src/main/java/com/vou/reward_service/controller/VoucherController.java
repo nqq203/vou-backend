@@ -7,7 +7,7 @@ import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.entity.UserVoucher;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
-import com.vou.reward_service.service.StorageService;
+//import com.vou.reward_service.service.StorageService;
 import com.vou.reward_service.service.VoucherRepoService;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
@@ -40,8 +40,8 @@ public class VoucherController {
 
     @Autowired
     private ItemRepository itemRepository;
-    @Autowired
-    private StorageService storageService;
+//    @Autowired
+//    private StorageService storageService;
 
     @GetMapping("")
     public ResponseEntity<List<Voucher>> getVouchers() {
@@ -189,40 +189,40 @@ public class VoucherController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("")
-    public ResponseEntity<InventoryImageUrlDTO> uploadInventoryImages(
-            @RequestParam("code") String code,
-            @ModelAttribute InventoryImageDTO inventoryImages
-    ) {
-        Voucher existVoucher;
-        try {
-            existVoucher = voucherService.findVoucherByCode(code);
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-        if (!isImageFile(inventoryImages.getQrImg()) || !isImageFile(inventoryImages.getVoucherImg())) {
-            return ResponseEntity.badRequest().build();
-        }
-        try {
-            String qrImgUrl = storageService.uploadImage(inventoryImages.getQrImg(), "qr_code");
-            String voucherImgUrl = storageService.uploadImage(inventoryImages.getVoucherImg(), "voucher");
-
-            if (qrImgUrl == null || voucherImgUrl == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-            boolean isUploaded = voucherService.uploadInventoryImages(existVoucher, qrImgUrl, voucherImgUrl);
-            if (!isUploaded) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-            return ResponseEntity.ok(new InventoryImageUrlDTO(qrImgUrl, voucherImgUrl));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    private boolean isImageFile(MultipartFile file) {
-        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
-    }
+//    @PutMapping("")
+//    public ResponseEntity<InventoryImageUrlDTO> uploadInventoryImages(
+//            @RequestParam("code") String code,
+//            @ModelAttribute InventoryImageDTO inventoryImages
+//    ) {
+//        Voucher existVoucher;
+//        try {
+//            existVoucher = voucherService.findVoucherByCode(code);
+//        } catch (NotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//        if (!isImageFile(inventoryImages.getQrImg()) || !isImageFile(inventoryImages.getVoucherImg())) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//        try {
+//            String qrImgUrl = storageService.uploadImage(inventoryImages.getQrImg(), "qr_code");
+//            String voucherImgUrl = storageService.uploadImage(inventoryImages.getVoucherImg(), "voucher");
+//
+//            if (qrImgUrl == null || voucherImgUrl == null) {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            }
+//            boolean isUploaded = voucherService.uploadInventoryImages(existVoucher, qrImgUrl, voucherImgUrl);
+//            if (!isUploaded) {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            }
+//            return ResponseEntity.ok(new InventoryImageUrlDTO(qrImgUrl, voucherImgUrl));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+//
+//    private boolean isImageFile(MultipartFile file) {
+//        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
+//    }
 }

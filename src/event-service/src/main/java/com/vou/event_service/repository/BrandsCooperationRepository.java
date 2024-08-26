@@ -9,4 +9,5 @@ import java.util.List;
 public interface BrandsCooperationRepository extends JpaRepository<BrandsCooperation, Long> {
     BrandsCooperation findByIdBrandCooperation(Long idBrandCooperation);
     List<BrandsCooperation> findAllByIdEvent(Long idEvent);
+    List<BrandsCooperation> findAllByIdBrand(Long idBrand);
 }
