@@ -1,4 +1,4 @@
-package com.vou.user_service.config;
+package com.vou.event_service.config;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,11 +1,10 @@
-package com.vou.user_service.service;
+package com.vou.reward_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectAclRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -16,11 +15,11 @@ public class StorageService {
     @Autowired
     private S3Client s3Client;
 
-    public String uploadImage(MultipartFile avatarFile) throws IOException {
+    public String uploadImage(MultipartFile avatarFile, String folder) throws IOException {
         String bucketName = "vou-storage";
 
         try {
-            String keyName = "avatar/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
+            String keyName = folder + "/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
             String contentType = avatarFile.getContentType();
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()

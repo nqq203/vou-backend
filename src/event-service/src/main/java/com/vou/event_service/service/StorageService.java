@@ -1,4 +1,4 @@
-package com.vou.user_service.service;
+package com.vou.event_service.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class StorageService {
         String bucketName = "vou-storage";
 
         try {
-            String keyName = "avatar/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
+            String keyName = "banner/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
             String contentType = avatarFile.getContentType();
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()

@@ -1,23 +1,24 @@
 package com.vou.reward_service.controller;
 
 import com.vou.reward_service.common.*;
-import com.vou.reward_service.dto.InventoryDTO;
-import com.vou.reward_service.dto.InventoryDetailDTO;
-import com.vou.reward_service.dto.ItemDetailDTO;
+import com.vou.reward_service.dto.*;
 import com.vou.reward_service.entity.CreateItemRequest;
 import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.entity.UserVoucher;
+import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
+import com.vou.reward_service.service.StorageService;
 import com.vou.reward_service.service.VoucherRepoService;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import com.vou.reward_service.repository.ItemRepository;
 import com.vou.reward_service.repository.VoucherRepository;
-import com.vou.reward_service.service.ItemService;
-import com.vou.reward_service.constant.HttpStatus;
 import com.vou.reward_service.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class VoucherController {
 
     @Autowired
     private ItemRepository itemRepository;
+    @Autowired
+    private StorageService storageService;
 
     @GetMapping("")
     public ResponseEntity<List<Voucher>> getVouchers() {
@@ -159,7 +162,7 @@ public class VoucherController {
     }
   
     @GetMapping("/voucher-info")
-    public ResponseEntity<InventoryDetailDTO> getInventoryInfo(@RequestParam Long eventId){
+    public ResponseEntity<InventoryDetailDTO> getInventoryInfo(@RequestParam Long eventId) {
         Voucher voucher = voucherRepository.findByIdEvent(eventId);
         List<Item> items = new ArrayList<>();
         addItemToList(voucher.getIdItem1(), items);
@@ -184,5 +187,42 @@ public class VoucherController {
         );
 
         return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<InventoryImageUrlDTO> uploadInventoryImages(
+            @RequestParam("code") String code,
+            @ModelAttribute InventoryImageDTO inventoryImages
+    ) {
+        Voucher existVoucher;
+        try {
+            existVoucher = voucherService.findVoucherByCode(code);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        if (!isImageFile(inventoryImages.getQrImg()) || !isImageFile(inventoryImages.getVoucherImg())) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            String qrImgUrl = storageService.uploadImage(inventoryImages.getQrImg(), "qr_code");
+            String voucherImgUrl = storageService.uploadImage(inventoryImages.getVoucherImg(), "voucher");
+
+            if (qrImgUrl == null || voucherImgUrl == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            boolean isUploaded = voucherService.uploadInventoryImages(existVoucher, qrImgUrl, voucherImgUrl);
+            if (!isUploaded) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            return ResponseEntity.ok(new InventoryImageUrlDTO(qrImgUrl, voucherImgUrl));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private boolean isImageFile(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
     }
 }

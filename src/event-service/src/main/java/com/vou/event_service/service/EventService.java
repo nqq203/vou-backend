@@ -76,4 +76,14 @@ public class EventService {
         }
     }
 
+    public Boolean uploadEventImage(Event event, String bannerUrl) throws Exception {
+        try {
+            event.setImageUrl(bannerUrl);
+            eventRepository.save(event);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
 }
