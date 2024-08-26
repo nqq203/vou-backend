@@ -19,4 +19,7 @@ public class BrandsCooperation {
 
     @Column(name = "id_brand")
     private Long idBrand;
+
+    @Column(name= "name_brand")
+    private String nameBrand;
 }

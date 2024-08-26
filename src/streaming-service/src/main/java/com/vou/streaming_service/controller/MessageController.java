@@ -14,6 +14,7 @@ import com.vou.streaming_service.model.QuizGame;
 import com.vou.streaming_service.model.ShakeGame;
 import com.vou.streaming_service.repository.GameRepository;
 import com.vou.streaming_service.repository.QuizGameRepository;
+import com.vou.streaming_service.repository.QuizRepository;
 import com.vou.streaming_service.repository.ShakeGameRepository;
 import com.vou.streaming_service.service.EventSchedulerService;
 import com.vou.streaming_service.service.MessageService;
@@ -47,6 +48,9 @@ public class MessageController{
 
     @Autowired
     private QuizGameRepository quizGameRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     @Autowired
     private ShakeGameRepository shakeGameRepository;
@@ -83,6 +87,26 @@ public class MessageController{
         quizService.saveQuizzes(quizzes);
         return ResponseEntity.ok("Save successfuly");
     }
+    @GetMapping("/game-info")
+    public ResponseEntity<GameInfoDTO>  getDetailGameInfo(@RequestParam Long eventId){
+        Game game = gameRepository.findByIdEvent(eventId);
+
+        List<Quiz> quizzes= quizRepository.findAllByIdGame(game.getIdGame());
+
+        List<QuizDTO> quizDto= quizzes.stream()
+                .map(QuizDTO::new)
+                .collect(Collectors.toList());
+        GameInfoDTO gameInfoDTO =new GameInfoDTO(
+                game.getIdGame(),
+                game.getName(),
+                game.getType(),
+                game.getStartedAt(),
+                game.getIdEvent(),
+                quizDto
+        );
+        return ResponseEntity.ok(gameInfoDTO);
+    }
+
 }
 
 
