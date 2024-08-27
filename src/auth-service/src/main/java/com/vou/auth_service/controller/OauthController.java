@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/oauth")
 @CrossOrigin
 public class OauthController {
-    @GetMapping("/home")
+    @GetMapping("")
     public String home(@AuthenticationPrincipal OAuth2AuthenticationToken authentication) {
         if (authentication != null) {
             OidcUser user = (OidcUser) authentication.getPrincipal();

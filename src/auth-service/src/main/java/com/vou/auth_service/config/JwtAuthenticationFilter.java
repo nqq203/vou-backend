@@ -35,7 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/register",
             "/api/v1/auth/verify-otp/**",
             "/api/v1/auth/resend-otp",
-            "/api/v1/auth/validate-token"
+            "/api/v1/auth/validate-token",
+            "/api/v1/oauth/home",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/swagger-resources/**"
     );
 
     @Override
