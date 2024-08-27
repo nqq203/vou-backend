@@ -27,7 +27,7 @@ public class BrandsCooperationController {
         }
     }
 
-    @GetMapping("/brands-cooperation/{id_event_id_brand}")
+    @GetMapping("/{id_event_id_brand}")
     public ResponseEntity<?> getBrandsCooperationById(@PathVariable("id_event_id_brand") Long id_event_id_brand) {
         try {
             BrandsCooperation brandsCooperation = brandsCooperationService.getBrandsCooperationById(id_event_id_brand);
@@ -51,7 +51,7 @@ public class BrandsCooperationController {
         }
     }
 
-    @PutMapping("/brands-cooperation/{id_event_id_brand}")
+    @PutMapping("/{id_event_id_brand}")
     public ResponseEntity<?> updateBrandsCooperation(@PathVariable("id_event_id_brand") Long id, @RequestBody CreateBrandsCooperationRequest request) {
         try {
             BrandsCooperation updatedBrandsCooperation = brandsCooperationService.updateBrandsCooperation(id, request);
@@ -63,7 +63,7 @@ public class BrandsCooperationController {
         }
     }
 
-    @DeleteMapping("/brands-cooperation/{id_event_id_brand}")
+    @DeleteMapping("/{id_event_id_brand}")
     public ResponseEntity<?> deleteBrandsCooperation(@PathVariable("id_event_id_brand") Long id) {
         try {
             boolean result = brandsCooperationService.deleteBrandsCooperationById(id);

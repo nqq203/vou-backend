@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/v1/inventory-and-reward/vouchers")
+@RequestMapping("/api/v1/vouchers")
 public class VoucherController {
     @Autowired
     private VoucherService voucherService;
@@ -161,8 +161,8 @@ public class VoucherController {
         }
     }
   
-    @GetMapping("/voucher-info")
-    public ResponseEntity<InventoryDetailDTO> getInventoryInfo(@RequestParam Long eventId) {
+    @GetMapping("/events/{eventId}")
+    public ResponseEntity<InventoryDetailDTO> getInventoryInfo(@PathVariable Long eventId) {
         Voucher voucher = voucherRepository.findByIdEvent(eventId);
         List<Item> items = new ArrayList<>();
         addItemToList(voucher.getIdItem1(), items);
