@@ -31,7 +31,7 @@ public class ItemRepoService {
 
 
         if (voucher.getIdItem5() != null) {
-            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndAmountIsGreaterThan(voucher.getIdItem5(), voucher.getAmCoin());
+            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndAmountIsGreaterThan(voucher.getIdItem5(), voucher.getAimCoin());
             if (enoughCoin) {
                 return true;
             } else {
@@ -60,7 +60,7 @@ public class ItemRepoService {
 
         if (voucher.getIdItem5() != null) {
             ItemRepo itemRepo = itemRepoRepository.findItemRepoByIdItem(voucher.getIdItem5());
-            itemRepo.setAmount(itemRepo.getAmount() - voucher.getAmCoin());
+            itemRepo.setAmount(itemRepo.getAmount() - voucher.getAimCoin());
             itemRepoRepository.save(itemRepo);
             return true;
         } else {

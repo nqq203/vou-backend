@@ -1,23 +1,81 @@
 package com.vou.event_service.service;
 
 import com.vou.event_service.common.NotFoundException;
+import com.vou.event_service.dto.EventDetailDTO;
+import com.vou.event_service.dto.GameInfoDTO;
+import com.vou.event_service.dto.InventoryDetailDTO;
+import com.vou.event_service.dto.ListEventDTO;
 import com.vou.event_service.entity.CreateEventRequest;
+import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EventService {
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private QuizService quizService;
+    @Autowired
+    private InventoryService inventoryService;
+    @Autowired
+    private BrandsCooperationRepository brandsCooperationRepository;
 
     public List<Event> getAllEvents() throws Exception{
         try {
             return eventRepository.findAll();
+        }
+        catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<ListEventDTO> getAllEventOfBrand(Long brandId){
+        List<Long> eventIds = brandsCooperationRepository.findAllByIdBrand(brandId)
+                .stream()
+                .map(BrandsCooperation::getIdEvent)
+                .collect(Collectors.toList());
+
+        List<Event> events =  eventRepository.findAllById(eventIds);
+        return events.stream()
+                .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
+                .collect(Collectors.toList());
+    }
+    public List<ListEventDTO> getAllEventActive(){
+        Timestamp currentTimestamp = Timestamp.from(Instant.now());;
+        List<Event> events = eventRepository.findActiveEvents(currentTimestamp);
+
+        return events.stream()
+                .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
+                .collect(Collectors.toList());
+
+    }
+    public EventDetailDTO getAnEvent(Long eventId)throws Exception{
+        try {
+            Event event = eventRepository.findByIdEvent(eventId);
+            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
+            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
+            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
+
+            EventDetailDTO eventDetailDTO = new EventDetailDTO(
+                    event.getIdEvent(),
+                    event.getEventName(),
+                    event.getNumberOfVouchers(),
+                    event.getStartDate(),
+                    event.getEndDate(),
+                    brandsCooperations,
+                    gameInfoDTO,
+                    inventoryDetailDTO
+            );
+            return eventDetailDTO;
         }
         catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -76,4 +134,14 @@ public class EventService {
         }
     }
 
+    public Boolean uploadEventImage(Event event, String bannerUrl) throws Exception {
+        try {
+            event.setImageUrl(bannerUrl);
+            eventRepository.save(event);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
 }

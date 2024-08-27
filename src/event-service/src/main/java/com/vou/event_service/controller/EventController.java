@@ -5,17 +5,16 @@ import com.vou.event_service.dto.*;
 
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
+import com.vou.event_service.entity.EventImageResponse;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.repository.BrandsCooperationRepository;
-import com.vou.event_service.service.BrandsCooperationService;
-import com.vou.event_service.service.EventService;
-import com.vou.event_service.service.InventoryService;
-import com.vou.event_service.service.QuizService;
+import com.vou.event_service.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -37,15 +36,22 @@ public class EventController {
 
     @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private StorageService storageService;
 
 
     @GetMapping("")
-    public ResponseEntity<?> fetchEvent(){
+    public ResponseEntity<?> fetchEvent(
+            @RequestParam(value="brandId", required = false) Long brandId
+    ){
         try {
-            List<Event> allEvents = eventService.getAllEvents();
-            List<ListEventDTO> listEventDTOs = allEvents.stream()
-                    .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
-                    .collect(Collectors.toList());
+            List<ListEventDTO> listEventDTOs;
+            if (brandId != null){
+                listEventDTOs = eventService.getAllEventOfBrand(brandId);
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
+            }
+
+            listEventDTOs = eventService.getAllEventActive();
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
@@ -83,26 +89,12 @@ public class EventController {
     @GetMapping("/{id_event}")
     public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
         try {
-            Event event = eventService.findEventById(id_event);
-            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
-            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
-            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
 
-            EventDetailDTO eventDetailDTO = new EventDetailDTO(
-                    event.getIdEvent(),
-                    event.getEventName(),
-                    event.getNumberOfVouchers(),
-                    event.getStartDate(),
-                    event.getEndDate(),
-                    brandsCooperations,
-                    gameInfoDTO,
-                    inventoryDetailDTO
-            );
-
+            EventDetailDTO event = eventService.getAnEvent(id_event);
             if (event == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
             }
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, eventDetailDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, event));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }
@@ -158,4 +150,48 @@ public class EventController {
 //        return ResponseEntity.ok(new SuccessResponse("Fetch successfully", HttpStatus.OK,events ));
 //    }
 
+    @PutMapping("")
+    public ResponseEntity<?> uploadEventImage(
+            @RequestParam("id_event") Long id_event,
+            @RequestParam("code") String code,
+            @ModelAttribute EventImageDTO eventImages
+    ) {
+        Event existEvent;
+        try {
+            existEvent = eventService.findEventById(id_event);
+        } catch (NotFoundException e) {
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy event!"));
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống"));
+        }
+        if (!isImageFile(eventImages.getBannerFile()) ||
+                !isImageFile(eventImages.getQrImage()) ||
+                !isImageFile(eventImages.getVoucherImg())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Loại tập tin không hợp lệ!", HttpStatus.BAD_REQUEST, "Chỉ file hình ảnh mới được chấp nhận!"));
+        }
+
+        try {
+            String bannerUrl = storageService.uploadImage(eventImages.getBannerFile());
+            Boolean isUploaded = eventService.uploadEventImage(existEvent, bannerUrl);
+            InventoryImageUrlDTO inventoryUrls = inventoryService.uploadInventoryImages(code, eventImages.getQrImage(), eventImages.getVoucherImg());
+            if (inventoryUrls == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống: Tải qr và ảnh voucher thất bại!"));
+            }
+            if (bannerUrl == null || !isUploaded) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống: Tải banner thất bại!"));
+            }
+            return ResponseEntity.ok(new SuccessResponse("Tải ảnh thành công!",
+                    HttpStatus.OK,
+                    new EventImageResponse(bannerUrl, inventoryUrls.getQrImgUrl(), inventoryUrls.getVoucherImgUrl())));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống!"));
+        }
+    }
+
+    private boolean isImageFile(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
+    }
 }

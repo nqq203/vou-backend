@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4cafa6a5-6547-4aad-bfda-6dcc5dbb656c" name="Changes" comment="" />
+    <list default="true" id="4cafa6a5-6547-4aad-bfda-6dcc5dbb656c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/ApiResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/AuthFailureResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/BadRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/ConflictResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/CreatedResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/ErrorResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/ForbiddenResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/InternalServerError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/NoContentResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/NotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/NotFoundResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/SuccessResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inventory-and-rewards-service/src/main/java/com/vou/reward_service/common/UnprocessableContentResponse.java" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,6 +96,8 @@
       <workItem from="1721118910266" duration="48000" />
       <workItem from="1721144855228" duration="256000" />
       <workItem from="1722089034193" duration="184000" />
+      <workItem from="1724661247355" duration="1215000" />
+      <workItem from="1724662703662" duration="345000" />
     </task>
     <servers />
   </component>
