@@ -192,20 +192,22 @@ public class VoucherController {
 
    @PutMapping("")
    public ResponseEntity<InventoryImageUrlDTO> uploadInventoryImages(
-           @RequestParam("code") String code,
+           @RequestParam("id_event") Long id_event,
            @ModelAttribute InventoryImageDTO inventoryImages
    ) {
-       Voucher existVoucher;
-       try {
-           existVoucher = voucherService.findVoucherByCode(code);
-       } catch (NotFoundException e) {
-           return ResponseEntity.notFound().build();
-       } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-       }
        if (!isImageFile(inventoryImages.getQrImg()) || !isImageFile(inventoryImages.getVoucherImg())) {
            return ResponseEntity.badRequest().build();
        }
+       Voucher existVoucher;
+       try {
+           existVoucher = voucherService.findVoucherByIdEvent(id_event);
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       }
+       if (existVoucher == null) {
+           return ResponseEntity.notFound().build();
+       }
+
        try {
            String qrImgUrl = storageService.uploadImage(inventoryImages.getQrImg(), "qr_code");
            String voucherImgUrl = storageService.uploadImage(inventoryImages.getVoucherImg(), "voucher");

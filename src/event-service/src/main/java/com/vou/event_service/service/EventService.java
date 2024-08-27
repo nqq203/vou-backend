@@ -97,8 +97,7 @@ public class EventService {
 
     public Event findEventById(Long id) throws Exception {
         try {
-            Event eventFound = eventRepository.findByIdEvent(id);
-            return eventFound;
+            return eventRepository.findByIdEvent(id);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }

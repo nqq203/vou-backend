@@ -58,6 +58,14 @@ public class VoucherService {
         }
     }
 
+    public Voucher findVoucherByIdEvent(Long eventId) throws Exception {
+        try {
+            return voucherRepository.findByIdEvent(eventId);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
     public Integer updateVoucherByCode(String code, CreateVoucherRequest request) {
         try {
             Voucher voucherFound = voucherRepository.findByCode(code.toUpperCase());

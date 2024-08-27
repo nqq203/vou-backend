@@ -153,30 +153,30 @@ public class EventController {
     @PutMapping("")
     public ResponseEntity<?> uploadEventImage(
             @RequestParam("id_event") Long id_event,
-            @RequestParam("code") String code,
             @ModelAttribute EventImageDTO eventImages
     ) {
-        Event existEvent;
-        try {
-            existEvent = eventService.findEventById(id_event);
-        } catch (NotFoundException e) {
-            System.out.println(e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy event!"));
-        } catch (Exception e) {
-            System.out.println(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống"));
-        }
         if (!isImageFile(eventImages.getBannerFile()) ||
                 !isImageFile(eventImages.getQrImage()) ||
                 !isImageFile(eventImages.getVoucherImg())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("Loại tập tin không hợp lệ!", HttpStatus.BAD_REQUEST, "Chỉ file hình ảnh mới được chấp nhận!"));
         }
+        Event existEvent;
+        try {
+            existEvent = eventService.findEventById(id_event);
+            System.out.println("Find event: " + existEvent);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống"));
+        }
+        if (existEvent == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy event!"));
+        }
 
         try {
             String bannerUrl = storageService.uploadImage(eventImages.getBannerFile());
             Boolean isUploaded = eventService.uploadEventImage(existEvent, bannerUrl);
-            InventoryImageUrlDTO inventoryUrls = inventoryService.uploadInventoryImages(code, eventImages.getQrImage(), eventImages.getVoucherImg());
+            InventoryImageUrlDTO inventoryUrls = inventoryService.uploadInventoryImages(id_event, eventImages.getQrImage(), eventImages.getVoucherImg());
             if (inventoryUrls == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống: Tải qr và ảnh voucher thất bại!"));
             }

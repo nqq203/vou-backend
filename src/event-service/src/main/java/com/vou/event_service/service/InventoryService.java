@@ -59,7 +59,7 @@ public class InventoryService {
         return response.getBody();
     }
 
-    public InventoryImageUrlDTO uploadInventoryImages(String code, MultipartFile qrImg, MultipartFile voucherImg) {
+    public InventoryImageUrlDTO uploadInventoryImages(Long eventId, MultipartFile qrImg, MultipartFile voucherImg) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -70,7 +70,7 @@ public class InventoryService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            String url = QUIZ_SERVICE_URL + "?code=" + code;
+            String url = QUIZ_SERVICE_URL + "?id_event=" + eventId;
 
             ResponseEntity<InventoryImageUrlDTO> response = restTemplate.exchange(
                     url
