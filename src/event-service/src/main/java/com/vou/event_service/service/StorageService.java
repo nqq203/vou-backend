@@ -13,28 +13,28 @@ import java.io.IOException;
 
 @Service
 public class StorageService {
-    @Autowired
-    private S3Client s3Client;
+   @Autowired
+   private S3Client s3Client;
 
-    public String uploadImage(MultipartFile avatarFile) throws IOException {
-        String bucketName = "vou-storage";
+   public String uploadImage(MultipartFile avatarFile) throws IOException {
+       String bucketName = "vou-storage";
 
-        try {
-            String keyName = "banner/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
-            String contentType = avatarFile.getContentType();
+       try {
+           String keyName = "banner/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
+           String contentType = avatarFile.getContentType();
 
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .contentType(contentType)
-                    .acl("public-read")
-                    .build();
+           PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                   .bucket(bucketName)
+                   .key(keyName)
+                   .contentType(contentType)
+                   .acl("public-read")
+                   .build();
 
-            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(avatarFile.getInputStream(), avatarFile.getSize()));
-            return "https://" + bucketName + ".s3.amazonaws.com/" + keyName;
-        } catch (S3Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
+           s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(avatarFile.getInputStream(), avatarFile.getSize()));
+           return "https://" + bucketName + ".s3.amazonaws.com/" + keyName;
+       } catch (S3Exception e) {
+           System.out.println(e.getMessage());
+           return null;
+       }
+   }
 }

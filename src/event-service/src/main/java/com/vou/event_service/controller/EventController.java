@@ -10,7 +10,6 @@ import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.service.*;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,12 +41,17 @@ public class EventController {
 
 
     @GetMapping("")
-    public ResponseEntity<?> fetchEvent(){
+    public ResponseEntity<?> fetchEvent(
+            @RequestParam(value="brandId", required = false) Long brandId
+    ){
         try {
-            List<Event> allEvents = eventService.getAllEvents();
-            List<ListEventDTO> listEventDTOs = allEvents.stream()
-                    .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
-                    .collect(Collectors.toList());
+            List<ListEventDTO> listEventDTOs;
+            if (brandId != null){
+                listEventDTOs = eventService.getAllEventOfBrand(brandId);
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
+            }
+
+            listEventDTOs = eventService.getAllEventActive();
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
@@ -85,26 +89,12 @@ public class EventController {
     @GetMapping("/{id_event}")
     public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
         try {
-            Event event = eventService.findEventById(id_event);
-            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
-            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
-            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
 
-            EventDetailDTO eventDetailDTO = new EventDetailDTO(
-                    event.getIdEvent(),
-                    event.getEventName(),
-                    event.getNumberOfVouchers(),
-                    event.getStartDate(),
-                    event.getEndDate(),
-                    brandsCooperations,
-                    gameInfoDTO,
-                    inventoryDetailDTO
-            );
-
+            EventDetailDTO event = eventService.getAnEvent(id_event);
             if (event == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
             }
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, eventDetailDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, event));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }
