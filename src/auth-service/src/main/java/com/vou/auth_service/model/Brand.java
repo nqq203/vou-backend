@@ -21,4 +21,37 @@ public class Brand extends User {
         this.setRole(user.getRole());
         this.setStatus(user.getStatus());
     }
+
+    public String getLogo_url() {
+        return logo_url;
+    }
+
+    public void setLogo_url(String logo_url) {
+        this.logo_url = logo_url;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 }

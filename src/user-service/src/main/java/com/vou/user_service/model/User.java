@@ -2,7 +2,9 @@ package com.vou.user_service.model;
 import com.vou.user_service.constant.Role;
 import com.vou.user_service.constant.Status;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,6 +59,73 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.status = status;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles;
+
+    // Getters and setters...
+
+    public Long getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public LocalDateTime getLockedDate() {
+        return lockedDate;
+    }
+
+    public void setLockedDate(LocalDateTime lockedDate) {
+        this.lockedDate = lockedDate;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Status getStatus() { return status; }
+
+    public void setStatus(Status status) {
         this.status = status;
     }
 }

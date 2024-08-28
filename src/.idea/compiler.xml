@@ -8,6 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
+        <module name="event_service" />
+        <module name="game-service" />
         <module name="statistics-service" />
         <module name="event-service" />
         <module name="api-gateway" />
@@ -15,6 +17,8 @@
         <module name="inventory-and-reward-service" />
         <module name="user-service" />
         <module name="turn-service" />
+        <module name="notification-service" />
+        <module name="reward-service" />
         <module name="service-registry" />
       </profile>
     </annotationProcessing>
