@@ -2,7 +2,6 @@ package com.vou.reward_service.controller;
 
 import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.service.ItemService;
-import com.vou.reward_service.constant.HttpStatus;
 import com.vou.reward_service.common.*;
 import com.vou.reward_service.dto.*;
 import com.vou.reward_service.entity.CreateItemRequest;
@@ -128,10 +127,10 @@ public class VoucherController {
         try {
             Integer result = voucherService.deleteVoucherByCode(code);
             HashMap<String, Object> response = new HashMap<>();
-            if (result == HttpStatus.NOT_FOUND) {
+            if (result == 404) {
                 response.put("status", HttpStatus.NOT_FOUND);
                 response.put("description", "Item not found");
-            } else if (result == HttpStatus.INTERNAL_SERVER_ERROR) {
+            } else if (result == 500) {
                 response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
                 response.put("description", "Internal server error");
             } else {
