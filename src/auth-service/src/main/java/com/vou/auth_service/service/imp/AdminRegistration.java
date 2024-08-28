@@ -20,8 +20,8 @@ public class AdminRegistration implements IRegistration {
 
     @Override
     public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
+        Optional<User> existingUserByUsername = client.getUserByUsername(user.getUsername());
+        Optional<User> existingUserByEmail = client.getUserByEmail(user.getEmail());
 
         if (existingUserByUsername.isPresent()) {
             return false;
@@ -47,7 +47,7 @@ public class AdminRegistration implements IRegistration {
     }
 
     @Override
-    public String resendOtp(String username, String email) {
+    public String resendOtp(String email) {
         return null;
     }
 }

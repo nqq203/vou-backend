@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 @Table(name = "sessions")
 public class Session {
     @Id
-    @Column(nullable = false, unique = true)
-    private String idSession;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
-    private Long idUser;
+    @Column(nullable = false, unique = true)
+    private String token;
 
     @Column(nullable = false)
     private boolean isActive;
@@ -20,24 +20,23 @@ public class Session {
     private LocalDateTime logoutAt;
 
     @Column(nullable = false)
-    private LocalDateTime expirationTime;
+    private LocalDateTime expiration;
 
     // Getters and Setters
-
-    public String getIdSession() {
-        return idSession;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdSession(String idSession) {
-        this.idSession = idSession;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getIdUser() {
-        return idUser;
+    public String getToken() {
+        return token;
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean isActive() {
@@ -56,11 +55,11 @@ public class Session {
         this.logoutAt = logoutAt;
     }
 
-    public LocalDateTime getExpirationTime() {
-        return expirationTime;
+    public LocalDateTime getExpiration() {
+        return expiration;
     }
 
-    public void setExpirationTime(LocalDateTime expirationTime) {
-        this.expirationTime = expirationTime;
+    public void setExpiration(LocalDateTime expiration) {
+        this.expiration = expiration;
     }
 }

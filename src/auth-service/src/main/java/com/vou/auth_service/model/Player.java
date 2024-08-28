@@ -1,9 +1,11 @@
 package com.vou.auth_service.model;
 
 import com.vou.auth_service.constant.Gender;
+import jakarta.persistence.*;
 
 public class Player extends User {
     private String avatarUrl;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String facebookUrl;
     public Player(User user, String password) {

@@ -1,28 +1,34 @@
 package com.vou.auth_service.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 public class Session {
-    private String idSession;
-    private Long idUser;
+    private Long id;
+    private String token;
     private boolean isActive;
+
+    @Column
     private LocalDateTime logoutAt;
-    private LocalDateTime expirationTime;
 
-    public String getIdSession() {
-        return idSession;
+    private LocalDateTime expiration;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
     }
 
-    public void setIdSession(String idSession) {
-        this.idSession = idSession;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getIdUser() {
-        return idUser;
+    public String getToken() {
+        return token;
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean isActive() {
@@ -41,11 +47,11 @@ public class Session {
         this.logoutAt = logoutAt;
     }
 
-    public LocalDateTime getExpirationTime() {
-        return expirationTime;
+    public LocalDateTime getExpiration() {
+        return expiration;
     }
 
-    public void setExpirationTime(LocalDateTime expirationTime) {
-        this.expirationTime = expirationTime;
+    public void setExpiration(LocalDateTime expiration) {
+        this.expiration = expiration;
     }
 }

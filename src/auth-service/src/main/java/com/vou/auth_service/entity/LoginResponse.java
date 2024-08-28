@@ -1,23 +1,21 @@
 package com.vou.auth_service.entity;
 
-import com.vou.auth_service.model.User;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class LoginResponse {
     private String token;
-    private User user;
 
     // Constructors, Getters and Setters
-    public LoginResponse(String token, User user) {
+    public LoginResponse(String token) {
         this.token = token;
-        this.user = user;
     }
 
     public LoginResponse() {
     }
 
+    public String getToken() {
+        return token;
+    }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
