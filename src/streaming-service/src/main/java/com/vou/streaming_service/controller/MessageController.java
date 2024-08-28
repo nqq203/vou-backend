@@ -8,14 +8,13 @@ package com.vou.streaming_service.controller;
 import com.vou.streaming_service.dto.GameInfoDTO;
 import com.vou.streaming_service.dto.QuizDTO;
 import com.vou.streaming_service.libs.RedisCache;
-import com.vou.streaming_service.model.Game;
-import com.vou.streaming_service.model.Quiz;
-import com.vou.streaming_service.model.QuizGame;
-import com.vou.streaming_service.model.ShakeGame;
+import com.vou.streaming_service.model.*;
 import com.vou.streaming_service.repository.GameRepository;
+import com.vou.streaming_service.repository.ItemRepoRepository;
 import com.vou.streaming_service.repository.QuizGameRepository;
 import com.vou.streaming_service.repository.ShakeGameRepository;
 import com.vou.streaming_service.service.EventSchedulerService;
+import com.vou.streaming_service.service.ItemService;
 import com.vou.streaming_service.service.MessageService;
 import com.vou.streaming_service.service.QuizService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,9 +41,13 @@ public class MessageController{
 
     @Autowired
     private QuizService quizService;
+    @Autowired
+    private ItemService itemService;
 
     @Autowired
     private GameRepository gameRepository;
+    @Autowired
+    private ItemRepoRepository itemRepoRepository;
 
     @Autowired
     private QuizGameRepository quizGameRepository;
@@ -82,6 +86,39 @@ public class MessageController{
         List<Quiz> quizzes = quizzdto.stream().map(quizz-> new Quiz(quizz, game.getIdGame())).collect(Collectors.toList());
         quizService.saveQuizzes(quizzes);
         return ResponseEntity.ok("Save successfully");
+    }
+
+
+    @GetMapping("/shake/{id_event}/{id_player}")
+    public ResponseEntity<String> playShakeGame(@PathVariable Long id_event, @PathVariable Long id_player) throws Exception {
+        try {
+            ItemRepo[] items = itemService.getItem(id_event);
+
+            double winProbability = 0.10;
+
+            // Generate a random number between 0 and 1
+            Random random = new Random();
+            double randomValue = random.nextDouble();
+
+            if (randomValue < winProbability) {
+                int itemIndex = random.nextInt(items.length);
+                ItemRepo wonItem = items[itemIndex];
+
+                ItemRepo existItem = itemRepoRepository.findItembyIdUser(id_player, wonItem.getId_item());
+                if (existItem.getId_item() != null) {
+                    itemService.updateQuantityItem(existItem.getId_itemRepo());
+                } else {
+                    ItemRepo newItemRepo = new ItemRepo(id_player, wonItem.getId_item(), 1);
+                    itemRepoRepository.save(newItemRepo);
+                }
+                return ResponseEntity.ok("Congratulations! You've won: " + wonItem);
+
+            } else {
+                return ResponseEntity.ok("Sorry! You didn't win anything this time.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
 
