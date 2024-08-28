@@ -2,21 +2,26 @@ package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
 import com.vou.event_service.dto.*;
-
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.entity.EventImageResponse;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
-import com.vou.event_service.repository.BrandsCooperationRepository;
-import com.vou.event_service.service.*;
+import com.vou.event_service.service.BrandsCooperationService;
+import com.vou.event_service.service.EventService;
+import com.vou.event_service.service.InventoryService;
+import com.vou.event_service.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.vou.event_service.repository.BrandsCooperationRepository;
+import com.vou.event_service.service.*;
 
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +38,6 @@ public class EventController {
     private BrandsCooperationService brandsCooperationService;
     @Autowired
     private BrandsCooperationRepository brandsCooperationRepository;
-
     @Autowired
     private InventoryService inventoryService;
     @Autowired

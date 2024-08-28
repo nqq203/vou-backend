@@ -15,6 +15,14 @@ public class UserResult {
         this.score = score;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
     @Override
     public String toString() {
         return "{" +
