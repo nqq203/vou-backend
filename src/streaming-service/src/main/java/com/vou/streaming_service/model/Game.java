@@ -41,7 +41,10 @@ public class Game {
         this.type = type;
         this.idEvent = idEvent;
     }
+<<<<<<< HEAD
 
     public Game() {
     }
+=======
+>>>>>>> origin/update-create-event
 }

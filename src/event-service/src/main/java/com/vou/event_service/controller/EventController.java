@@ -1,10 +1,19 @@
 package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
+<<<<<<< HEAD
 import com.vou.event_service.dto.*;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.entity.EventImageResponse;
+=======
+import com.vou.event_service.dto.EventDTO;
+import com.vou.event_service.dto.GameInfoDTO;
+import com.vou.event_service.dto.InventoryDTO;
+import com.vou.event_service.dto.QuizDTO;
+import com.vou.event_service.entity.CreateBrandsCooperationRequest;
+import com.vou.event_service.entity.CreateEventRequest;
+>>>>>>> origin/update-create-event
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.service.BrandsCooperationService;
@@ -18,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.service.*;
-
 
 import java.util.Collection;
 import java.util.Collections;

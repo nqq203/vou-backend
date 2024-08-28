@@ -14,7 +14,10 @@ import com.vou.streaming_service.model.QuizGame;
 import com.vou.streaming_service.model.ShakeGame;
 import com.vou.streaming_service.repository.GameRepository;
 import com.vou.streaming_service.repository.QuizGameRepository;
+<<<<<<< HEAD
 import com.vou.streaming_service.repository.QuizRepository;
+=======
+>>>>>>> origin/update-create-event
 import com.vou.streaming_service.repository.ShakeGameRepository;
 import com.vou.streaming_service.service.EventSchedulerService;
 import com.vou.streaming_service.service.MessageService;
@@ -50,9 +53,12 @@ public class MessageController{
     private QuizGameRepository quizGameRepository;
 
     @Autowired
+<<<<<<< HEAD
     private QuizRepository quizRepository;
 
     @Autowired
+=======
+>>>>>>> origin/update-create-event
     private ShakeGameRepository shakeGameRepository;
 
     @GetMapping("message/{room}")
