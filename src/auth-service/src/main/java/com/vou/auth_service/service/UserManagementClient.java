@@ -1,7 +1,6 @@
 package com.vou.auth_service.service;
 
 import com.vou.auth_service.model.*;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -117,32 +116,44 @@ public class UserManagementClient {
         }
     }
 
-//    public Optional<Player> getPlayerByIdUser(Long userId) {
-//        try {
-//            ResponseEntity<Player> response = restTemplate.getForEntity(userServiceUrl + "/get-player-by-userid/" + userId, Player.class);
-//            if (response.getStatusCode() == HttpStatus.OK) {
-//                return Optional.ofNullable(response.getBody());
-//            }
-//            return Optional.empty();  // When user is not found or any other non-OK response
-//        } catch (Exception e) {
-//            System.err.println("Error retrieving user: " + e.getMessage());
-//            return Optional.empty();  // Return empty Optional in case of exceptions
-//        }
-//    }
+    public Optional<Object> getPlayerByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(playerUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving player: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
 
-    // DONE: replaced by get by identifier api above
-//    public Optional<User> getUserByEmail(String email) {
-//        try {
-//            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + email, User.class);
-//            if (response.getStatusCode() == HttpStatus.OK) {
-//                return Optional.ofNullable((response.getBody()));
-//            }
-//            return Optional.empty();
-//        } catch (Exception e) {
-//            System.err.println("Error retrieving user: " + e.getMessage());
-//            return Optional.empty();
-//        }
-//    }
+    public Optional<Object> getAdminByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(adminUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving admin: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Object> getBrandByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(brandUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving brand: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
 
     public Session createSession(Session session) {
         return restTemplate.postForObject(sessionUrl + "/", session, Session.class);

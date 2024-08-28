@@ -53,7 +53,6 @@ services:
       - service-registry
       - auth-service
       - user-service
-      # - notification-service
       - event-service
       # - statistics-service
       # - turn-service
@@ -98,12 +97,12 @@ services:
       - "8082:8082"
     depends_on:
       - service-registry
-      - authdb
+      - user-database
     environment: 
       SPRING_APPLICATION_NAME: user-service
       SERVER_PORT: 8082
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
-      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/authdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-database:5432/user
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -123,19 +122,6 @@ services:
     networks:  
       - microservices-network
 
-  notification-service: 
-    image: notification-service:latest
-    build:
-      context: ./src/notification-service
-    ports: 
-      - "8082:8082"
-    depends_on:
-      - service-registry
-    volumes:
-      - notification-service-data:/var/notification-service
-    networks: 
-      - microservices-network
-
   event-service: 
     image: event-service:latest
     build:
@@ -144,12 +130,12 @@ services:
       - "8083:8083"
     depends_on:
       - service-registry
-      - eventdb
+      - event-database
     environment: 
       SPRING_APPLICATION_NAME: event-service
       SERVER_PORT: 8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
-      SPRING_DATASOURCE_URL: jdbc:postgresql://eventdb:5432/eventdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-database:5432/event
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -162,31 +148,31 @@ services:
     networks: 
       - microservices-network
 
-  statistics-service: 
-    image: statistics-service:latest
-    build:
-      context: ./src/statistics-service
-    ports: 
-      - "8084:8084"
-    depends_on:
-      - service-registry
-    volumes:
-      - statistics-service-data:/var/statistics-service
-    networks: 
-      - microservices-network
+  # statistics-service: 
+  #   image: statistics-service:latest
+  #   build:
+  #     context: ./src/statistics-service
+  #   ports: 
+  #     - "8084:8084"
+  #   depends_on:
+  #     - service-registry
+  #   volumes:
+  #     - statistics-service-data:/var/statistics-service
+  #   networks: 
+  #     - microservices-network
 
-  turn-service: 
-    image: turn-service:latest
-    build:
-      context: ./src/turn-service
-    ports: 
-      - "8085:8085"
-    depends_on:
-      - service-registry
-    volumes:
-      - turn-service-data:/var/turn-service
-    networks: 
-      - microservices-network
+  # turn-service: 
+  #   image: turn-service:latest
+  #   build:
+  #     context: ./src/turn-service
+  #   ports: 
+  #     - "8085:8085"
+  #   depends_on:
+  #     - service-registry
+  #   volumes:
+  #     - turn-service-data:/var/turn-service
+  #   networks: 
+  #     - microservices-network
 
   streaming-service: 
     image: streaming-service:latest
@@ -196,7 +182,7 @@ services:
       - "8086:8086"
     depends_on:
       - service-registry
-      - gamedb
+      - game-database
     environment: 
       SPRING_APPLICATION_NAME: streaming-service
       SERVER_PORT: 8086 # Make sure to use the correct port
@@ -205,7 +191,7 @@ services:
       SPRING_REDIS_HOST: redis # Assuming you have a Redis service in the same network
       SPRING_REDIS_PORT: 6379
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
-      SPRING_DATASOURCE_URL: jdbc:postgresql://gamedb:5432/gamedb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://game-database:5432/game
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -231,11 +217,19 @@ services:
       - "8087:8087"
     depends_on:
       - service-registry
-      - inventory-and-reward-db
+      - inventory-database
     environment: 
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventory-and-reward-db:5432/inventoryrewarddb
-      - SPRING_DATASOURCE_USERNAME=inventoryuser
-      - SPRING_DATASOURCE_PASSWORD=inventorypassword
+      SPRING_APPLICATION_NAME: inventory-and-reward-service
+      SERVER_PORT: 8087
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://inventory-database:5432/inventory
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_GENERATE_DDL: true
     volumes:
       - inventory-and-reward-service-data:/var/inventory-and-reward-service
     networks: 
@@ -248,60 +242,121 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "8888:80"
+    depends_on:
+      - user-database
+      - inventory-database
+      - game-database
+      - event-database
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
       - microservices-network
       
-  authdb:
+  # authdb:
+  #   image: postgres:16.3-bullseye
+  #   environment:
+  #     POSTGRES_DB: authdb
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - authdb-data:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
+
+  # eventdb:
+  #   image: postgres:16.3-bullseye
+  #   environment:
+  #     POSTGRES_DB: eventdb
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin
+  #   ports:
+  #     - "5433:5432"
+  #   volumes:
+  #     - eventdb-data:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
+
+  # gamedb:
+  #   image: postgres:16.3-bullseye
+  #   environment:
+  #     POSTGRES_DB: gamedb
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin
+  #   ports:
+  #     - "5434:5432"
+  #   volumes:
+  #     - gamedb-data:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
+
+  # inventoryandrewarddb:
+  #   image: postgres:16.3-bullseye
+  #   environment:
+  #     POSTGRES_DB: inventoryrewarddb
+  #     POSTGRES_USER: admin
+  #     POSTGRES_PASSWORD: admin
+  #   ports:
+  #     - "5435:5432"
+  #   volumes:
+  #     - inventoryandrewarddb-data:/var/lib/postgresql/data
+  #   networks:
+  #     - microservices-network
+
+  user-database:
     image: postgres:16.3-bullseye
     environment:
-      POSTGRES_DB: authdb
+      POSTGRES_DB: user
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
-      - authdb-data:/var/lib/postgresql/data
+      - user-data:/var/lib/postgresql/data
+      - ./assets/V0__user.sql:/docker-entrypoint-initdb.d/V0__user.sql
     networks:
       - microservices-network
 
-  eventdb:
+  game-database:
     image: postgres:16.3-bullseye
     environment:
-      POSTGRES_DB: eventdb
+      POSTGRES_DB: game
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
       - "5433:5432"
     volumes:
-      - eventdb-data:/var/lib/postgresql/data
+      - game-data:/var/lib/postgresql/data
+      - ./assets/V0__game.sql:/docker-entrypoint-initdb.d/V0__game.sql
     networks:
       - microservices-network
 
-  gamedb:
+  event-database:
     image: postgres:16.3-bullseye
     environment:
-      POSTGRES_DB: gamedb
+      POSTGRES_DB: event
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
       - "5434:5432"
     volumes:
-      - gamedb-data:/var/lib/postgresql/data
+      - event-data:/var/lib/postgresql/data
+      - ./assets/V0__event.sql:/docker-entrypoint-initdb.d/V0__event.sql
     networks:
       - microservices-network
 
-  inventory-and-reward-db:
+  inventory-database:
     image: postgres:16.3-bullseye
     environment:
-      POSTGRES_DB: inventoryrewarddb
+      POSTGRES_DB: inventory
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
       - "5435:5432"
     volumes:
-      - inventory-and-reward-db-data:/var/lib/postgresql/data
+      - inventory-data:/var/lib/postgresql/data
+      - ./assets/V0__inventory_and_rewards.sql:/docker-entrypoint-initdb.d/V0__inventory_and_rewards.sql
     networks:
       - microservices-network
 
@@ -314,15 +369,18 @@ volumes:
   api-gateway-data:
   auth-service-data:
   user-service-data:
-  notification-service-data:
   event-service-data:
-  statistics-service-data:
-  turn-service-data:
+  # statistics-service-data:
+  # turn-service-data:
   streaming-service-data:
   inventory-and-reward-service-data:
-  authdb-data:
+  # authdb-data:
   pgadmin-data:
-  eventdb-data:
-  gamedb-data:
-  inventory-and-reward-db-data:
+  # eventdb-data:
+  # gamedb-data:
+  # inventoryandrewarddb-data:
+  user-data:
+  game-data:
+  event-data:
+  inventory-data:
   redis-data:

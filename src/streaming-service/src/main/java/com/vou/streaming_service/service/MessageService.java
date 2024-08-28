@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.streaming_service.constants.Constants;
 import com.vou.streaming_service.dto.QuizDTO;
 import com.vou.streaming_service.libs.RedisCache;
+import com.vou.streaming_service.model.Option;
 import com.vou.streaming_service.model.Quiz;
 import com.vou.streaming_service.model.UserResult;
 import com.vou.streaming_service.socket.SocketService;

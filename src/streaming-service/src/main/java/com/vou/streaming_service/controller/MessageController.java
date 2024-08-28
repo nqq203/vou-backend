@@ -12,6 +12,7 @@ import com.vou.streaming_service.model.*;
 import com.vou.streaming_service.repository.GameRepository;
 import com.vou.streaming_service.repository.ItemRepoRepository;
 import com.vou.streaming_service.repository.QuizGameRepository;
+import com.vou.streaming_service.repository.QuizRepository;
 import com.vou.streaming_service.repository.ShakeGameRepository;
 import com.vou.streaming_service.service.EventSchedulerService;
 import com.vou.streaming_service.service.ItemService;
@@ -19,13 +20,9 @@ import com.vou.streaming_service.service.MessageService;
 import com.vou.streaming_service.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -51,6 +48,9 @@ public class MessageController{
 
     @Autowired
     private QuizGameRepository quizGameRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
 
     @Autowired
     private ShakeGameRepository shakeGameRepository;
@@ -120,6 +120,27 @@ public class MessageController{
             return ResponseEntity.internalServerError().build();
         }
     }
+    
+    @GetMapping("/game-info")
+    public ResponseEntity<GameInfoDTO>  getDetailGameInfo(@RequestParam Long eventId){
+        Game game = gameRepository.findByIdEvent(eventId);
+
+        List<Quiz> quizzes= quizRepository.findAllByIdGame(game.getIdGame());
+
+        List<QuizDTO> quizDto= quizzes.stream()
+                .map(QuizDTO::new)
+                .collect(Collectors.toList());
+        GameInfoDTO gameInfoDTO =new GameInfoDTO(
+                game.getIdGame(),
+                game.getName(),
+                game.getType(),
+                game.getStartedAt(),
+                game.getIdEvent(),
+                quizDto
+        );
+        return ResponseEntity.ok(gameInfoDTO);
+    }
+
 }
 
 

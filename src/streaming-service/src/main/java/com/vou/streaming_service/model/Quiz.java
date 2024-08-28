@@ -33,7 +33,7 @@ public class Quiz {
 
     private String ans3;
 
-    private Long id_game;
+    private Long idGame;
 
     private int correctAnswerIndex;
 
@@ -42,10 +42,12 @@ public class Quiz {
         this.ans1= quizDTO.getAns1();
         this.ans2= quizDTO.getAns2();
         this.ans3= quizDTO.getAns3();
-        this.id_game=id_game;
+        this.idGame=id_game;
         this.correctAnswerIndex = quizDTO.getCorrectAnswerIndex();
     }
 
+    public Quiz() {
+    }
 
     @JsonCreator
     public Quiz(
@@ -60,7 +62,7 @@ public class Quiz {
         this.ans1 = ans1;
         this.ans2 = ans2;
         this.ans3 = ans3;
-        this.id_game = id_game;
+        this.idGame = id_game;
         this.correctAnswerIndex = correctAnswerIndex;
     }
 

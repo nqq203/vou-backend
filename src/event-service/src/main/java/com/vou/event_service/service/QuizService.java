@@ -20,7 +20,7 @@ public class QuizService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://streaming-service:8086/api/v1/game/quiz/create";
+    private final String QUIZ_SERVICE_URL = "http://localhost:8084/api/v1/game/quiz/create";
 
     public void createQuiz(GameInfoDTO gameInfoDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -43,5 +43,14 @@ public class QuizService {
         } else {
             System.out.println("Failed to create quizzes: " + response.getStatusCode());
         }
+    }
+    public GameInfoDTO getGameInfo(Long eventId) {
+        String url = "http://localhost:8084/api/v1/game/game-info?eventId=" + eventId;
+
+        // Make the GET request
+        ResponseEntity<GameInfoDTO> response = restTemplate.getForEntity(url, GameInfoDTO.class);
+
+        // Return the body of the response
+        return response.getBody();
     }
 }

@@ -32,7 +32,7 @@ public class AdminController {
     public ResponseEntity<?> getAdminByUserId(@PathVariable Long userId) {
         try {
             Admin admin = userService.findAdminByUserId(userId);
-            return ResponseEntity.ok().body(new SuccessResponse("Get admin successfully", HttpStatus.OK, admin));
+            return ResponseEntity.ok(admin);
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Not found admin"));
         } catch (Exception e) {

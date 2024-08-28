@@ -1,12 +1,14 @@
 package com.vou.event_service.controller;
 
 import com.vou.event_service.common.*;
+import com.vou.event_service.entity.CreateBrandsCooperationRequest;
+import com.vou.event_service.entity.CreateEventRequest;
+import com.vou.event_service.dto.*;
+import com.vou.event_service.entity.EventImageResponse;
 import com.vou.event_service.dto.EventDTO;
 import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.InventoryDTO;
 import com.vou.event_service.dto.QuizDTO;
-import com.vou.event_service.entity.CreateBrandsCooperationRequest;
-import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.service.BrandsCooperationService;
@@ -17,10 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import com.vou.event_service.repository.BrandsCooperationRepository;
+import com.vou.event_service.service.*;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -34,20 +40,32 @@ public class EventController {
     @Autowired
     private BrandsCooperationService brandsCooperationService;
     @Autowired
+    private BrandsCooperationRepository brandsCooperationRepository;
+    @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private StorageService storageService;
 
 
-    @GetMapping("/")
-    public ResponseEntity<?> fetchEvent(){
+    @GetMapping("")
+    public ResponseEntity<?> fetchEvent(
+            @RequestParam(value="brandId", required = false) Long brandId
+    ){
         try {
-            List<Event> allEvents = eventService.getAllEvents();
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, allEvents));
+            List<ListEventDTO> listEventDTOs;
+            if (brandId != null){
+                listEventDTOs = eventService.getAllEventOfBrand(brandId);
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
+            }
+
+            listEventDTOs = eventService.getAllEventActive();
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
         GameInfoDTO gameInfoDTO = event.getGameInfoDTO();
         InventoryDTO inventoryDTO = event.getInventoryInfo();
@@ -78,7 +96,8 @@ public class EventController {
     @GetMapping("/{id_event}")
     public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
         try {
-            Event event = eventService.findEventById(id_event);
+
+            EventDetailDTO event = eventService.getAnEvent(id_event);
             if (event == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
             }
@@ -138,4 +157,48 @@ public class EventController {
 //        return ResponseEntity.ok(new SuccessResponse("Fetch successfully", HttpStatus.OK,events ));
 //    }
 
+    @PutMapping("")
+    public ResponseEntity<?> uploadEventImage(
+            @RequestParam("id_event") Long id_event,
+            @ModelAttribute EventImageDTO eventImages
+    ) {
+        if (!isImageFile(eventImages.getBannerFile()) ||
+                !isImageFile(eventImages.getQrImage()) ||
+                !isImageFile(eventImages.getVoucherImg())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Loại tập tin không hợp lệ!", HttpStatus.BAD_REQUEST, "Chỉ file hình ảnh mới được chấp nhận!"));
+        }
+        Event existEvent;
+        try {
+            existEvent = eventService.findEventById(id_event);
+            System.out.println("Find event: " + existEvent);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống"));
+        }
+        if (existEvent == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy event!"));
+        }
+
+        try {
+            String bannerUrl = storageService.uploadImage(eventImages.getBannerFile());
+            Boolean isUploaded = eventService.uploadEventImage(existEvent, bannerUrl);
+            InventoryImageUrlDTO inventoryUrls = inventoryService.uploadInventoryImages(id_event, eventImages.getQrImage(), eventImages.getVoucherImg());
+            if (inventoryUrls == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống: Tải qr và ảnh voucher thất bại!"));
+            }
+            if (bannerUrl == null || !isUploaded) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống: Tải banner thất bại!"));
+            }
+            return ResponseEntity.ok(new SuccessResponse("Tải ảnh thành công!",
+                    HttpStatus.OK,
+                    new EventImageResponse(bannerUrl, inventoryUrls.getQrImgUrl(), inventoryUrls.getVoucherImgUrl())));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống!"));
+        }
+    }
+
+    private boolean isImageFile(MultipartFile file) {
+        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
+    }
 }
