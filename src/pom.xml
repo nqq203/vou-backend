@@ -12,13 +12,14 @@
     <modules>
         <module>auth-service</module>
         <module>event-service</module>
-        <module>game-service</module>
-        <module>notification-service</module>
-        <module>reward-service</module>
+<!--        <module>game-service</module>-->
+<!--        <module>notification-service</module>-->
+        <module>inventory-and-reward-service</module>
         <module>statistics-service</module>
         <module>streaming-service</module>
         <module>turn-service</module>
         <module>api-gateway</module>
         <module>service-registry</module>
+        <module>user-service</module>
     </modules>
 </project>

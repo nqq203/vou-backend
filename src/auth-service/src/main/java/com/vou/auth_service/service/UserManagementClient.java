@@ -1,10 +1,10 @@
 package com.vou.auth_service.service;
 
 import com.vou.auth_service.model.*;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,12 @@ import java.util.Optional;
 public class UserManagementClient {
 
     private final RestTemplate restTemplate;
-    private final String userServiceUrl = "http://localhost:8082/api/v1/user";
+    private final String userUrl = "http://user-service:8082/api/v1/users";
+    private final String playerUrl = "http://user-service:8082/api/v1/players";
+    private final String brandUrl = "http://user-service:8082/api/v1/brands";
+    private final String adminUrl = "http://user-service:8082/api/v1/admins";
+    private final String sessionUrl = "http://user-service:8082/api/v1/sessions";
+
 
     @Autowired
     public UserManagementClient(RestTemplateBuilder restTemplateBuilder) {
@@ -32,7 +37,7 @@ public class UserManagementClient {
 
     public Boolean createAdmin(Admin admin) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-admin", admin, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl + "/", admin, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -47,7 +52,7 @@ public class UserManagementClient {
 
     public Boolean createBrand(Brand brand) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-brand", brand, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl + "/", brand, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -62,7 +67,7 @@ public class UserManagementClient {
 
     public Boolean createPlayer(Player player) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-player", player, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(playerUrl + "/", player, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -75,87 +80,124 @@ public class UserManagementClient {
         }
     }
 
-    public Boolean updateUserInternal(User user) {
+    //TODO: re-handle for it 13-8-2024
+    public User updateUserInternal(User user) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(userServiceUrl + "/create-player", user, Boolean.class);
+            HttpEntity<User> requestEntity = new HttpEntity<>(user);
+            ResponseEntity<User> response = restTemplate.exchange(
+                    userUrl + "/" + user.getIdUser(),
+                    HttpMethod.PUT,
+                    requestEntity,
+                    User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
-                return true;
+                return response.getBody();
             }
             else {
                 System.err.println("Failed to update user, status code: " + response.getStatusCode());
-                return false;
+                return null;
             }
         } catch (RestClientException e) {
-            System.err.println("RestClientException when creating player: " + e.getMessage());
-            return false;
+            System.err.println("RestClientException when updating player: " + e.getMessage());
+            return null;
         }
     }
 
 
-    public Optional<User> getUserByUsername(String username) {
+    public Optional<User> getUserByIdentifier(String identifier) {
         try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/get-user-by-username/" + username, User.class);
+            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/" + identifier, User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
-            }
-            return Optional.empty();  // When user is not found or any other non-OK response
-        } catch (Exception e) {
-            System.err.println("Error retrieving user: " + e.getMessage());
-            return Optional.empty();  // Return empty Optional in case of exceptions
-        }
-    }
-
-//    public Optional<Player> getPlayerByIdUser(Long userId) {
-//        try {
-//            ResponseEntity<Player> response = restTemplate.getForEntity(userServiceUrl + "/get-player-by-userid/" + userId, Player.class);
-//            if (response.getStatusCode() == HttpStatus.OK) {
-//                return Optional.ofNullable(response.getBody());
-//            }
-//            return Optional.empty();  // When user is not found or any other non-OK response
-//        } catch (Exception e) {
-//            System.err.println("Error retrieving user: " + e.getMessage());
-//            return Optional.empty();  // Return empty Optional in case of exceptions
-//        }
-//    }
-
-    public Optional<User> getUserByEmail(String email) {
-        try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userServiceUrl + "/get-user-by-email/" + email, User.class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return Optional.ofNullable((response.getBody()));
             }
             return Optional.empty();
         } catch (Exception e) {
             System.err.println("Error retrieving user: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Object> getPlayerByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(playerUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving player: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Object> getAdminByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(adminUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving admin: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Object> getBrandByIdUser(Long userId) {
+        try {
+            ResponseEntity<Object> response = restTemplate.getForEntity(brandUrl + "/" + userId, Object.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.err.println("Error retrieving brand: " + e.getMessage());
             return Optional.empty();
         }
     }
 
     public Session createSession(Session session) {
-        return restTemplate.postForObject(userServiceUrl + "/create-session", session, Session.class);
+        return restTemplate.postForObject(sessionUrl + "/", session, Session.class);
     }
 
-    public Optional<Session> getSessionByToken(String token) {
+    public Session getSessionByToken(String token) {
         try {
-            ResponseEntity<Session> response = restTemplate.getForEntity(userServiceUrl + "/get-token/" + token, Session.class);
+            ResponseEntity<Session> response = restTemplate.getForEntity(sessionUrl + "/" + token, Session.class);
             if (response.getStatusCode() == HttpStatus.OK) {
-                return Optional.ofNullable(response.getBody());
+                return response.getBody();
             }
-            return Optional.empty();
+            return null;
         } catch (Exception e) {
             System.err.println("Error retrieving session: " + e.getMessage());
-            return Optional.empty();
+            return null;
         }
     }
 
     public Session updateSession(Session session) {
-        return restTemplate.postForObject(userServiceUrl + "/update-session", session, Session.class);
+//        return restTemplate.postForObject(userServiceUrl + "/session/" + session.getToken(), session, Session.class);
+        try {
+            HttpEntity<Session> requestEntity = new HttpEntity<>(session);
+            ResponseEntity<Session> response = restTemplate.exchange(
+                    sessionUrl + "/" + session.getIdSession(),
+                    HttpMethod.PUT,
+                    requestEntity,
+                    Session.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                System.err.println("Failed to update session, status code: " + response.getStatusCode());
+                return null;
+            }
+        } catch (RestClientException e) {
+            System.err.println("RestClientException when updating session: " + e.getMessage());
+            return null;
+        }
     }
 
     public Optional<List<Session>> getListSession() {
         try {
             ResponseEntity<List<Session>> response = restTemplate.exchange(
-                    userServiceUrl + "/get-all-sessions",
+                    sessionUrl + "/",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<Session>>() {}
