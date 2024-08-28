@@ -20,7 +20,7 @@ public class StorageService {
         String bucketName = "vou-storage";
 
         try {
-            String keyName = System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
+            String keyName = "avatar/" + System.currentTimeMillis() + "_" + avatarFile.getOriginalFilename();
             String contentType = avatarFile.getContentType();
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()

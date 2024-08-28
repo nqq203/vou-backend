@@ -21,13 +21,9 @@ import com.vou.streaming_service.service.MessageService;
 import com.vou.streaming_service.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,13 +55,13 @@ public class MessageController{
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
         return ResponseEntity.ok(messageService.getPlayers(room));
     }
-//
-//    @PostMapping("/create")
-//    public ResponseEntity<String> createGame(){
-//
-//        String date = messageService.startGame();
-//        return ResponseEntity.ok(date);
-//    }
+
+    @PostMapping("/create")
+    public ResponseEntity<String> createGame(){
+
+        String date = messageService.startGame(1231123L);
+        return ResponseEntity.ok(date);
+    }
 
     @PostMapping("/quiz/create")
     public ResponseEntity<String> createQuiz(@RequestBody GameInfoDTO gameInfoDTO){
@@ -76,7 +72,7 @@ public class MessageController{
             ShakeGame shakeGame = new ShakeGame();
             shakeGame.setGame(game);
             shakeGameRepository.save(shakeGame);
-            return ResponseEntity.ok("Save successfuly");
+            return ResponseEntity.ok("Save successfully");
 
         }
         QuizGame quizGame = new QuizGame(4);
@@ -85,7 +81,7 @@ public class MessageController{
 
         List<Quiz> quizzes = quizzdto.stream().map(quizz-> new Quiz(quizz, game.getIdGame())).collect(Collectors.toList());
         quizService.saveQuizzes(quizzes);
-        return ResponseEntity.ok("Save successfuly");
+        return ResponseEntity.ok("Save successfully");
     }
     @GetMapping("/game-info")
     public ResponseEntity<GameInfoDTO>  getDetailGameInfo(@RequestParam Long eventId){

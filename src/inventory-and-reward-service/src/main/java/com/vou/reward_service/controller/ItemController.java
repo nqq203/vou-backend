@@ -1,9 +1,12 @@
 package com.vou.reward_service.controller;
 
+import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.entity.CreateItemRequest;
+import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.service.ItemService;
 import com.vou.reward_service.constant.HttpStatus;
+import com.vou.reward_service.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/inventory-and-reward/items")
+@RequestMapping("/api/v1/items")
 @CrossOrigin
 public class ItemController {
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private VoucherService voucherService;
 
     @GetMapping("")
     public ResponseEntity<List<Item>> getItem() {
@@ -24,9 +29,36 @@ public class ItemController {
     }
 
     @PostMapping("")
-    public ResponseEntity<HashMap<String, Object>>  createItem(@RequestBody CreateItemRequest request) {
+    public ResponseEntity<HashMap<String, Object>>  createVoucher(@RequestBody InventoryDTO inventoryDTO) {
         try {
-            int result = itemService.createItem(request);
+            CreateVoucherRequest request;
+            if (inventoryDTO.getGameType().equals("shake-game")) {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getItems(),
+                        inventoryDTO.getAim_coin(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+            else {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+            int result = voucherService.createVoucher(request);
             HashMap<String, Object> response = new HashMap<>();
             if (result == HttpStatus.CREATED) {
                 response.put("status", HttpStatus.CREATED);

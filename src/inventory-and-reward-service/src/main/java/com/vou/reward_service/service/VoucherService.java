@@ -10,6 +10,7 @@ import com.vou.reward_service.repository.VoucherRepoRepository;
 import com.vou.reward_service.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -54,6 +55,14 @@ public class VoucherService {
             return voucherRepository.findByCode(code.toUpperCase());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public Voucher findVoucherByIdEvent(Long eventId) throws Exception {
+        try {
+            return voucherRepository.findByIdEvent(eventId);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -135,6 +144,17 @@ public class VoucherService {
             throw notFoundException;
         } catch (Exception e) {
             throw new Exception("Internal Error getting vouchers of user");
+        }
+    }
+
+    public Boolean uploadInventoryImages(Voucher voucher, String qrImgUrl, String voucherImgUrl) {
+        try {
+            voucher.setQrCode(qrImgUrl);
+            voucher.setImageUrl(voucherImgUrl);
+            voucherRepository.save(voucher);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
