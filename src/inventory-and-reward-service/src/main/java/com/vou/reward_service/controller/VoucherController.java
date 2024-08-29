@@ -119,28 +119,6 @@ public class VoucherController {
     }
 
     @DeleteMapping("/{code}")
-//    public ResponseEntity<HashMap<String, Object>> deleteItemById(@PathVariable String code) {
-//        try {
-//            Integer result = voucherService.deleteVoucherByCode(code);
-//            HashMap<String, Object> response = new HashMap<>();
-//            if (result == 404) {
-//                response.put("status", HttpStatus.NOT_FOUND);
-//                response.put("description", "Item not found");
-//            } else if (result == 500) {
-//                response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-//                response.put("description", "Internal server error");
-//            } else {
-//                response.put("status", HttpStatus.OK);
-//                response.put("description", "Item updated");
-//            }
-//            return ResponseEntity.status((int) response.get("status")).body(response);
-//        } catch (Exception e) {
-//            HashMap<String, Object> response = new HashMap<>();
-//            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-//            response.put("description", "Internal server error");
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//        }
-//    }
     public ResponseEntity<ApiResponse> deleteVoucherById(@PathVariable String code) {
         try {
             Integer result = voucherService.deleteVoucherByCode(code);

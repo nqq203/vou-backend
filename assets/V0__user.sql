@@ -18,8 +18,9 @@ INSERT INTO users (username, password, full_name, email, phone_number, role, sta
 VALUES
 ('testplayer', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test player', 'john.doe@example.com', '1234567890', 'PLAYER', 'ACTIVE', 'Somewhere on earth', 'http://example.com/avatar1.jpg'),
 ('testadmin', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test admin', 'jane.doe@example.com', '0987654321', 'ADMIN', 'ACTIVE', 'Somewhere on earth', 'http://example.com/avatar1.jpg'),
-('testbrand', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test brand', 'jane.doe@example.com', '0987654321', 'BRAND', 'ACTIVE', 'Somewhere on earth', 'http://example.com/avatar1.jpg');
-
+('testbrand', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test brand', 'jane.doe@example.com', '0987654322', 'BRAND', 'ACTIVE', 'Somewhere on earth', 'http://example.com/avatar1.jpg'),
+('testbrand2', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test brand 2', 'jane.doe@example.com', '0987654323', 'BRAND', 'PENDING', 'Somewhere on earth', 'http://example.com/avatar1.jpg'),
+('testbrand3', '$2a$10$ejcpe4FIQHIcWmeOq5VzFuTDE8bpDuU.qj4c5l/KQltDAR390XSQK', 'The Anh test brand 3', 'jane.doe@example.com', '0987654324', 'BRAND', 'ACTIVE', 'Somewhere on earth', 'http://example.com/avatar1.jpg');
 
 -- Creating the Session table
 CREATE TABLE sessions (
@@ -62,4 +63,6 @@ CREATE TABLE brands (
 -- Inserting mock data into the Brand table
 INSERT INTO brands (id_user, field, latitude, longitude)
 VALUES
-(3, 'Momo', 37.7749, -122.4194);
+(3, 'Momo', 37.7749, -122.4194),
+(4, 'VNPAY', 32, 52),
+(5, 'HAPPYMEAL', 65, 67);
