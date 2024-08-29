@@ -18,11 +18,11 @@ public class OtpService {
 
     private static final long OTP_VALID_DURATION = 60; // 60 seconds
 
-    private final Map<String, OtpEntry> otpStorage = new HashMap<>();
+    private Map<String, OtpEntry> otpStorage = new HashMap<>();
 
     private static class OtpEntry {
-        private final String otp;
-        private final LocalDateTime timestamp;
+        private String otp;
+        private LocalDateTime timestamp;
 
         public OtpEntry(String otp, LocalDateTime timestamp) {
             this.otp = otp;
@@ -49,7 +49,6 @@ public class OtpService {
     }
 
     public void storeOtp(String key, String otp) {
-        otpStorage.remove(key);
         OtpEntry otpEntry = new OtpEntry(otp, LocalDateTime.now());
         otpStorage.put(key, otpEntry);
     }
@@ -68,5 +67,21 @@ public class OtpService {
         }
 
         return otp.equals(otpEntry.getOtp());
+    }
+
+    public String resendOtp(String email) {
+        OtpEntry otpEntry = otpStorage.get(email);
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if (otpEntry == null || java.time.Duration.between(otpEntry.getTimestamp(), currentTime).getSeconds() > OTP_VALID_DURATION) {
+            String newOtp = generateOtp();
+            storeOtp(email, newOtp);
+            sendOtpEmail(email, newOtp);
+            return newOtp;
+        }
+        else {
+            sendOtpEmail(email, otpEntry.getOtp());
+            return otpEntry.getOtp();
+        }
     }
 }

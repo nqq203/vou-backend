@@ -1,109 +1,145 @@
 package com.vou.user_service.controller;
 
-import com.vou.user_service.common.*;
-import com.vou.user_service.model.User;
-import com.vou.user_service.service.StorageService;
+import com.vou.user_service.common.SuccessResponse;
+import com.vou.user_service.model.*;
 import com.vou.user_service.service.UserService;
+import jakarta.ws.rs.Path;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user")
 @CrossOrigin
 public class UserController {
     private final UserService userService;
-    private final StorageService storageService;
 
     @Autowired
-    public UserController(UserService userService, StorageService storageService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.storageService = storageService;
     }
 
-    @PutMapping("/{id_user}")
-    public ResponseEntity<?> updateUser(@RequestBody Map<String, Object> updates, @PathVariable("id_user") Long id_user) {
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@RequestBody Map<String, Object> updates, @PathVariable Long userId) {
         try {
-            User updatedUser = userService.updateUser(id_user, updates);
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("User updated", HttpStatus.OK, updatedUser));
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("User not found"));
+            User updatedUser = userService.updateUser(userId, updates);
+            return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, e));
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping ("/{id_user}/avatar")
-    public ResponseEntity<?> updateAvatar(@PathVariable Long id_user, @RequestParam("avatar") MultipartFile avatarFile) {
-        if (!avatarFile.getContentType().startsWith("image/")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Invalid file type", HttpStatus.BAD_REQUEST, "Only image files are allowed"));
-        }
-        try {
-            String avatarUrl = storageService.uploadImage(avatarFile);
-            if (avatarUrl == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Error uploading", HttpStatus.INTERNAL_SERVER_ERROR, null));
-            }
-            Boolean isUpdated = userService.updateAvatarUser(id_user, avatarUrl);
-            if (!isUpdated) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Error updating avatar url", HttpStatus.INTERNAL_SERVER_ERROR, null));
-            }
-            return ResponseEntity.ok(new SuccessResponse("Avatar updated successfully", HttpStatus.OK, avatarUrl));
-        } catch (DataAccessException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Database error", HttpStatus.INTERNAL_SERVER_ERROR, null));
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("File upload error", HttpStatus.INTERNAL_SERVER_ERROR, null));
-        }
-    }
-
-    @PostMapping("/")
+    @PostMapping("/create-user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        try {
-            User savedUser = userService.createUser(user);
-            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        User savedUser = userService.createUser(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{identifier}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable("identifier") String identifier) {
-        try {
-            User user = userService.findByIdentifier(identifier);
+    @GetMapping("/get-user-by-username/{username}")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        User user = userService.findByUsername(username);
+        if (user != null) {
             return ResponseEntity.ok(user);
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/get-player-by-userid/{userId}")
+    public ResponseEntity<Player> getPlayerByIdUser(@PathVariable Long userId) {
+        Player player = userService.findPlayerByUserId(userId);
+        if (player != null) {
+            return ResponseEntity.ok(player);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/get-user-by-email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        User user = userService.findByEmail(email);
+        if (user != null){
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/create-admin")
+    public ResponseEntity<Boolean> createAdmin(@RequestBody Admin admin) {
+        Admin savedAdmin = userService.createAdmin(admin);
+        if (savedAdmin != null) {
+            return ResponseEntity.ok(true);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getListUser(@RequestParam("id_user") Long id_user) {
-        User user;
-        try {
-            user = userService.findByIdUser(id_user);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Bad Request: Invalid user id"));
+    @PostMapping("/create-player")
+    public ResponseEntity<Boolean> createPlayer(@RequestBody Player player) {
+        Player savedPlayer = userService.createPlayer(player);
+        if (savedPlayer != null) {
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        if (!user.getRole().toString().equalsIgnoreCase("admin")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ForbiddenResponse("Access Denied: Just admin can get list users"));
+    }
+
+    @PostMapping("/create-brand")
+    public ResponseEntity<Boolean> createBrand(@RequestBody Brand brand) {
+        Brand savedBrand = userService.createBrand(brand);
+        if (savedBrand != null) {
+            return ResponseEntity.ok(true);
         }
-        try {
-            List<User> users = userService.findAllUsers();
-            if (users == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Empty users list"));
-            }
-            return ResponseEntity.ok().body(new SuccessResponse("Get list users successfully", HttpStatus.OK, users));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Get list users failed by server"));
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/update-player")
+    public ResponseEntity<?> updatePlayer(@RequestBody Player player) {
+        Player savedPlayer = userService.updatePlayer(player);
+        return new ResponseEntity<>(savedPlayer, HttpStatus.OK);
+    }
+
+    @PostMapping("/update-user-internal")
+    public ResponseEntity<Boolean> updateUserInternal(@RequestBody User user) {
+        User savedUser = userService.updateUserInternal(user);
+        if (savedUser != null) {
+            return ResponseEntity.ok(true);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/create-session")
+    public ResponseEntity<?> createSession(@RequestBody Session session) {
+        Session savedSession = userService.createSession(session);
+        return new ResponseEntity<>(savedSession, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-token/{token}")
+    public ResponseEntity<?> getSessionByToken(@PathVariable String token) {
+        Session session = userService.findSessionByToken(token);
+        if (session != null) {
+            return ResponseEntity.ok(session);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/update-session")
+    public ResponseEntity<?> updateSession(@RequestBody Session session) {
+        Session savedSession = userService.updateSession(session);
+        return new ResponseEntity<>(savedSession, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-sessions")
+    public ResponseEntity<?> getListSession() {
+        List<Session> sessions = userService.findAll();
+        return new ResponseEntity<>(sessions, HttpStatus.OK);
     }
 }

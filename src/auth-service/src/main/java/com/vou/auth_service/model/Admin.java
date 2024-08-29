@@ -1,10 +1,5 @@
 package com.vou.auth_service.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public class Admin extends User {
 
     public Admin(User user, String password) {
