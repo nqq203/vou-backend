@@ -180,6 +180,8 @@ public class VoucherController {
                 voucher.getDescription(),
                 voucher.getVoucherName(),
                 voucher.getVoucherPrice(),
+                voucher.getImageUrl(),
+                voucher.getQrCode(),
                 voucher.getAimCoin(),
                 voucher.getExpirationDate(),
                 itemDetailDTOS,

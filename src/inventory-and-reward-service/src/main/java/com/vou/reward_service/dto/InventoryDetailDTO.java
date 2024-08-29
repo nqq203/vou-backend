@@ -15,6 +15,8 @@ public class InventoryDetailDTO {
     private String voucher_description;
     private String voucher_name;
     private Long voucher_price;
+    private String imageUrl;
+    private String qrCode;
     private Long aim_coin;
     private Timestamp expiration_date;
     private List<ItemDetailDTO> items;
@@ -26,6 +28,8 @@ public class InventoryDetailDTO {
             String voucher_description,
             String voucher_name,
             Long voucher_price,
+            String imageUrl,
+            String qrCode,
             Long aim_coin,
             Timestamp expiration_date,
             List<ItemDetailDTO> items,
@@ -36,6 +40,8 @@ public class InventoryDetailDTO {
         this.voucher_description = voucher_description;
         this.voucher_name = voucher_name;
         this.voucher_price = voucher_price;
+        this.imageUrl = imageUrl;
+        this.qrCode = qrCode;
         this.aim_coin = aim_coin;
         this.expiration_date = expiration_date;
         this.items = items;
