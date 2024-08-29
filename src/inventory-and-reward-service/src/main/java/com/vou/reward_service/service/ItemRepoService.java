@@ -67,4 +67,24 @@ public class ItemRepoService {
             return true;
         }
     }
+
+    public List<ItemRepo> getItemRepoListByIdUser(Long idUser) throws Exception {
+        try {
+            return itemRepoRepository.findItemReposByIdPlayer(idUser);
+        } catch (Exception e) {
+            throw new Exception("Error in getItemRepoListByIdUser: " + e.getMessage());
+        }
+    }
+
+    public int incrementAmountByIdItemRepo(Long idItemRepo) {
+        return itemRepoRepository.incrementAmountByIdItemRepo(idItemRepo);
+    }
+
+    public ItemRepo getItemRepoByIdItemRepo(Long idItemRepo) throws Exception {
+        try {
+            return itemRepoRepository.findItemRepoByIdItemRepo(idItemRepo);
+        } catch (Exception e) {
+            throw new Exception("Error in getItemRepoByIdItemRepo service: " + e.getMessage());
+        }
+    }
 }
