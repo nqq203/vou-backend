@@ -1,18 +1,14 @@
 package com.vou.reward_service.controller;
 
 import com.vou.reward_service.dto.InventoryDTO;
-import com.vou.reward_service.service.ItemService;
-import com.vou.reward_service.constant.HttpStatus;
 import com.vou.reward_service.common.*;
 import com.vou.reward_service.dto.*;
-import com.vou.reward_service.entity.CreateItemRequest;
 import com.vou.reward_service.entity.CreateVoucherRequest;
 import com.vou.reward_service.entity.UserVoucher;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
 import com.vou.reward_service.service.StorageService;
 import com.vou.reward_service.service.VoucherRepoService;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import com.vou.reward_service.repository.ItemRepository;
 import com.vou.reward_service.repository.VoucherRepository;
@@ -20,7 +16,6 @@ import com.vou.reward_service.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -124,29 +119,6 @@ public class VoucherController {
     }
 
     @DeleteMapping("/{code}")
-    public ResponseEntity<HashMap<String, Object>> deleteItemById(@PathVariable String code) {
-        try {
-            Integer result = voucherService.deleteVoucherByCode(code);
-            HashMap<String, Object> response = new HashMap<>();
-            if (result == HttpStatus.NOT_FOUND) {
-                response.put("status", HttpStatus.NOT_FOUND);
-                response.put("description", "Item not found");
-            } else if (result == HttpStatus.INTERNAL_SERVER_ERROR) {
-                response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-                response.put("description", "Internal server error");
-            } else {
-                response.put("status", HttpStatus.OK);
-                response.put("description", "Item updated");
-            }
-            return ResponseEntity.status((int) response.get("status")).body(response);
-        } catch (Exception e) {
-            HashMap<String, Object> response = new HashMap<>();
-            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-            response.put("description", "Internal server error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
     public ResponseEntity<ApiResponse> deleteVoucherById(@PathVariable String code) {
         try {
             Integer result = voucherService.deleteVoucherByCode(code);

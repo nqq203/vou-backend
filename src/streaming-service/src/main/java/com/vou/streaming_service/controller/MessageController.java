@@ -5,21 +5,25 @@
  */
 package com.vou.streaming_service.controller;
 
+import com.vou.streaming_service.common.BadRequest;
+import com.vou.streaming_service.common.InternalServerError;
+import com.vou.streaming_service.common.NotFoundResponse;
+import com.vou.streaming_service.common.SuccessResponse;
 import com.vou.streaming_service.dto.GameInfoDTO;
 import com.vou.streaming_service.dto.QuizDTO;
+import com.vou.streaming_service.dto.RewardDTO;
 import com.vou.streaming_service.libs.RedisCache;
 import com.vou.streaming_service.model.*;
-import com.vou.streaming_service.repository.GameRepository;
-import com.vou.streaming_service.repository.ItemRepoRepository;
-import com.vou.streaming_service.repository.QuizGameRepository;
-import com.vou.streaming_service.repository.QuizRepository;
-import com.vou.streaming_service.repository.ShakeGameRepository;
+import com.vou.streaming_service.repository.*;
+//import com.vou.streaming_service.repository.ItemRepoRepository;
 import com.vou.streaming_service.service.EventSchedulerService;
-import com.vou.streaming_service.service.ItemService;
 import com.vou.streaming_service.service.MessageService;
 import com.vou.streaming_service.service.QuizService;
+import com.vou.streaming_service.service.RewardService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,13 +42,12 @@ public class MessageController{
 
     @Autowired
     private QuizService quizService;
-    @Autowired
-    private ItemService itemService;
 
     @Autowired
     private GameRepository gameRepository;
+
     @Autowired
-    private ItemRepoRepository itemRepoRepository;
+    private PlaySessionRepository playSessionRepository;
 
     @Autowired
     private QuizGameRepository quizGameRepository;
@@ -54,6 +57,9 @@ public class MessageController{
 
     @Autowired
     private ShakeGameRepository shakeGameRepository;
+
+    @Autowired
+    private RewardService rewardService;
 
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
@@ -89,10 +95,16 @@ public class MessageController{
     }
 
 
-    @GetMapping("/shake/{id_event}/{id_player}")
-    public ResponseEntity<String> playShakeGame(@PathVariable Long id_event, @PathVariable Long id_player) throws Exception {
+    @GetMapping("/{id_game}/player/{id_player}")
+    public ResponseEntity<?> playShakeGame(@PathVariable Long id_game, @PathVariable Long id_player) throws Exception {
         try {
-            ItemRepo[] items = itemService.getItem(id_event);
+            PlaySession playSession = playSessionRepository.findPlaySessionByIdPlayerAndIdGame(id_player, id_game);
+            if (playSession == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Người dùng chưa đăng ký sự kiện"));
+            }
+            if (playSession.getTurns() == 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Không đủ lượt để chơi!"));
+            }
 
             double winProbability = 0.10;
 
@@ -100,24 +112,35 @@ public class MessageController{
             Random random = new Random();
             double randomValue = random.nextDouble();
 
+            List<RewardDTO> rewardsList = rewardService.getRewardListByIdPlayer(id_player).orElse(null);
+            if (rewardsList == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi khi cố tải kho vật dụng của người dùng!"));
+            }
+
+            RewardDTO[] rewards = rewardsList.toArray(new RewardDTO[0]);
+
             if (randomValue < winProbability) {
-                int itemIndex = random.nextInt(items.length);
-                ItemRepo wonItem = items[itemIndex];
-
-                ItemRepo existItem = itemRepoRepository.findItembyIdUser(id_player, wonItem.getId_item());
-                if (existItem.getId_item() != null) {
-                    itemService.updateQuantityItem(existItem.getId_itemRepo());
+                int itemIndex = random.nextInt(rewards.length);
+                RewardDTO wonItem = rewards[itemIndex];
+                RewardDTO updatedReward;
+                if (wonItem.getItemName().equals("Xu") || wonItem.getIdItem() == 5) {
+                    Long coin = random.nextLong(200) + 1;
+                    updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo(), coin);
                 } else {
-                    ItemRepo newItemRepo = new ItemRepo(id_player, wonItem.getId_item(), 1);
-                    itemRepoRepository.save(newItemRepo);
+                    updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo(), null);
                 }
-                return ResponseEntity.ok("Congratulations! You've won: " + wonItem);
-
+                if (!checkTurnRecords(id_player, id_game) || updatedReward == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
+                }
+                return ResponseEntity.ok(new SuccessResponse("Bạn đã trúng được 1 " + updatedReward.getItemName(), HttpStatus.OK, updatedReward));
             } else {
-                return ResponseEntity.ok("Sorry! You didn't win anything this time.");
+                if (!checkTurnRecords(id_player, id_game)) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
+                }
+                return ResponseEntity.ok("Hụt mất rồi. Hãy thử lại vào lần sau nhé!");
             }
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Changing password failed by server!"));
         }
     }
     
@@ -141,6 +164,9 @@ public class MessageController{
         return ResponseEntity.ok(gameInfoDTO);
     }
 
+    public boolean checkTurnRecords(Long idPlayer, Long idGame) {
+        return playSessionRepository.decrementTurns(idPlayer, idGame) == 1;
+    }
 }
 
 

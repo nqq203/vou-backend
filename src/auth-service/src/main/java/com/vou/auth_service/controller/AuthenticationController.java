@@ -76,7 +76,6 @@ public class AuthenticationController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         System.out.println("Attempting to login user: " + registerRequest.getUsername());
 
-//        implement logic to check role
         Role role;
         if (registerRequest.getRole().equalsIgnoreCase("player")) {
             role = Role.PLAYER;
