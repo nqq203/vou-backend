@@ -38,8 +38,8 @@ public class VoucherController {
 
     @Autowired
     private ItemRepository itemRepository;
-   @Autowired
-   private StorageService storageService;
+    @Autowired
+    private StorageService storageService;
 
     @GetMapping("")
     public ResponseEntity<List<Voucher>> getVouchers() {
@@ -57,6 +57,7 @@ public class VoucherController {
                         inventoryDTO.getVoucher_name(),
                         null,
                         inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
                         inventoryDTO.getVoucher_description(),
                         inventoryDTO.getVoucher_type(),
                         inventoryDTO.getItems(),
@@ -71,6 +72,7 @@ public class VoucherController {
                         inventoryDTO.getVoucher_name(),
                         null,
                         inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
                         inventoryDTO.getVoucher_description(),
                         inventoryDTO.getVoucher_type(),
                         inventoryDTO.getEvent_id()

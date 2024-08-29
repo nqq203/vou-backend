@@ -13,9 +13,9 @@ public class EventDetailDTO {
     private int numberOfVouchers;
     private Timestamp startDate;
     private Timestamp endDate;
-    private List<BrandsCooperation> brands;
+    private List<BrandsCooperation> brandId;
     private GameInfoDTO gameInfoDTO;
-    private InventoryDetailDTO inventoryDetailDTO;
+    private InventoryDetailDTO inventoryInfo;
 
     public EventDetailDTO(
             Long idEvent,
@@ -32,8 +32,8 @@ public class EventDetailDTO {
         this.numberOfVouchers = numberOfVouchers;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.brands = brands;
+        this.brandId = brands;
         this.gameInfoDTO = gameInfoDTO;
-        this.inventoryDetailDTO = inventoryDetailDTO;
+        this.inventoryInfo = inventoryDetailDTO;
     }
 }

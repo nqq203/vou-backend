@@ -164,6 +164,47 @@ public class MessageController{
         return ResponseEntity.ok(gameInfoDTO);
     }
 
+    @PutMapping("/game-info")
+    public ResponseEntity<GameInfoDTO>  updateGameInfo(@RequestBody GameInfoDTO gameInfoDTO){
+
+        Game game = gameRepository.findByIdGame(gameInfoDTO.getGameId());
+        game.setName(gameInfoDTO.getName());
+        gameRepository.save(game);
+        if(gameInfoDTO.getGameType().equals("quiz-game")) {
+            List<Quiz> quizzes = quizRepository.findAllByIdGame(gameInfoDTO.getGameId());
+            Map<String, QuizDTO> quizMap = gameInfoDTO.getQuiz().stream()
+                    .collect(Collectors.toMap(QuizDTO::getQuestion, Function.identity()));
+
+            // Update existing quizzes
+            for (Quiz existingQuiz : quizzes) {
+                QuizDTO quizDTO = quizMap.get(existingQuiz.getQuestion());
+
+                if (quizDTO != null) {
+                    existingQuiz.setAns1(quizDTO.getAns1());
+                    existingQuiz.setAns2(quizDTO.getAns2());
+                    existingQuiz.setAns3(quizDTO.getAns3());
+                    existingQuiz.setCorrectAnswerIndex(quizDTO.getCorrectAnswerIndex());
+                }
+            }
+
+        }
+
+//        List<Quiz> quizzes= quizRepository.findAllByIdGame(game.getIdGame());
+//
+//        List<QuizDTO> quizDto= quizzes.stream()
+//                .map(QuizDTO::new)
+//                .collect(Collectors.toList());
+//        GameInfoDTO gameInfoDTO =new GameInfoDTO(
+//                game.getIdGame(),
+//                game.getName(),
+//                game.getType(),
+//                game.getStartedAt(),
+//                game.getIdEvent(),
+//                quizDto
+//        );
+        return ResponseEntity.ok(gameInfoDTO);
+    }
+
     public boolean checkTurnRecords(Long idPlayer, Long idGame) {
         return playSessionRepository.decrementTurns(idPlayer, idGame) == 1;
     }

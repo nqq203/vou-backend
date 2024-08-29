@@ -34,7 +34,8 @@ public class VoucherService {
             voucher.setImageUrl(request.getImageUrl());
             voucher.setDescription(request.getDescription());
             voucher.setExpirationDate(request.getExpirationDate());
-            voucher.setType("active");
+            voucher.setVoucherPrice(request.getVoucherPrice());
+            voucher.setType(request.getType());
             voucher.setIdItem1(request.getIdItem1());
             voucher.setIdItem2(request.getIdItem2());
             voucher.setIdItem3(request.getIdItem3());
