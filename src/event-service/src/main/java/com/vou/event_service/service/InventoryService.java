@@ -29,7 +29,7 @@ public class InventoryService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://inventory-and-reward-service:8087/api/v1/vouchers";
+    private final String QUIZ_SERVICE_URL = "http://localhost:8087/api/v1/vouchers";
 
     public void createInventory(InventoryDTO inventoryDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -54,7 +54,7 @@ public class InventoryService {
         }
     }
     public InventoryDetailDTO getInventoryInfo(Long eventId) {
-        String url = "http://inventory-and-reward-service:8087/api/v1/vouchers/events/" + eventId;
+        String url = "http://localhost:8087/api/v1/vouchers/events/" + eventId;
 
         // Make the GET request
         ResponseEntity<InventoryDetailDTO> response = restTemplate.getForEntity(url, InventoryDetailDTO.class);
@@ -89,5 +89,17 @@ public class InventoryService {
         } catch (Exception e) {
             return null;
         }
+    }
+    public boolean checkVoucherExists(String voucherCode) {
+        String url = "http://localhost:8087/api/v1/vouchers/exists/" + voucherCode;
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                Boolean.class
+        );
+
+        return Boolean.TRUE.equals(response.getBody());
     }
 }

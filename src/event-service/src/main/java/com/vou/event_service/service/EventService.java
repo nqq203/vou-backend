@@ -58,29 +58,30 @@ public class EventService {
                 .collect(Collectors.toList());
 
     }
-    public EventDetailDTO getAnEvent(Long eventId)throws Exception{
-        try {
-            Event event = eventRepository.findByIdEvent(eventId);
-            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
-            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
-            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
-
-            EventDetailDTO eventDetailDTO = new EventDetailDTO(
-                    event.getIdEvent(),
-                    event.getEventName(),
-                    event.getNumberOfVouchers(),
-                    event.getStartDate(),
-                    event.getEndDate(),
-                    brandsCooperations,
-                    gameInfoDTO,
-                    inventoryDetailDTO
-            );
-            return eventDetailDTO;
-        }
-        catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
+//    public EventDetailDTO getAnEvent(Long eventId)throws Exception{
+//        try {
+//            Event event = eventRepository.findByIdEvent(eventId);
+//            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
+//            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
+//            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
+//
+//            EventDetailDTO eventDetailDTO = new EventDetailDTO(
+//                    event.getIdEvent(),
+//                    event.getEventName(),
+//                    event.getNumberOfVouchers(),
+//                    event.getImageUrl(),
+//                    event.getStartDate(),
+//                    event.getEndDate(),
+//                    brandsCooperations,
+//                    gameInfoDTO,
+//                    inventoryDetailDTO
+//            );
+//            return eventDetailDTO;
+//        }
+//        catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
+//    }
 
     public Event createEvent(CreateEventRequest request) throws Exception{
         Event newEvent = new Event();

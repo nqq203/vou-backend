@@ -38,8 +38,8 @@ public class VoucherController {
 
     @Autowired
     private ItemRepository itemRepository;
-   @Autowired
-   private StorageService storageService;
+    @Autowired
+    private StorageService storageService;
 
     @GetMapping("")
     public ResponseEntity<List<Voucher>> getVouchers() {
@@ -57,6 +57,7 @@ public class VoucherController {
                         inventoryDTO.getVoucher_name(),
                         null,
                         inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
                         inventoryDTO.getVoucher_description(),
                         inventoryDTO.getVoucher_type(),
                         inventoryDTO.getItems(),
@@ -71,6 +72,7 @@ public class VoucherController {
                         inventoryDTO.getVoucher_name(),
                         null,
                         inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
                         inventoryDTO.getVoucher_description(),
                         inventoryDTO.getVoucher_type(),
                         inventoryDTO.getEvent_id()
@@ -178,6 +180,8 @@ public class VoucherController {
                 voucher.getDescription(),
                 voucher.getVoucherName(),
                 voucher.getVoucherPrice(),
+                voucher.getImageUrl(),
+                voucher.getQrCode(),
                 voucher.getAimCoin(),
                 voucher.getExpirationDate(),
                 itemDetailDTOS,
@@ -225,4 +229,11 @@ public class VoucherController {
    private boolean isImageFile(MultipartFile file) {
        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
    }
+
+    @GetMapping("/exists/{voucherCode}")
+    public ResponseEntity<Boolean> checkVoucherExists(@PathVariable String voucherCode) {
+        // Check if the voucher exists in the repository
+        boolean exists = voucherRepository.existsByCode(voucherCode.toUpperCase());
+        return ResponseEntity.ok(exists);
+    }
 }

@@ -85,6 +85,59 @@ public class Quiz {
                 "}";
     }
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String getAns1() {
+        return ans1;
+    }
+
+    public void setAns1(String ans1) {
+        this.ans1 = ans1;
+    }
+
+    public String getAns2() {
+        return ans2;
+    }
+
+    public void setAns2(String ans2) {
+        this.ans2 = ans2;
+    }
+
+    public String getAns3() {
+        return ans3;
+    }
+
+    public void setAns3(String ans3) {
+        this.ans3 = ans3;
+    }
+
+    public Long getIdGame() {
+        return idGame;
+    }
+
+    public void setIdGame(Long idGame) {
+        this.idGame = idGame;
+    }
+
+    public int getCorrectAnswerIndex() {
+        return correctAnswerIndex;
+    }
+
+    public void setCorrectAnswerIndex(int correctAnswerIndex) {
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
 }

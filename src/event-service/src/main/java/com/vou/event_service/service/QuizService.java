@@ -53,4 +53,17 @@ public class QuizService {
         // Return the body of the response
         return response.getBody();
     }
+    public GameInfoDTO updateGameInfo(GameInfoDTO gameInfoDTO) {
+        String url = "http://streaming-service:8086/api/v1/game/game-info?eventId=" + gameInfoDTO.getEventId();
+
+        // Make a PUT request to the updateGameInfo endpoint
+        ResponseEntity<GameInfoDTO> response = restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                new HttpEntity<>(gameInfoDTO),
+                GameInfoDTO.class
+        );
+
+        return response.getBody(); // Return the updated GameInfoDTO
+    }
 }
