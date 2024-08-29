@@ -107,9 +107,16 @@ public class EventController {
         }
     }
     @PutMapping("/{id_event}")
-    public ResponseEntity<?> updateEvent(@PathVariable("id_event") Long id, @RequestBody CreateEventRequest request) {
+    public ResponseEntity<?> updateEvent(@PathVariable("id_event") Long id, @RequestBody EventDetailDTO eventDetailDTO) {
         try {
+            CreateEventRequest request = new CreateEventRequest(
+                    eventDetailDTO.getEventName(),
+                    eventDetailDTO.getNumberOfVouchers(),
+                    eventDetailDTO.getStartDate(),
+                    eventDetailDTO.getEndDate()
+            );
             Event result = eventService.updateEventById(id, request);
+            quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event updated", HttpStatus.OK, result));
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Event not found"));

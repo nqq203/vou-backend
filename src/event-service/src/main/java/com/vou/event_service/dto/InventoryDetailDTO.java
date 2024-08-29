@@ -14,6 +14,8 @@ public class InventoryDetailDTO {
     private String voucher_description;
     private String voucher_name;
     private Long voucher_price;
+    private String qrCode;
+    private String imageUrl;
     private Long aim_coin;
     private Timestamp expiration_date;
     private List<ItemDetailDTO> items;

@@ -69,6 +69,7 @@ public class EventService {
                     event.getIdEvent(),
                     event.getEventName(),
                     event.getNumberOfVouchers(),
+                    event.getImageUrl(),
                     event.getStartDate(),
                     event.getEndDate(),
                     brandsCooperations,

@@ -32,11 +32,11 @@ public class ListEventDTO {
         Timestamp now = Timestamp.from(Instant.now());
 
         if (now.before(startDate)) {
-            return "Sắp bắt đầu";
+            return "pending";
         } else if (now.after(endDate)) {
-            return "Kết thúc";
+            return "inactive";
         } else {
-            return "Đang diễn ra";
+            return "active";
         }
     }
 }
