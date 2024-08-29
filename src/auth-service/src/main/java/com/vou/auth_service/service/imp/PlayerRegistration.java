@@ -1,8 +1,10 @@
 package com.vou.auth_service.service.imp;
 
 import com.vou.auth_service.constant.Status;
+import com.vou.auth_service.model.ItemRepo;
 import com.vou.auth_service.model.Player;
 import com.vou.auth_service.model.User;
+import com.vou.auth_service.service.InventoryClient;
 import com.vou.auth_service.service.OtpService;
 import com.vou.auth_service.service.UserManagementClient;
 import com.vou.auth_service.service.registration_interface.IRegistration;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +23,8 @@ public class PlayerRegistration implements IRegistration {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OtpService otpService;
+    @Autowired
+    private InventoryClient inventoryClient;
 
     @Override
     public boolean register(User user) {
@@ -38,22 +43,20 @@ public class PlayerRegistration implements IRegistration {
         // Set other specific fields for Admin
 
         try {
-            boolean isSaved = client.createPlayer(player);
+            Player isSaved = client.createPlayer(player).orElse(null);
             System.out.println("Qua day 2");
-            if (isSaved) {
+            if (isSaved != null) {
                 //Generate and send OTP
                 String otp = otpService.generateOtp();
                 otpService.storeOtp(player.getUsername(), otp);
-
                 if (player.getEmail() != null) {
                     otpService.sendOtpEmail(player.getEmail(), otp);
                     System.out.println("Qua day 3");
                 }
+                List<ItemRepo> itemRepoList = inventoryClient.createItemRepo(isSaved.getIdUser()).orElse(null);
             }
-
-            return isSaved;
+            return isSaved != null;
         } catch (Exception e) {
-
             System.err.println("Failed to create player: " + e.getMessage());
             return false;
         }
@@ -69,13 +72,12 @@ public class PlayerRegistration implements IRegistration {
         }
 
         // Retrieve the user using the username
-        Optional<User> optionalUser = client.getUserByIdentifier(username);
-        if (!optionalUser.isPresent()) {
+        User user = client.getUserByIdentifier(username).orElse(null);
+        if (user == null) {
             System.out.println("No user found with username: " + username);
             return false;
         }
 
-        User user = optionalUser.get();
         user.setStatus(Status.ACTIVE);
         return client.updateUserInternal(user) != null;
     }
@@ -95,8 +97,7 @@ public class PlayerRegistration implements IRegistration {
         otpService.storeOtp(username, newOtp);
         if (email == null) {
             otpService.sendOtpEmail(user.getEmail(), newOtp);
-        }
-        else {
+        } else {
             otpService.sendOtpEmail(email, newOtp);
         }
         return newOtp;

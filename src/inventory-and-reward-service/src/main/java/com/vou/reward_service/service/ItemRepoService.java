@@ -1,5 +1,6 @@
 package com.vou.reward_service.service;
 
+import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.ItemRepo;
 import com.vou.reward_service.model.Voucher;
 import com.vou.reward_service.repository.ItemRepoRepository;
@@ -89,6 +90,24 @@ public class ItemRepoService {
             return itemRepoRepository.findItemRepoByIdItemRepo(idItemRepo);
         } catch (Exception e) {
             throw new Exception("Error in getItemRepoByIdItemRepo service: " + e.getMessage());
+        }
+    }
+
+    public List<ItemRepo> createItemRepos(Long userId, List<Item> itemList) throws Exception {
+        try {
+            List<ItemRepo> itemRepoList = new ArrayList<>();
+            itemList.forEach(item -> {
+                ItemRepo itemRepo = new ItemRepo();
+                itemRepo.setIdPlayer(userId);
+                itemRepo.setIdItem(item.getIdItem());
+                itemRepo.setAmount(Long.valueOf(0));
+                ItemRepo savedRepo = itemRepoRepository.save(itemRepo);
+                itemRepoList.add(savedRepo);
+            });
+
+            return itemRepoList;
+        } catch (Exception e) {
+            return null;
         }
     }
 }

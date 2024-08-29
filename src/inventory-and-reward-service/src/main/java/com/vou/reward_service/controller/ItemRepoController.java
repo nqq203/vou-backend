@@ -66,4 +66,15 @@ public class ItemRepoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/{id_user}")
+    public ResponseEntity<?> createItemRepo(@PathVariable Long id_user) {
+        List<Item> itemList = itemService.getAllItems();
+        try {
+            List<ItemRepo> itemRepoList = itemRepoService.createItemRepos(id_user, itemList);
+            return ResponseEntity.ok(itemRepoList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
