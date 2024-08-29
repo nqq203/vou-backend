@@ -80,6 +80,10 @@ public class ItemRepoService {
         return itemRepoRepository.incrementAmountByIdItemRepo(idItemRepo);
     }
 
+    public int incrementAmountCoinByIdItemRepo(Long idItemRepo, Long updatedAmount) {
+        return itemRepoRepository.incrementAmountCoinByIdItemRepo(idItemRepo, updatedAmount);
+    }
+
     public ItemRepo getItemRepoByIdItemRepo(Long idItemRepo) throws Exception {
         try {
             return itemRepoRepository.findItemRepoByIdItemRepo(idItemRepo);

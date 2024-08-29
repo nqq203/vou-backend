@@ -122,7 +122,13 @@ public class MessageController{
             if (randomValue < winProbability) {
                 int itemIndex = random.nextInt(rewards.length);
                 RewardDTO wonItem = rewards[itemIndex];
-                RewardDTO updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo());
+                RewardDTO updatedReward;
+                if (wonItem.getItemName().equals("Xu") || wonItem.getIdItem() == 5) {
+                    Long coin = random.nextLong(200) + 1;
+                    updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo(), coin);
+                } else {
+                    updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo(), null);
+                }
                 if (!checkTurnRecords(id_player, id_game) || updatedReward == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
                 }

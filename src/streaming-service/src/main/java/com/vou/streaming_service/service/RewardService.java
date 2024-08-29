@@ -9,9 +9,12 @@ import com.vou.streaming_service.dto.RewardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,12 +49,13 @@ public class RewardService {
         }
     }
 
-    public RewardDTO incrementAmountByIdItemRepo(Long idItemRepo) {
+    public RewardDTO incrementAmountByIdItemRepo(Long idItemRepo, Long updatedAmount) {
         try {
+            HttpEntity<Long> requestEntity = new HttpEntity<>(updatedAmount);
             ResponseEntity<RewardDTO> response = restTemplate.exchange(
                     ITEM_REPOS_URL + "/" + idItemRepo,
                     HttpMethod.PUT,
-                    null,
+                    requestEntity,
                     RewardDTO.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
