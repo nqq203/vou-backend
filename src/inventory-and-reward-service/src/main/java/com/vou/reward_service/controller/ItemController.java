@@ -1,9 +1,6 @@
 package com.vou.reward_service.controller;
 
-import com.vou.reward_service.common.ApiResponse;
-import com.vou.reward_service.common.InternalServerError;
-import com.vou.reward_service.common.NotFoundResponse;
-import com.vou.reward_service.common.SuccessResponse;
+import com.vou.reward_service.common.*;
 import com.vou.reward_service.entity.CreateItemRequest;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.service.ItemService;
@@ -15,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/items")
@@ -83,6 +81,16 @@ public class ItemController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new InternalServerError(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/events/{id_event}")
+    public ResponseEntity<ApiResponse> getItemsByEvent(@PathVariable Long id_event) {
+        try {
+            Set<Item> items = itemService.getListItemsOfEvent(id_event);
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Các items cần cho sự kiện này là", HttpStatus.OK, items));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));
         }
     }
 }

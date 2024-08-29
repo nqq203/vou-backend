@@ -4,17 +4,20 @@ import com.vou.reward_service.common.NotFoundException;
 import com.vou.reward_service.constant.HttpStatus;
 import com.vou.reward_service.entity.CreateItemRequest;
 import com.vou.reward_service.model.Item;
+import com.vou.reward_service.model.Voucher;
 import com.vou.reward_service.repository.ItemRepository;
-import org.aspectj.weaver.ast.Not;
+import com.vou.reward_service.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     public List<Item> getAllItems() {
         return itemRepository.findAll();
@@ -64,5 +67,46 @@ public class ItemService {
         }
         itemRepository.delete(itemFound);
         return HttpStatus.OK;
+    }
+
+    public List<Item> getListItemsOfVoucher(String code) {
+        List<Item> items = new ArrayList<>();
+        Voucher voucher = voucherRepository.findByCode(code);
+
+        if (voucher == null) {
+            throw new NotFoundException("Không tìm thấy voucher với code đã cho");
+        }
+        Optional.ofNullable(voucher.getIdItem1()).ifPresent(action -> {
+            items.add(itemRepository.findItemByIdItem(voucher.getIdItem1()));
+        });
+        Optional.ofNullable(voucher.getIdItem2()).ifPresent(action -> {
+            items.add(itemRepository.findItemByIdItem(voucher.getIdItem2()));
+        });
+        Optional.ofNullable(voucher.getIdItem3()).ifPresent(action -> {
+            items.add(itemRepository.findItemByIdItem(voucher.getIdItem3()));
+        });
+        Optional.ofNullable(voucher.getIdItem4()).ifPresent(action -> {
+            items.add(itemRepository.findItemByIdItem(voucher.getIdItem4()));
+        });
+        Optional.ofNullable(voucher.getIdItem5()).ifPresent(action -> {
+            items.add(itemRepository.findItemByIdItem(voucher.getIdItem5()));
+        });
+
+        return items;
+    }
+
+    public Set<Item> getListItemsOfEvent(Long eventId) {
+        List<Voucher> vouchersOfEvent = voucherRepository.findVouchersByIdEvent(eventId);
+        Set<Item> items = new HashSet<>();
+
+        if (vouchersOfEvent.isEmpty()) {
+            throw new NotFoundException("Không tìm thấy items với event đã cho");
+        }
+
+        for(Voucher voucher : vouchersOfEvent) {
+            items.addAll(getListItemsOfVoucher(voucher.getCode()));
+        }
+
+        return items;
     }
 }
