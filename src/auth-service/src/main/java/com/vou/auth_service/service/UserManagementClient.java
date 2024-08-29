@@ -37,7 +37,7 @@ public class UserManagementClient {
 
     public Boolean createAdmin(Admin admin) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl + "/", admin, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl, admin, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -52,7 +52,7 @@ public class UserManagementClient {
 
     public Boolean createBrand(Brand brand) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl + "/", brand, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl, brand, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
