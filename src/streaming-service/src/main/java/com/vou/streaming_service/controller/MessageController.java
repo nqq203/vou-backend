@@ -77,6 +77,7 @@ public class MessageController{
     public ResponseEntity<String> createQuiz(@RequestBody GameInfoDTO gameInfoDTO){
         List<QuizDTO> quizzdto = gameInfoDTO.getQuiz();
         Game game = new Game(gameInfoDTO.getName(),gameInfoDTO.getGameType(), gameInfoDTO.getEventId());
+        System.out.println(game);
         gameRepository.save(game);
         if (gameInfoDTO.getGameType().equals("shake-game")){
             ShakeGame shakeGame = new ShakeGame();

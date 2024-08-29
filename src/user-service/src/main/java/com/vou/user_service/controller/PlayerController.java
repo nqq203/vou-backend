@@ -35,10 +35,10 @@ public class PlayerController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
+    public ResponseEntity<Long> createPlayer(@RequestBody Player player) {
         try {
             Player savedPlayer = userService.createPlayer(player);
-            return ResponseEntity.ok(savedPlayer);
+            return ResponseEntity.ok(savedPlayer.getIdUser());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

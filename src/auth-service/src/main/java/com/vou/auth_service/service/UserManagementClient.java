@@ -65,18 +65,18 @@ public class UserManagementClient {
         }
     }
 
-    public Optional<Player> createPlayer(Player player) {
+    public Long createPlayer(Player player) {
         try {
-            ResponseEntity<Player> response = restTemplate.postForEntity(playerUrl + "/", player, Player.class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return Optional.ofNullable(response.getBody());
+            ResponseEntity<Long> response = restTemplate.postForEntity(playerUrl + "/", player, Long.class);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
             } else {
                 System.err.println("Failed to create player, status code: " + response.getStatusCode());
-                return Optional.empty();
+                return null;
             }
         } catch (RestClientException e) {
             System.err.println("RestClientException when creating player: " + e.getMessage());
-            return Optional.empty();
+            return null;
         }
     }
 

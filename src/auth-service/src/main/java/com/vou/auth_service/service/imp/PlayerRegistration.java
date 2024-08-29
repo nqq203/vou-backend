@@ -43,9 +43,9 @@ public class PlayerRegistration implements IRegistration {
         // Set other specific fields for Admin
 
         try {
-            Player isSaved = client.createPlayer(player).orElse(null);
+            Long idUser = client.createPlayer(player);
             System.out.println("Qua day 2");
-            if (isSaved != null) {
+            if (idUser != null) {
                 //Generate and send OTP
                 String otp = otpService.generateOtp();
                 otpService.storeOtp(player.getUsername(), otp);
@@ -53,9 +53,9 @@ public class PlayerRegistration implements IRegistration {
                     otpService.sendOtpEmail(player.getEmail(), otp);
                     System.out.println("Qua day 3");
                 }
-                List<ItemRepo> itemRepoList = inventoryClient.createItemRepo(isSaved.getIdUser()).orElse(null);
+                List<ItemRepo> itemRepoList = inventoryClient.createItemRepo(idUser).orElse(null);
             }
-            return isSaved != null;
+            return idUser != null;
         } catch (Exception e) {
             System.err.println("Failed to create player: " + e.getMessage());
             return false;

@@ -5,12 +5,13 @@ CREATE TABLE Game (
     image_url VARCHAR(255) DEFAULT NULL,
     type VARCHAR(10) CHECK (type IN ('shake', 'quiz')),
     instruction TEXT,
-    started_at TIMESTAMP
+    started_at TIMESTAMP,
+    event_id INT DEFAUlT NULL
 );
 
-INSERT INTO Game (name, image_url, type, instruction, started_at) VALUES
-('Trivia Quiz', 'http://example.com/trivia.png', 'quiz', 'Trả lời các câu hỏi chính xác và nhanh nhất có thể', '2024-09-15 12:00:00'),
-('Lắc xì Moomoo', 'http://example.com/shake.png', 'shake', 'Lắc thiết bị nhanh nhất có thể', '2024-10-10 15:00:00');
+INSERT INTO Game (name, image_url, type, instruction, started_at, event_id) VALUES
+('Trivia Quiz', 'http://example.com/trivia.png', 'quiz-game', 'Trả lời các câu hỏi chính xác và nhanh nhất có thể', '2024-09-15 12:00:00', 1),
+('Lắc xì Moomoo', 'http://example.com/shake.png', 'shake-game', 'Lắc thiết bị nhanh nhất có thể', '2024-10-10 15:00:00', 1);
 
 -- Creating the QuizGame table
 CREATE TABLE QuizGame (

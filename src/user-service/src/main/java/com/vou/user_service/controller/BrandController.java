@@ -54,7 +54,7 @@ public class BrandController {
     public ResponseEntity<?> getBrandByUserId(@PathVariable Long userId) {
         try {
             Brand brand = userService.findBrandByUserId(userId);
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Tìm thấy thương hiệu với id tương ứng", HttpStatus.OK, brand));
+            return ResponseEntity.ok(brand);
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy thương hiệu với id đã cho"));
         } catch (Exception e) {
