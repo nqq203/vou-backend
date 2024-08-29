@@ -21,4 +21,9 @@ public interface ItemRepoRepository extends JpaRepository<ItemRepo, Long> {
     int incrementAmountByIdItemRepo(Long idItemRepo);
 
     ItemRepo findItemRepoByIdItemRepo(Long idItemRepo);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE ItemRepo ir SET ir.amount = ir.amount + :updatedAmount WHERE ir.idItemRepo = :idItemRepo")
+    int incrementAmountCoinByIdItemRepo(Long idItemRepo, Long updatedAmount);
 }

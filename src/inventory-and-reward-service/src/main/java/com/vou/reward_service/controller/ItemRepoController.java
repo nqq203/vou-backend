@@ -46,9 +46,12 @@ public class ItemRepoController {
     }
 
     @PutMapping("/{id_item_repo}")
-    public ResponseEntity<RewardDTO> incrementAmountByIdItemRepo(@PathVariable Long id_item_repo) {
+    public ResponseEntity<RewardDTO> incrementAmountByIdItemRepo(@PathVariable Long id_item_repo, @RequestBody Long updatedAmount) {
         try {
             int recordNumber = itemRepoService.incrementAmountByIdItemRepo(id_item_repo);
+            if (updatedAmount != null) {
+                recordNumber = itemRepoService.incrementAmountCoinByIdItemRepo(id_item_repo, updatedAmount);
+            }
             if (recordNumber != 1) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
