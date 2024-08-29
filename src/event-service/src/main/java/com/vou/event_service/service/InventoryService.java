@@ -90,4 +90,16 @@ public class InventoryService {
             return null;
         }
     }
+    public boolean checkVoucherExists(String voucherCode) {
+        String url = "http://localhost:8087/api/v1/vouchers/exists/" + voucherCode;
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                Boolean.class
+        );
+
+        return Boolean.TRUE.equals(response.getBody());
+    }
 }

@@ -11,6 +11,7 @@ import com.vou.event_service.dto.InventoryDTO;
 import com.vou.event_service.dto.QuizDTO;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.repository.EventRepository;
 import com.vou.event_service.service.BrandsCooperationService;
 import com.vou.event_service.service.EventService;
 import com.vou.event_service.service.InventoryService;
@@ -45,6 +46,8 @@ public class EventController {
     private InventoryService inventoryService;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private EventRepository eventRepository;
 
 
     @GetMapping("")
@@ -67,6 +70,9 @@ public class EventController {
 
     @PostMapping("")
     public ResponseEntity<?> createEvent(@RequestBody EventDTO event){
+        if(inventoryService.checkVoucherExists(event.getInventoryInfo().getVoucher_code())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Voucher code đã tồn tại!"));
+        }
         GameInfoDTO gameInfoDTO = event.getGameInfoDTO();
         InventoryDTO inventoryDTO = event.getInventoryInfo();
         CreateEventRequest request = new CreateEventRequest(
@@ -78,7 +84,7 @@ public class EventController {
         List<Long> brand_id = event.getBrandId();
         try {
             Event result = eventService.createEvent(request);
-            for(int i = 0;i< brand_id.size();i++){
+            for(int i = 1;i< brand_id.size()+1;i++){
                 CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), (long) i);
                 brandsCooperationService.createBrandsCooperation(brandsCooperation);
             }
@@ -97,11 +103,27 @@ public class EventController {
     public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
         try {
 
-            EventDetailDTO event = eventService.getAnEvent(id_event);
+            Event event = eventRepository.findByIdEvent(id_event);
+
             if (event == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
             }
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, event));
+            GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
+            InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
+            List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
+
+            EventDetailDTO eventDetailDTO = new EventDetailDTO(
+                    event.getIdEvent(),
+                    event.getEventName(),
+                    event.getNumberOfVouchers(),
+                    event.getImageUrl(),
+                    event.getStartDate(),
+                    event.getEndDate(),
+                    brandsCooperations,
+                    gameInfoDTO,
+                    inventoryDetailDTO
+            );
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, eventDetailDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }

@@ -229,4 +229,11 @@ public class VoucherController {
    private boolean isImageFile(MultipartFile file) {
        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
    }
+
+    @GetMapping("/exists/{voucherCode}")
+    public ResponseEntity<Boolean> checkVoucherExists(@PathVariable String voucherCode) {
+        // Check if the voucher exists in the repository
+        boolean exists = voucherRepository.existsByCode(voucherCode.toUpperCase());
+        return ResponseEntity.ok(exists);
+    }
 }
