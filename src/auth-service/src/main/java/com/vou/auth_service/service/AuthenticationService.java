@@ -81,7 +81,7 @@ public class AuthenticationService {
         return token;
     }
 
-    public boolean register(User user) {
+    public byte register(User user){
         IRegistration registrationService = registrationFactory.getRegistration(user.getRole().toString());
         return registrationService.register(user);
     }

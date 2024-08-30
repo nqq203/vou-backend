@@ -24,9 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.service.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -48,6 +48,8 @@ public class EventController {
     private StorageService storageService;
     @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private BrandClient brandClient;
 
 
     @GetMapping("")
@@ -56,13 +58,13 @@ public class EventController {
     ){
         try {
             List<ListEventDTO> listEventDTOs;
-            if (brandId != null){
-                listEventDTOs = eventService.getAllEventOfBrand(brandId);
-                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
+            if (brandId == null){
+                listEventDTOs = eventService.getAllEventActive();
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập danh sách sự kiện thành công", HttpStatus.OK, listEventDTOs));
             }
+            listEventDTOs = eventService.getAllEventOfBrand(brandId);
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập danh sách sự kiện của nhãn hàng thành công!", HttpStatus.OK, listEventDTOs));
 
-            listEventDTOs = eventService.getAllEventActive();
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("List of events", HttpStatus.OK, listEventDTOs));
         } catch (Exception e) {
             return ResponseEntity.ok(new InternalServerError());
         }
@@ -79,23 +81,33 @@ public class EventController {
                 event.getEventName(),
                 event.getNumberOfVouchers(),
                 event.getStartDate(),
-                event.getEndDate()
+                event.getEndDate(),
+                event.getCreatedBy()
         );
         List<Long> brand_id = event.getBrandId();
         try {
+            System.out.println("Trước khi save event");
             Event result = eventService.createEvent(request);
-            for(int i = 1;i< brand_id.size()+1;i++){
-                CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), (long) i);
-                brandsCooperationService.createBrandsCooperation(brandsCooperation);
+            System.out.println("Save event thành công");
+            boolean hasError = false;
+            for (Long id : brand_id) {
+                CreateBrandsCooperationRequest brandsCooperation = new CreateBrandsCooperationRequest(result.getIdEvent(), id);
+                try {
+                    brandsCooperationService.createBrandsCooperation(brandsCooperation);
+                } catch (Exception e) {
+                    hasError = true;
+                }
+            }
+            if (hasError) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng tạo brand cộng tác"));
             }
             gameInfoDTO.setEventId(result.getIdEvent());
             inventoryDTO.setEvent_id(result.getIdEvent());
             quizService.createQuiz(gameInfoDTO);
             inventoryService.createInventory(inventoryDTO);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse(result));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse("Tạo sự kiện mưới thành công", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng tạo sự kiên mới"));
         }
     }
 
@@ -106,8 +118,11 @@ public class EventController {
             Event event = eventRepository.findByIdEvent(id_event);
 
             if (event == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy sự kiện"));
             }
+
+            String brandLogo = brandClient.getBrandLogo(event.getCreatedBy()).orElse(null);
+
             GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
             InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
             List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
@@ -117,15 +132,17 @@ public class EventController {
                     event.getEventName(),
                     event.getNumberOfVouchers(),
                     event.getImageUrl(),
+                    brandLogo,
+                    event.getCreatedBy(),
                     event.getStartDate(),
                     event.getEndDate(),
                     brandsCooperations,
                     gameInfoDTO,
                     inventoryDetailDTO
             );
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event details", HttpStatus.OK, eventDetailDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập chi tiết sự kiện thành công!", HttpStatus.OK, eventDetailDTO));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập sự kiện!"));
         }
     }
     @PutMapping("/{id_event}")
@@ -135,13 +152,14 @@ public class EventController {
                     eventDetailDTO.getEventName(),
                     eventDetailDTO.getNumberOfVouchers(),
                     eventDetailDTO.getStartDate(),
-                    eventDetailDTO.getEndDate()
+                    eventDetailDTO.getEndDate(),
+                    eventDetailDTO.getCreatedBy()
             );
             Event result = eventService.updateEventById(id, request);
             quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event updated", HttpStatus.OK, result));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Cập nhật sự kiện thành công", HttpStatus.OK, result));
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Event not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy sự kiện"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }
@@ -195,7 +213,17 @@ public class EventController {
                 !isImageFile(eventImages.getQrImage()) ||
                 !isImageFile(eventImages.getVoucherImg())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("Loại tập tin không hợp lệ!", HttpStatus.BAD_REQUEST, "Chỉ file hình ảnh mới được chấp nhận!"));
+                    .body(new ErrorResponse("Không tìm thấy file hình ảnh", HttpStatus.BAD_REQUEST, null));
+        }
+
+        String contentType1 = eventImages.getQrImage().getContentType();
+        String contentType2 = eventImages.getBannerFile().getContentType();
+        String contentType3 = eventImages.getVoucherImg().getContentType();
+
+        if (!Arrays.asList("image/png", "image/jpeg", "image/jpg").contains(contentType1) &&
+                !Arrays.asList("image/png", "image/jpeg", "image/jpg").contains(contentType2) &&
+                !Arrays.asList("image/png", "image/jpeg", "image/jpg").contains(contentType3)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("File không hợp lệ", HttpStatus.BAD_REQUEST, "Chỉ cho phép các định dạng png, jpg, jpeg"));
         }
         Event existEvent;
         try {

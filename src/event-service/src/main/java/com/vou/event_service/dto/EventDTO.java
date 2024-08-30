@@ -14,6 +14,7 @@ import java.util.List;
 public class EventDTO {
     private String eventName;
     private int numberOfVouchers;
+    private Long createdBy;
     private Timestamp startDate;
     private Timestamp endDate;
     private List<Long> brandId;

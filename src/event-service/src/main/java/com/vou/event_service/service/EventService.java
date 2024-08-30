@@ -8,13 +8,16 @@ import com.vou.event_service.dto.ListEventDTO;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.model.FavouriteEvent;
 import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.repository.EventRepository;
+import com.vou.event_service.repository.FavouriteEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +32,8 @@ public class EventService {
     private InventoryService inventoryService;
     @Autowired
     private BrandsCooperationRepository brandsCooperationRepository;
+    @Autowired
+    private FavouriteEventRepository favouriteEventRepository;
 
     public List<Event> getAllEvents() throws Exception{
         try {
@@ -52,7 +57,11 @@ public class EventService {
     public List<ListEventDTO> getAllEventActive(){
         Timestamp currentTimestamp = Timestamp.from(Instant.now());;
         List<Event> events = eventRepository.findActiveEvents(currentTimestamp);
-
+        System.out.println("Danh sách events: " + events);
+        System.out.println("Vào getAllEventActive và đã tìm xong");
+        for (Event event : events) {
+            System.out.println(event.getClass());
+        }
         return events.stream()
                 .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
                 .collect(Collectors.toList());
@@ -89,6 +98,8 @@ public class EventService {
         newEvent.setNumberOfVouchers(request.getNumberOfVouchers());
         newEvent.setStartDate(request.getStartDate());
         newEvent.setEndDate(request.getEndDate());
+        newEvent.setCreatedBy(request.getCreatedBy());
+        newEvent.setDeletedDate(null);
         try {
             return eventRepository.save(newEvent);
         } catch (Exception e) {
@@ -125,9 +136,20 @@ public class EventService {
     public boolean deleteEventById(Long id) throws Exception {
         try {
             Event event = eventRepository.findByIdEvent(id);
+            List<FavouriteEvent> favouriteEvents = favouriteEventRepository.findAllByIdEvent(id);
+            if (favouriteEvents.toArray().length == 0) {
+                return false;
+            }
             if (event == null)
                 throw new NotFoundException("Event not found");
-            eventRepository.delete(event);
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            favouriteEvents.forEach(fEvent -> {
+                fEvent.setDeletedDate(now);
+                favouriteEventRepository.save(fEvent);
+            });
+
+            event.setDeletedDate(now);
+            eventRepository.save(event);
             return true;
         } catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -140,7 +162,7 @@ public class EventService {
             eventRepository.save(event);
             return true;
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
             return false;
         }
     }

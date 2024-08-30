@@ -293,5 +293,21 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
+    public User findUserByUsernameAndEmail(String username, String email) {
+        User userByUsername = userRepository.findByUsername(username);
+        User userByEmail = userRepository.findByEmail(email);
+        if (userByUsername != null && userByEmail != null) {
+            if (userByUsername.equals(userByEmail)) {
+                return userByUsername;
+            } else {
+                return null;
+            }
+        }
+        if (userByUsername != null) {
+            return userByUsername;
+        } else if (userByEmail != null) {
+            return userByEmail;
+        }
+        return null;
+    }
 }

@@ -211,4 +211,17 @@ public class UserManagementClient {
             return Optional.empty();
         }
     }
+
+    public Optional<User> getUserByUsernameAndEmail(String username, String email){
+        try {
+            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/query" +"?username=" + username + "&email=" + email, User.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.out.println("Error in getUserByUsernameAndEmail: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
 }

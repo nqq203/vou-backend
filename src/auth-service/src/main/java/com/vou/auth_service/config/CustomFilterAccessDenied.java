@@ -14,6 +14,6 @@ public class CustomFilterAccessDenied implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Access Denied\", \"message\": \"" + accessDeniedException.getMessage() + "\"}");
+        response.getWriter().write("{\"message\": \"Yêu cầu bị từ chối\", \"}");
     }
 }

@@ -95,6 +95,8 @@ public class ItemRepoService {
 
     public List<ItemRepo> createItemRepos(Long userId, List<Item> itemList) throws Exception {
         try {
+            System.out.println("In createItemRepos, userId: " + userId);
+            System.out.println("In createItemRepos, itemList: " + itemList);
             List<ItemRepo> itemRepoList = new ArrayList<>();
             itemList.forEach(item -> {
                 ItemRepo itemRepo = new ItemRepo();
@@ -104,7 +106,7 @@ public class ItemRepoService {
                 ItemRepo savedRepo = itemRepoRepository.save(itemRepo);
                 itemRepoList.add(savedRepo);
             });
-
+            System.out.println("Item Repo created: " + itemRepoList);
             return itemRepoList;
         } catch (Exception e) {
             return null;

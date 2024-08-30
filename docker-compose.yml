@@ -314,7 +314,7 @@ services:
       - "5432:5432"
     volumes:
       - user-data:/var/lib/postgresql/data
-      # - ./assets/V0__user.sql:/docker-entrypoint-initdb.d/V0__user.sql
+      - ./assets/v1/V1__user.sql:/docker-entrypoint-initdb.d/V1__user.sql
     networks:
       - microservices-network
 
@@ -328,7 +328,7 @@ services:
       - "5433:5432"
     volumes:
       - game-data:/var/lib/postgresql/data
-      # - ./assets/V0__game.sql:/docker-entrypoint-initdb.d/V0__game.sql
+      - ./assets/v1/V1__game.sql:/docker-entrypoint-initdb.d/V1__game.sql
     networks:
       - microservices-network
 
@@ -342,7 +342,7 @@ services:
       - "5434:5432"
     volumes:
       - event-data:/var/lib/postgresql/data
-      # - ./assets/V0__event.sql:/docker-entrypoint-initdb.d/V0__event.sql
+      - ./assets/v1/V1__event.sql:/docker-entrypoint-initdb.d/V1__event.sql
     networks:
       - microservices-network
 
@@ -356,7 +356,7 @@ services:
       - "5435:5432"
     volumes:
       - inventory-data:/var/lib/postgresql/data
-      # - ./assets/V0__inventory_and_rewards.sql:/docker-entrypoint-initdb.d/V0__inventory_and_rewards.sql
+      - ./assets/v1/V1__inventory_and_reward.sql:/docker-entrypoint-initdb.d/V1__inventory_and_rewards.sql
     networks:
       - microservices-network
 

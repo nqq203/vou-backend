@@ -27,26 +27,26 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         System.out.println("Attempting to log in user: " + loginRequest.getUsername());
         if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
-            return ResponseEntity.badRequest().body(new BadRequest("Not found username or password"));
+            return ResponseEntity.badRequest().body(new BadRequest("Không tìm thấy tài khoản hoặc mật khẩu"));
         }
 
         String token = authenticationService.login(loginRequest.getUsername(), loginRequest.getPassword());
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Invalid username or password",
+                    .body(new ErrorResponse("Tài khoản hoặc mật khẩu không đúng!",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
         if (token.equals("1")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Unverified account, please verify OTP",
+                    .body(new ErrorResponse("Tài khoản chưa được xác thực. Hãy xác thực OTP để đăng nhập!",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
         if (token.equals("2")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Unverified account, please waiting for account approval",
+                    .body(new ErrorResponse("Tài khoản chưa được xác thực. Hãy chờ để được phê duyệt",
                             HttpStatus.UNAUTHORIZED, null));
         }
 
@@ -54,54 +54,56 @@ public class AuthenticationController {
         User user = authenticationService.loadUserByUsername(loginRequest.getUsername());
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Handle get user failed"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Truy cập thông tin người dùng thất bại!"));
         }
 
         Object account;
         if (user.getRole().toString().equalsIgnoreCase("admin")) {
             account = authenticationService.getAdminById(user.getIdUser());
-        }
-        else if (user.getRole().toString().equalsIgnoreCase("player")) {
+        } else if (user.getRole().toString().equalsIgnoreCase("player")) {
             account = authenticationService.getPlayerById(user.getIdUser());
-        }
-        else {
+        } else {
             account = authenticationService.getBrandById(user.getIdUser());
         }
 
         LoginResponse loginResponse = new LoginResponse(token, account);
-        return ResponseEntity.ok(new SuccessResponse("Login successfully", HttpStatus.OK, loginResponse));
+        return ResponseEntity.ok(new SuccessResponse("Đăng nhập thành công", HttpStatus.OK, loginResponse));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        System.out.println("Attempting to login user: " + registerRequest.getUsername());
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) throws Exception {
+        try {
+            System.out.println("Attempting to login user: " + registerRequest.getUsername());
+            Role role;
+            if (registerRequest.getRole().equalsIgnoreCase("player")) {
+                role = Role.PLAYER;
+            } else if (registerRequest.getRole().equalsIgnoreCase("admin")) {
+                role = Role.ADMIN;
+            } else {
+                role = Role.BRAND;
+            }
+            User newUser = new User(registerRequest.getUsername(),
+                    registerRequest.getPassword(),
+                    registerRequest.getFullName(),
+                    registerRequest.getEmail(),
+                    registerRequest.getPhoneNumber(),
+                    role,
+                    Status.PENDING);
+            if (role.toString().equalsIgnoreCase("admin"))
+                newUser.setStatus(Status.ACTIVE);
 
-        Role role;
-        if (registerRequest.getRole().equalsIgnoreCase("player")) {
-            role = Role.PLAYER;
-        }
-        else if (registerRequest.getRole().equalsIgnoreCase("admin")) {
-            role = Role.ADMIN;
-        }
-        else {
-            role = Role.BRAND;
-        }
-
-        User newUser = new User(registerRequest.getUsername(),
-                                registerRequest.getPassword(),
-                                registerRequest.getFullName(),
-                                registerRequest.getEmail(),
-                                registerRequest.getPhoneNumber(),
-                                role,
-                                Status.PENDING);
-
-        boolean result = authenticationService.register(newUser);
-        if (result) {
-            return ResponseEntity.ok(new SuccessResponse(
-                    "User registered successfully",
-                    HttpStatus.CREATED, null));
-        } else {
-            return ResponseEntity.badRequest().body(new BadRequest("Username or email already exists"));
+            byte result = authenticationService.register(newUser);
+            if (result == 1) {
+                return ResponseEntity.ok(new SuccessResponse("Đăng ký tài khoản thành công!", HttpStatus.CREATED, null));
+            } else if (result == 0) {
+                return ResponseEntity.badRequest().body(new BadRequest("Tên tài khoản (username) hoặc email đã tồn tại"));
+            } else if (result == 2) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố đăng ký tài khoản. Hãy thử lại sau nhé!"));
+            } else {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Hệ thống đã đăng ký ta khoản thành công. Nhưng chưa tạo kho lưu trữ"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Hệ thống đang xảy ra vẫn đề. Hãy thử đăng ký lại sau!"));
         }
     }
 
@@ -115,10 +117,10 @@ public class AuthenticationController {
         System.out.println("logout boolean:" + result);
         if (result) {
             System.out.println("Vao result");
-            return ResponseEntity.ok(new SuccessResponse("Logout successfully", HttpStatus.OK, null));
+            return ResponseEntity.ok(new SuccessResponse("Đăng xuất thành công!", HttpStatus.OK, null));
         } else {
             System.out.println("Khong vao result");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid token", HttpStatus.UNAUTHORIZED, null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Token kông hợp lệ", HttpStatus.UNAUTHORIZED, null));
         }
     }
 
@@ -141,12 +143,10 @@ public class AuthenticationController {
                 Object account = authenticationService.getPlayerById(user.getIdUser());
                 LoginResponse loginResponse = new LoginResponse(token, account);
                 return ResponseEntity.ok(new SuccessResponse("OTP verified and login successfully. Your account is now active.", HttpStatus.CREATED, loginResponse));
-            }
-            else {
+            } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Create token failed"));
             }
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new BadRequest("Invalid OTP"));
         }
     }
@@ -158,8 +158,7 @@ public class AuthenticationController {
 
         if (otp != null) {
             return ResponseEntity.ok(new SuccessResponse("OTP resend successfully", HttpStatus.OK, null));
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new InternalServerError("Resend failed"));
         }
     }
@@ -171,14 +170,13 @@ public class AuthenticationController {
         String password = changePasswordRequest.getPassword();
         String rePassword = changePasswordRequest.getRePassword();
 
-        if (!password.equals(rePassword)){
+        if (!password.equals(rePassword)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Password was re-entered incorrectly"));
         }
         boolean isChanged = authenticationService.changePassword(email, password);
         if (isChanged) {
             return ResponseEntity.ok(new SuccessResponse("Change password successfully", HttpStatus.OK, null));
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Changing password failed by server!"));
         }
     }

@@ -9,17 +9,17 @@ import java.sql.Timestamp;
 @Setter
 public class CreateEventRequest {
     private String eventName;
-
     private Integer numberOfVouchers;
-
     private Timestamp startDate;
-
     private Timestamp endDate;
+    private Long createdBy;
 
-    public CreateEventRequest(String eventName, Integer numberOfVouchers, Timestamp startDate, Timestamp endDate) {
+
+    public CreateEventRequest(String eventName, Integer numberOfVouchers, Timestamp startDate, Timestamp endDate, Long createdBy) {
         this.eventName = eventName;
         this.numberOfVouchers = numberOfVouchers;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.createdBy = createdBy;
     }
 }

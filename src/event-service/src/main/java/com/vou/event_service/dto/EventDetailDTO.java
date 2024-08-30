@@ -12,6 +12,8 @@ public class EventDetailDTO {
     private String eventName;
     private int numberOfVouchers;
     private String imageUrl;
+    private String brandLogo;
+    private Long createdBy;
     private Timestamp startDate;
     private Timestamp endDate;
     private List<BrandsCooperation> brandId;
@@ -23,6 +25,8 @@ public class EventDetailDTO {
             String eventName,
             int numberOfVouchers,
             String imageUrl,
+            String brandLogo,
+            Long createdBy,
             Timestamp startDate,
             Timestamp endDate,
             List<BrandsCooperation> brands,
@@ -38,5 +42,7 @@ public class EventDetailDTO {
         this.brandId = brands;
         this.gameInfoDTO = gameInfoDTO;
         this.inventoryInfo = inventoryDetailDTO;
+        this.createdBy = createdBy;
+        this.brandLogo = brandLogo;
     }
 }

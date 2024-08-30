@@ -22,7 +22,7 @@ public class ApiGatewayConfiguration {
                         .filters(f -> f.filter(new AuthenticationFilter(webClientBuilder)))
                         .uri("lb://user-service")
                 )
-                .route("event-service", r -> r.path("/api/v1/events/**", "/api/v1/brands-cooperation/**")
+                .route("event-service", r -> r.path("/api/v1/events/**", "/api/v1/brands-cooperation/**", "/api/v1/favourite-events/**")
                         .filters(f -> f.filter(new AuthenticationFilter(webClientBuilder)))
                         .uri("lb://event-service")
                 )

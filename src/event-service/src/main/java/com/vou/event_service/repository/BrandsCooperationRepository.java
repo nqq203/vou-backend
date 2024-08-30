@@ -10,4 +10,5 @@ public interface BrandsCooperationRepository extends JpaRepository<BrandsCoopera
     BrandsCooperation findByIdBrandCooperation(Long idBrandCooperation);
     List<BrandsCooperation> findAllByIdEvent(Long idEvent);
     List<BrandsCooperation> findAllByIdBrand(Long idBrand);
+    BrandsCooperation findByIdEvent(Long idEvent);
 }

@@ -16,16 +16,16 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Page not found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy trang"));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleInternalServerException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Bad request" + ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Yêu cầu không dụng"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Access denied"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Từ chối yêu cầu"));
     }
 }
