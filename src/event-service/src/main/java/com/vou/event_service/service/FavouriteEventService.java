@@ -71,4 +71,13 @@ public class FavouriteEventService {
             return null;
         }
     }
+
+    public boolean deleteFavouriteEvent(Long idFavouriteEvent) {
+        try {
+            favouriteEventRepository.deleteById(idFavouriteEvent);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

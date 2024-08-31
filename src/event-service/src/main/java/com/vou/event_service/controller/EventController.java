@@ -112,7 +112,7 @@ public class EventController {
     }
 
     @GetMapping("/{id_event}")
-    public ResponseEntity<?> getEventById(@PathVariable("id_event") long id_event){
+    public ResponseEntity<ApiResponse> getEventById(@PathVariable("id_event") long id_event){
         try {
 
             Event event = eventRepository.findByIdEvent(id_event);
@@ -170,7 +170,7 @@ public class EventController {
         try {
             boolean result = eventService.deleteEventById(id_event);
             if (result) {
-                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event deleted", HttpStatus.OK));
+                return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Event deleted", HttpStatus.OK, null));
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
             }

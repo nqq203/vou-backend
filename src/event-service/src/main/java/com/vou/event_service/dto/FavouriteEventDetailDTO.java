@@ -27,5 +27,6 @@ public class FavouriteEventDetailDTO {
         this.startDate = favouriteEvent.getStartDate();
         this.endDate = favouriteEvent.getEndDate();
         this.brandLogo = brandLogo;
+        this.idBrand = idBrand;
     }
 }

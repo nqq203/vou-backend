@@ -12,4 +12,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, String> {
     Voucher findByIdEvent(Long idEvent);
     List<Voucher> findVouchersByIdEvent(Long idEvent);
     Boolean existsByCode(String code);
+
+    List<Voucher> findVouchersByTypeIs(String type);
 }

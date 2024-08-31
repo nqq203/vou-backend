@@ -11,8 +11,8 @@ import java.util.List;
 public interface VoucherRepoRepository extends JpaRepository<VoucherRepo, Long> {
     @Query("SELECT new com.vou.reward_service.entity.UserVoucher(V, VP.amount) " +
             "FROM Voucher V JOIN VoucherRepo VP ON V.code = VP.codeVoucher " +
-            "WHERE VP.idPlayer = :userId")
-    List<UserVoucher> findVouchersByUserId(@Param("userId") Long userId);
+            "WHERE VP.idPlayer = :userId AND V.type = :type")
+    List<UserVoucher> findVouchersByUserId(@Param("userId") Long userId, @Param("type") String type);
 
     VoucherRepo findVoucherRepoByCodeVoucher(String codeVoucher);
 

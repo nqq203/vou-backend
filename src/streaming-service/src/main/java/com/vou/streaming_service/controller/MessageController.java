@@ -16,10 +16,7 @@ import com.vou.streaming_service.libs.RedisCache;
 import com.vou.streaming_service.model.*;
 import com.vou.streaming_service.repository.*;
 //import com.vou.streaming_service.repository.ItemRepoRepository;
-import com.vou.streaming_service.service.EventSchedulerService;
-import com.vou.streaming_service.service.MessageService;
-import com.vou.streaming_service.service.QuizService;
-import com.vou.streaming_service.service.RewardService;
+import com.vou.streaming_service.service.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +60,9 @@ public class MessageController{
     @Autowired
     private RewardService rewardService;
 
+    @Autowired
+    private PlaySessionService playSessionService;
+
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
         return ResponseEntity.ok(messageService.getPlayers(room));
@@ -98,22 +98,13 @@ public class MessageController{
     }
 
 
-    @GetMapping("/{id_game}/player/{id_player}")
+    @PostMapping("/{id_game}/player/{id_player}")
     public ResponseEntity<?> playShakeGame(@PathVariable Long id_game, @PathVariable Long id_player) throws Exception {
         try {
-            PlaySession playSession = playSessionRepository.findPlaySessionByIdPlayerAndIdGame(id_player, id_game);
-            if (playSession == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Người dùng chưa đăng ký sự kiện"));
-            }
+            PlaySession playSession = playSessionService.findOrCreatePlaySession(id_game, id_player);
             if (playSession.getTurns() == 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Không đủ lượt để chơi!"));
             }
-
-            double winProbability = 0.10;
-
-            // Generate a random number between 0 and 1
-            Random random = new Random();
-            double randomValue = random.nextDouble();
 
             List<RewardDTO> rewardsList = rewardService.getRewardListByIdPlayer(id_player).orElse(null);
             if (rewardsList == null) {
@@ -121,6 +112,12 @@ public class MessageController{
             }
 
             RewardDTO[] rewards = rewardsList.toArray(new RewardDTO[0]);
+
+            double winProbability = 0.75;
+
+            // Generate a random number between 0 and 1
+            Random random = new Random();
+            double randomValue = random.nextDouble();
 
             if (randomValue < winProbability) {
                 int itemIndex = random.nextInt(rewards.length);
@@ -132,15 +129,13 @@ public class MessageController{
                 } else {
                     updatedReward = rewardService.incrementAmountByIdItemRepo(wonItem.getIdItemRepo(), null);
                 }
-                if (!checkTurnRecords(id_player, id_game) || updatedReward == null) {
+                if (updatedReward == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
                 }
+                playSessionRepository.decrementTurns(id_player, id_game);
                 return ResponseEntity.ok(new SuccessResponse("Bạn đã trúng được 1 " + updatedReward.getItemName(), HttpStatus.OK, updatedReward));
             } else {
-                if (!checkTurnRecords(id_player, id_game)) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
-                }
-                return ResponseEntity.ok("Hụt mất rồi. Hãy thử lại vào lần sau nhé!");
+                return ResponseEntity.ok(new SuccessResponse("Hụt mất rồi. Hãy thử lại vào lần sau nhé!", HttpStatus.OK, null));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Changing password failed by server!"));
@@ -208,9 +203,9 @@ public class MessageController{
         return ResponseEntity.ok(gameInfoDTO);
     }
 
-    public boolean checkTurnRecords(Long idPlayer, Long idGame) {
-        return playSessionRepository.decrementTurns(idPlayer, idGame) == 1;
-    }
+//    public boolean checkTurnRecords(Long idPlayer, Long idGame) {
+//        return playSessionRepository.decrementTurns(idPlayer, idGame) == 1;
+//    }
 }
 
 

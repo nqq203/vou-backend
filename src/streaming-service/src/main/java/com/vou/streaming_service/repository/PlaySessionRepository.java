@@ -11,5 +11,5 @@ public interface PlaySessionRepository extends JpaRepository<PlaySession, Long> 
     @Transactional
     @Modifying
     @Query("UPDATE PlaySession ps SET ps.turns = ps.turns - 1 WHERE ps.idPlayer = :idPlayer AND ps.idGame = :idGame AND ps.turns > 0")
-    int decrementTurns(Long idPlayer, Long idGame);
+    void decrementTurns(Long idPlayer, Long idGame);
 }

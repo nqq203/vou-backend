@@ -134,9 +134,9 @@ public class VoucherService {
         }
     }
 
-    public List<UserVoucher> getVouchersByUserId(Long id) throws Exception{
+    public List<UserVoucher> getVouchersByUserId(Long id, String type) throws Exception{
         try {
-            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id);
+            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id, type);
             if (vouchersFound == null || vouchersFound.isEmpty()) {
                 throw new NotFoundException("Not found any vouchers of this user");
             }
@@ -156,6 +156,14 @@ public class VoucherService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public List<Voucher> getListOnlineOrOfflineVoucher(String type) {
+        try {
+            return voucherRepository.findVouchersByTypeIs(type);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

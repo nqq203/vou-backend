@@ -36,7 +36,11 @@ public class FavouriteEventController {
             }
             FavouriteEvent existFavouriteEvent = favouriteEventService.findByIdEvent(id_event);
             if  (existFavouriteEvent != null) {
-                return ResponseEntity.ok(new SuccessResponse("Xóa khỏi danh sách sự kiện yêu thích thành công!", HttpStatus.OK, eventService));
+                boolean deletedEvent = favouriteEventService.deleteFavouriteEvent(existFavouriteEvent.getIdFavouriteEvent());
+                if (!deletedEvent) {
+                    return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng sự kiện khỏi danh sách yêu thích!"));
+                }
+                return ResponseEntity.ok(new SuccessResponse("Xóa khỏi danh sách sự kiện yêu thích thành công!", HttpStatus.OK, null));
             }
             FavouriteEvent favouriteEvent = favouriteEventService.addFavouriteEvent(id_event, id_player, existEvent);
             if (favouriteEvent == null) {
