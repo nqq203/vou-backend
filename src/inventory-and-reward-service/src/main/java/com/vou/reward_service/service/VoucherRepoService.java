@@ -34,14 +34,14 @@ public class VoucherRepoService {
             if (existingVoucher != null) {
                 existingVoucher.setAmount(existingVoucher.getAmount() + 1);
                 voucherRepoRepository.save(existingVoucher);
-                itemRepoService.exchangeItemForVoucher(voucher);
+                itemRepoService.exchangeItemForVoucher(voucher, id);
                 return true;
             } else {
                 VoucherRepo newRepo = new VoucherRepo();
                 newRepo.setIdPlayer(id);
                 newRepo.setCodeVoucher(code.toUpperCase());
                 newRepo.setAmount((long) 1);
-                itemRepoService.exchangeItemForVoucher(voucher);
+                itemRepoService.exchangeItemForVoucher(voucher, id);
 
                 voucherRepoRepository.save(newRepo);
                 return true;

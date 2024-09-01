@@ -1,16 +1,19 @@
 package com.vou.reward_service.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "giftlog")
 public class GiftLog {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_giftlog")
     Long idGiftLog;
 
@@ -20,6 +23,12 @@ public class GiftLog {
     @Column(name = "uid_sender")
     Long uidSender;
 
+    @Column(name = "sender_name")
+    String senderName;
+
+    @Column(name = "receiver_name")
+    String receiverName;
+
     @Column(name = "id_item")
     Long idItem;
 
@@ -28,4 +37,9 @@ public class GiftLog {
 
     @Column(name = "give_time")
     Timestamp giveTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_item", referencedColumnName = "id_item", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    Item item;
 }

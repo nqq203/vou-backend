@@ -26,5 +26,20 @@ public class SuccessResponse implements ApiResponse {
         this.code = status.value();
         this.metadata = metadata;
     }
+
+    @Override
+    public HttpStatus getStatus() {
+        return HttpStatus.valueOf(code);
+    }
+
+    @Override
+    public Object getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }
 
