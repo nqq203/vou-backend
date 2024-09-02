@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -164,42 +165,32 @@ public class MessageController{
 
     @PutMapping("/game-info")
     public ResponseEntity<GameInfoDTO>  updateGameInfo(@RequestBody GameInfoDTO gameInfoDTO){
-
         Game game = gameRepository.findByIdGame(gameInfoDTO.getGameId());
         game.setName(gameInfoDTO.getName());
         gameRepository.save(game);
-        if(gameInfoDTO.getGameType().equals("quiz-game")) {
-            List<Quiz> quizzes = quizRepository.findAllByIdGame(gameInfoDTO.getGameId());
-            Map<String, QuizDTO> quizMap = gameInfoDTO.getQuiz().stream()
-                    .collect(Collectors.toMap(QuizDTO::getQuestion, Function.identity()));
-
-            // Update existing quizzes
-            for (Quiz existingQuiz : quizzes) {
-                QuizDTO quizDTO = quizMap.get(existingQuiz.getQuestion());
-
-                if (quizDTO != null) {
+        if (gameInfoDTO.getGameType().equals("quiz-game")) {
+            List<QuizDTO> quizDTOS = gameInfoDTO.getQuiz();
+            for (QuizDTO quizDTO : quizDTOS) {
+                Optional<Quiz> existingQuizOpt = quizRepository.findById(quizDTO.getQuizId());
+                if (existingQuizOpt.isPresent()) {
+                    Quiz existingQuiz = existingQuizOpt.get();
                     existingQuiz.setAns1(quizDTO.getAns1());
                     existingQuiz.setAns2(quizDTO.getAns2());
                     existingQuiz.setAns3(quizDTO.getAns3());
                     existingQuiz.setCorrectAnswerIndex(quizDTO.getCorrectAnswerIndex());
+                    quizRepository.save(existingQuiz);
+                } else {
+                    Quiz newQuiz = new Quiz();
+                    newQuiz.setQuestion(quizDTO.getQuestion());
+                    newQuiz.setAns1(quizDTO.getAns1());
+                    newQuiz.setAns2(quizDTO.getAns2());
+                    newQuiz.setAns3(quizDTO.getAns3());
+                    newQuiz.setCorrectAnswerIndex(quizDTO.getCorrectAnswerIndex());
+                    newQuiz.setIdGame(gameInfoDTO.getGameId());
+                    quizRepository.save(newQuiz);
                 }
             }
-
         }
-
-//        List<Quiz> quizzes= quizRepository.findAllByIdGame(game.getIdGame());
-//
-//        List<QuizDTO> quizDto= quizzes.stream()
-//                .map(QuizDTO::new)
-//                .collect(Collectors.toList());
-//        GameInfoDTO gameInfoDTO =new GameInfoDTO(
-//                game.getIdGame(),
-//                game.getName(),
-//                game.getType(),
-//                game.getStartedAt(),
-//                game.getIdEvent(),
-//                quizDto
-//        );
         return ResponseEntity.ok(gameInfoDTO);
     }
 

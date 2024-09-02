@@ -102,4 +102,16 @@ public class InventoryService {
 
         return Boolean.TRUE.equals(response.getBody());
     }
+    public InventoryDTO updateInventory(InventoryDTO inventoryDTO) {
+        String url = "http://inventory-and-reward-service:8087/api/v1/vouchers/info?code=" + inventoryDTO.getVoucher_code();
+
+        // Make a PUT request to the updateGameInfo endpoint
+        ResponseEntity<InventoryDTO> response = restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                new HttpEntity<>(inventoryDTO),
+                InventoryDTO.class
+        );
+        return response.getBody();
+    }
 }

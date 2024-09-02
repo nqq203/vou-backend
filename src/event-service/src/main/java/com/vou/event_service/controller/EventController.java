@@ -155,8 +155,43 @@ public class EventController {
                     eventDetailDTO.getEndDate(),
                     eventDetailDTO.getCreatedBy()
             );
+            boolean hasError = false;
+
+            List<BrandsCooperation> brandsCooperations = eventDetailDTO.getBrandId();
+            brandsCooperationRepository.saveAll(brandsCooperations);
             Event result = eventService.updateEventById(id, request);
-            quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
+            try {
+                quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
+            } catch (Exception e) {
+                hasError = true;
+            }
+            if (hasError) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin trò chơi!"));
+            }
+            List<ItemDetailDTO> itemDetailDTOS= eventDetailDTO.getInventoryInfo().getItems();
+            List<Long> itemIds = itemDetailDTOS.stream()
+                    .map(ItemDetailDTO::getIdItem)
+                    .collect(Collectors.toList());
+            InventoryDTO inventoryDTO =new InventoryDTO(
+                    eventDetailDTO.getGameInfoDTO().getGameType(),
+                    eventDetailDTO.getInventoryInfo().getVoucher_type(),
+                    eventDetailDTO.getInventoryInfo().getVoucher_code(),
+                    eventDetailDTO.getInventoryInfo().getVoucher_description(),
+                    eventDetailDTO.getInventoryInfo().getVoucher_name(),
+                    eventDetailDTO.getInventoryInfo().getVoucher_price(),
+                    eventDetailDTO.getInventoryInfo().getAim_coin(),
+                    eventDetailDTO.getInventoryInfo().getExpiration_date(),
+                    itemIds,
+                    eventDetailDTO.getInventoryInfo().getEvent_id()
+            );
+            try {
+                inventoryService.updateInventory(inventoryDTO);
+            } catch (Exception e) {
+                hasError = true;
+            }
+            if (hasError) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin voucher!"));
+            }
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Cập nhật sự kiện thành công", HttpStatus.OK, result));
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy sự kiện"));
