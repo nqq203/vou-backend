@@ -64,9 +64,9 @@ public class FavouriteEventService {
         }
     }
 
-    public FavouriteEvent findByIdEvent(Long idEvent) {
+    public FavouriteEvent findByIdEventAndIdPlayer(Long idEvent, Long idPlayer) {
         try {
-            return favouriteEventRepository.findByIdEvent(idEvent);
+            return favouriteEventRepository.findByIdEventAndIdPlayer(idEvent, idPlayer);
         } catch (Exception e) {
             return null;
         }

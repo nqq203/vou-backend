@@ -69,24 +69,21 @@ public class VoucherService {
 
     public Integer updateVoucherByCode(String code, CreateVoucherRequest request) {
         try {
-            Voucher voucherFound = voucherRepository.findByCode(code.toUpperCase());
+            Voucher voucherFound = voucherRepository.findByCode(code);
             if (voucherFound == null) {
                 return HttpStatus.NOT_FOUND;
             } else {
-                if (request.getQrCode() != null) {
-                    voucherFound.setQrCode(request.getQrCode());
-                }
                 if (request.getVoucherName() != null) {
                     voucherFound.setVoucherName(request.getVoucherName());
-                }
-                if (request.getImageUrl() != null) {
-                    voucherFound.setImageUrl(request.getImageUrl());
                 }
                 if (request.getDescription() != null) {
                     voucherFound.setDescription(request.getDescription());
                 }
                 if (request.getExpirationDate() != null) {
                     voucherFound.setExpirationDate(request.getExpirationDate());
+                }
+                if (request.getVoucherPrice() != null){
+                    voucherFound.setVoucherPrice(request.getVoucherPrice());
                 }
                 if (request.getType() != null) {
                     voucherFound.setType(request.getType());

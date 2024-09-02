@@ -34,7 +34,7 @@ public class FavouriteEventController {
             if (existEvent == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Sự kiện không tồn tại"));
             }
-            FavouriteEvent existFavouriteEvent = favouriteEventService.findByIdEvent(id_event);
+            FavouriteEvent existFavouriteEvent = favouriteEventService.findByIdEventAndIdPlayer(id_event, id_player);
             if  (existFavouriteEvent != null) {
                 boolean deletedEvent = favouriteEventService.deleteFavouriteEvent(existFavouriteEvent.getIdFavouriteEvent());
                 if (!deletedEvent) {
