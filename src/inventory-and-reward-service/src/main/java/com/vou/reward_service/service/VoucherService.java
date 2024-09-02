@@ -136,11 +136,7 @@ public class VoucherService {
 
     public List<UserVoucher> getVouchersByUserId(Long id, String type) throws Exception{
         try {
-            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id, type);
-            if (vouchersFound == null || vouchersFound.isEmpty()) {
-                throw new NotFoundException("Not found any vouchers of this user");
-            }
-            return vouchersFound;
+            return voucherRepoRepository.findVouchersByUserId(id, type);
         } catch (NotFoundException notFoundException) {
             throw notFoundException;
         } catch (Exception e) {
