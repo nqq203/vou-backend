@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -35,6 +36,7 @@ public class GiftLog {
     @Column(name = "amount")
     Long amount;
 
+    @CreationTimestamp
     @Column(name = "give_time")
     Timestamp giveTime;
 

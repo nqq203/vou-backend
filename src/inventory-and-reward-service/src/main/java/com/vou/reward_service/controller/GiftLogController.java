@@ -24,7 +24,7 @@ public class GiftLogController {
     @PostMapping("")
     public ResponseEntity<ApiResponse> giftAnItem(@RequestBody GiftItemRequest request) {
         try {
-            giftLogService.giftAnItemForUser(request.getItemId(), request.getReceiverId(), request.getSenderId(), request.getReceiverUsername(), request.getSenderUsername(), request.getAmount());
+            giftLogService.giftAnItemForUser(request.getItemId(), request.getReceiverId(), request.getSenderId(), request.getAmount());
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Gửi thành công vật phẩm", HttpStatus.CREATED.value()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));

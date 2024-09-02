@@ -9,10 +9,7 @@ import java.sql.Timestamp;
 @Setter
 public class GiftItemRequest {
     private Long receiverId;
-    private String receiverUsername;
     private Long senderId;
-    private String senderUsername;
     private Long itemId;
     private Long amount;
-    private Timestamp giftTime;
 }

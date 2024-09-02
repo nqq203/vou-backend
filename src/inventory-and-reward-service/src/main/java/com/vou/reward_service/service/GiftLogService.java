@@ -21,25 +21,18 @@ public class GiftLogService {
     @Autowired
     private UserService userService;
 
-    public void giftAnItemForUser(Long itemId, Long receiverId, Long senderId, String receiverName, String senderName, Long amount) throws Exception {
+    public void giftAnItemForUser(Long itemId, Long receiverId, Long senderId, Long amount) throws Exception {
+        if (Objects.equals(senderId, receiverId))
+            throw new Exception("Không thể tự gửi vật phẩm cho chính mình");
+
+        LinkedHashMap<String, Object> senderResponse = userService.findPlayerById(senderId);
+
         // Check user có đủ item ko
-        System.out.println(itemRepoService.checkIfUserHaveAmountOfItemLargerThan(senderId, amount, itemId));
         if (!itemRepoService.checkIfUserHaveAmountOfItemLargerThan(senderId, amount, itemId)) {
             throw new Exception("Người dùng không đủ item để tặng");
         }
         // Check receiver có tồn tại hay ko
-        LinkedHashMap<String, Object> response = userService.findPlayerById(receiverId);
-        for (Map.Entry<String, Object> entry : response.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            System.out.println("Key: " + key + ", Value: " + value);
-        }
-        System.out.println(response.get("code") != (Integer) 200);
-
-        if (!response.get("code").equals((Integer) 200)) {
-            throw new Exception("Nguoi nhan khong ton tai");
-        }
+        LinkedHashMap<String, Object> receiverResponse = userService.findPlayerById(receiverId);
         // Tiến hành trừ item của sender
         itemRepoService.updateItemAmountOfUser(itemId, senderId, -amount);
         // Tiến hành cộng item của receiver
@@ -49,8 +42,8 @@ public class GiftLogService {
         newGiftLog.setIdItem(itemId);
         System.out.println(itemId);
         newGiftLog.setAmount(amount);
-        newGiftLog.setSenderName(senderName);
-        newGiftLog.setReceiverName(receiverName);
+        newGiftLog.setSenderName((String) senderResponse.get("fullName"));
+        newGiftLog.setReceiverName((String) receiverResponse.get("fullName"));
         newGiftLog.setUidReceiver(receiverId);
         newGiftLog.setUidSender(senderId);
         giftLogRepository.save(newGiftLog);

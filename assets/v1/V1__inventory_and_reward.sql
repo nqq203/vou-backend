@@ -23,6 +23,8 @@ CREATE TABLE GiftLog (
     id_giftlog SERIAL PRIMARY KEY,
     uid_receiver INT NOT NULL,
     uid_sender INT NOT NULL,
+    sender_name VARCHAR(50),
+    receiver_name VARCHAR(50),
     id_item INT NOT NULL,
     amount INT DEFAULT 1,
     give_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

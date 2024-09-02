@@ -136,6 +136,6 @@ public class ItemRepoService {
     }
 
     public boolean checkIfUserHaveAmountOfItemLargerThan(Long userId, Long amount, Long idItem) {
-        return itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(userId, idItem, amount);
+        return itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(idItem, userId, amount);
     }
 }
