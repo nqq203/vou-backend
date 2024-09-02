@@ -1,5 +1,6 @@
 package com.vou.auth_service.config;
 
+import com.vou.auth_service.service.CustomOidcUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,6 +55,6 @@ public class SecurityConfig  {
    }
 
     private OidcUserService oidcUserService() {
-        return new OidcUserService();
+        return new CustomOidcUserService();
     }
 }

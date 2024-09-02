@@ -1,5 +1,6 @@
 package com.vou.auth_service.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -15,18 +16,9 @@ import java.util.Map;
 @RequestMapping("/api/v1/oauth")
 @CrossOrigin
 public class OauthController {
-    @GetMapping("")
-    public String home(@AuthenticationPrincipal OAuth2AuthenticationToken authentication) {
-        if (authentication != null) {
-            OidcUser user = (OidcUser) authentication.getPrincipal();
-            Map<String, Object> attributes = user.getAttributes();
-
-            String username = (String) attributes.get("name");
-            String id = (String) attributes.get("id");
-            String email = (String) attributes.get("email");
-
-            return "username: " + username + "\nid: " + id + "\nemail: " + email;
-        }
-        return "nullllllllllllllllllllllllllll";
+    @GetMapping("/secured")
+    public ResponseEntity<String> securedCall(@AuthenticationPrincipal OidcUser principal) {
+        String accessToken = principal.getClaims().get("accessToken").toString();
+        return ResponseEntity.ok("Access Token: " + accessToken);
     }
 }
