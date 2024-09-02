@@ -1,5 +1,9 @@
 package com.vou.reward_service.controller;
 
+import com.vou.reward_service.common.ApiResponse;
+import com.vou.reward_service.common.InternalServerError;
+import com.vou.reward_service.common.NotFoundResponse;
+import com.vou.reward_service.common.SuccessResponse;
 import com.vou.reward_service.dto.RewardDTO;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.ItemRepo;
@@ -42,6 +46,31 @@ public class ItemRepoController {
         } catch (Exception e) {
             System.out.println("Error in getRewardsByIdUser: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @GetMapping("")
+    public ResponseEntity<ApiResponse> getItemRepo(@RequestParam(value = "id_user") Long id_user) {
+        try {
+            List<ItemRepo> itemRepoList = itemRepoService.getItemRepoListByIdUser(id_user);
+            List<RewardDTO> rewards = new ArrayList<>();
+
+            if (itemRepoList.toArray().length == 0) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy kho vật dụng của người dùng"));
+            }
+
+            for (ItemRepo itemRepo : itemRepoList) {
+                Item item = itemService.getItemById(itemRepo.getIdItem());
+                if (item != null) {
+                    rewards.add(new RewardDTO(item, itemRepo));
+                }
+            }
+
+
+            return ResponseEntity.ok(new SuccessResponse("Truy cập kho vật dụng thành công!", HttpStatus.OK, rewards));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố tải kho vật dụng của ngời chơi!"));
         }
     }
 
