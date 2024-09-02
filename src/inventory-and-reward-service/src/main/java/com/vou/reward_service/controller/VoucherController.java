@@ -4,6 +4,7 @@ import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.common.*;
 import com.vou.reward_service.dto.*;
 import com.vou.reward_service.entity.CreateVoucherRequest;
+import com.vou.reward_service.entity.RewardVouchersForWinnersRequest;
 import com.vou.reward_service.entity.UserVoucher;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
@@ -242,5 +243,15 @@ public class VoucherController {
         // Check if the voucher exists in the repository
         boolean exists = voucherRepository.existsByCode(voucherCode.toUpperCase());
         return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/gifts")
+    public ResponseEntity<ApiResponse> rewardVouchersForWinners(@RequestBody RewardVouchersForWinnersRequest request) {
+        try {
+            voucherRepoService.rewardVoucherQuizGame(request.getWinnerIds(), request.getVoucherCode());
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Đã gửi phần thưởng vào kho voucher của người chơi", 200));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));
+        }
     }
 }
