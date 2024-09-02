@@ -34,7 +34,8 @@ public class VoucherService {
             voucher.setImageUrl(request.getImageUrl());
             voucher.setDescription(request.getDescription());
             voucher.setExpirationDate(request.getExpirationDate());
-            voucher.setType("active");
+            voucher.setVoucherPrice(request.getVoucherPrice());
+            voucher.setType(request.getType());
             voucher.setIdItem1(request.getIdItem1());
             voucher.setIdItem2(request.getIdItem2());
             voucher.setIdItem3(request.getIdItem3());
@@ -55,6 +56,14 @@ public class VoucherService {
             return voucherRepository.findByCode(code.toUpperCase());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public Voucher findVoucherByIdEvent(Long eventId) throws Exception {
+        try {
+            return voucherRepository.findByIdEvent(eventId);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -125,13 +134,9 @@ public class VoucherService {
         }
     }
 
-    public List<UserVoucher> getVouchersByUserId(Long id) throws Exception{
+    public List<UserVoucher> getVouchersByUserId(Long id, String type) throws Exception{
         try {
-            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id);
-            if (vouchersFound == null || vouchersFound.isEmpty()) {
-                throw new NotFoundException("Not found any vouchers of this user");
-            }
-            return vouchersFound;
+            return voucherRepoRepository.findVouchersByUserId(id, type);
         } catch (NotFoundException notFoundException) {
             throw notFoundException;
         } catch (Exception e) {
@@ -147,6 +152,14 @@ public class VoucherService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public List<Voucher> getListOnlineOrOfflineVoucher(String type) {
+        try {
+            return voucherRepository.findVouchersByTypeIs(type);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

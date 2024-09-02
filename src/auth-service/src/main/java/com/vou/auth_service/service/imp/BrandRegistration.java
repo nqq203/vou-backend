@@ -21,24 +21,21 @@ public class BrandRegistration implements IRegistration {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
-        if (existingUserByUsername.isPresent()) {
-            return false;
+    public byte register(User user) {
+        User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+        if (existUser != null) {
+            return 0;
         }
-        if (existingUserByEmail.isPresent()) {
-            return false;
-        }
-
         String password = passwordEncoder.encode(user.getPassword());
         Brand brand = new Brand(user, password);
-
         try {
-            return client.createBrand(brand);
+            if (client.createBrand(brand)) {
+                return 1;
+            }
+            return 2;
         } catch (Exception e) {
             System.err.println("Failed to create admin: " + e.getMessage());
-            return false;
+            return 2;
         }
     }
 

@@ -1,4 +1,5 @@
 package com.vou.event_service.common;
+
 import org.springframework.http.HttpStatus;
 
 public class ForbiddenResponse extends ErrorResponse {

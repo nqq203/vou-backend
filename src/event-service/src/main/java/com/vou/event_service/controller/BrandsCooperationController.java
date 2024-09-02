@@ -4,6 +4,7 @@ import com.vou.event_service.common.*;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.service.BrandsCooperationService;
+import jakarta.ws.rs.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,7 @@ public class BrandsCooperationController {
     public ResponseEntity<?> deleteBrandsCooperation(@PathVariable("id_event_id_brand") Long id) {
         try {
             boolean result = brandsCooperationService.deleteBrandsCooperationById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Brand cooperation deleted", HttpStatus.OK));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Brand cooperation deleted", HttpStatus.OK, null));
         } catch (NotFoundException notFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Brand cooperation not found"));
         } catch (Exception e) {

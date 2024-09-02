@@ -25,4 +25,12 @@ public class QuizDTO {
         this.ans3=quiz.getAns3();
         this.correctAnswerIndex=quiz.getCorrectAnswerIndex();
     }
+    
+    public QuizDTO(String question, String ans1, String ans2, String ans3, int correctAnswerIndex) {
+        this.question = question;
+        this.ans1 = ans1;
+        this.ans2 = ans2;
+        this.ans3 = ans3;
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
 }

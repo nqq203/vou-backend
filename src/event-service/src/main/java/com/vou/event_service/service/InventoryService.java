@@ -3,21 +3,25 @@ package com.vou.event_service.service;
 
 import com.vou.event_service.common.InternalServerError;
 import com.vou.event_service.common.NotFoundException;
-import com.vou.event_service.dto.GameInfoDTO;
-import com.vou.event_service.dto.InventoryDTO;
 import com.vou.event_service.dto.InventoryDetailDTO;
 import com.vou.event_service.dto.InventoryImageUrlDTO;
 import com.vou.event_service.entity.MultipartInputStreamFileResource;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import com.vou.event_service.dto.GameInfoDTO;
+import com.vou.event_service.dto.InventoryDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +63,7 @@ public class InventoryService {
         return response.getBody();
     }
 
-    public InventoryImageUrlDTO uploadInventoryImages(String code, MultipartFile qrImg, MultipartFile voucherImg) {
+    public InventoryImageUrlDTO uploadInventoryImages(Long eventId, MultipartFile qrImg, MultipartFile voucherImg) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -70,7 +74,7 @@ public class InventoryService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            String url = QUIZ_SERVICE_URL + "?code=" + code;
+            String url = QUIZ_SERVICE_URL + "?id_event=" + eventId;
 
             ResponseEntity<InventoryImageUrlDTO> response = restTemplate.exchange(
                     url
@@ -85,5 +89,17 @@ public class InventoryService {
         } catch (Exception e) {
             return null;
         }
+    }
+    public boolean checkVoucherExists(String voucherCode) {
+        String url = "http://inventory-and-reward-service:8087/api/v1/vouchers/exists/" + voucherCode;
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                Boolean.class
+        );
+
+        return Boolean.TRUE.equals(response.getBody());
     }
 }

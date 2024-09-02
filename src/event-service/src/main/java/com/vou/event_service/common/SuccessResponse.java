@@ -1,10 +1,14 @@
 package com.vou.event_service.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+@Setter
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SuccessResponse {
+public class SuccessResponse implements ApiResponse {
     private boolean success = true;
     private String message;
     private int code;
@@ -12,47 +16,14 @@ public class SuccessResponse {
 
     public SuccessResponse() {}
 
-    public SuccessResponse(String message, HttpStatus status, Object metadata) {
+    public SuccessResponse(String message, int code) {
         this.message = message;
-        this.code = status.value();
-        this.metadata = metadata;
-    }
-
-    public SuccessResponse(String message, HttpStatus status) {
-        this.message = message;
-        this.code = status.value();
-    }
-
-    // Getters and Setters
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
         this.code = code;
     }
 
-    public Object getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Object metadata) {
+    public SuccessResponse(String message, HttpStatus status, Object metadata) {
+        this.message = message;
+        this.code = status.value();
         this.metadata = metadata;
     }
 }

@@ -17,6 +17,8 @@ public class CreateVoucherRequest {
 
     String imageUrl;
 
+    Long voucherPrice;
+
     Timestamp expirationDate;
 
     String description;
@@ -43,6 +45,7 @@ public class CreateVoucherRequest {
             String voucherName,
             String imageUrl,
             Timestamp expirationDate,
+            Long voucherPrice,
             String description,
             String type,
             List<Long> itemId,
@@ -55,6 +58,7 @@ public class CreateVoucherRequest {
         this.imageUrl = imageUrl;
         this.expirationDate = expirationDate;
         this.description = description;
+        this.voucherPrice = voucherPrice;
         this.type = type;
         this.aimCoin = aimCoin;
         this.idEvent = idEvent;
@@ -74,6 +78,7 @@ public class CreateVoucherRequest {
             String voucherName,
             String imageUrl,
             Timestamp expirationDate,
+            Long voucherPrice,
             String description,
             String type,
             Long idEvent
@@ -83,6 +88,7 @@ public class CreateVoucherRequest {
         this.voucherName = voucherName;
         this.imageUrl = imageUrl;
         this.expirationDate = expirationDate;
+        this.voucherPrice=voucherPrice;
         this.description = description;
         this.type = type;
         this.idEvent = idEvent;

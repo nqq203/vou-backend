@@ -3,14 +3,15 @@ package com.vou.user_service.controller;
 import com.vou.user_service.common.InternalServerError;
 import com.vou.user_service.common.NotFoundException;
 import com.vou.user_service.common.NotFoundResponse;
-import com.vou.user_service.common.SuccessResponse;
-import com.vou.user_service.model.Brand;
 import com.vou.user_service.model.Player;
 import com.vou.user_service.model.User;
 import com.vou.user_service.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/players")
@@ -34,10 +35,10 @@ public class PlayerController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Boolean> createPlayer(@RequestBody Player player) {
+    public ResponseEntity<Long> createPlayer(@RequestBody Player player) {
         try {
             Player savedPlayer = userService.createPlayer(player);
-            return ResponseEntity.ok(true);
+            return ResponseEntity.ok(savedPlayer.getIdUser());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

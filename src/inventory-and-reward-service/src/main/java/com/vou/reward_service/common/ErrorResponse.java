@@ -12,6 +12,16 @@ public class ErrorResponse implements ApiResponse{
 
     public ErrorResponse() {}
 
+    @Override
+    public HttpStatus getStatus() {
+        return HttpStatus.valueOf(code);
+    }
+
+    @Override
+    public Object getMetadata() {
+        return errors;
+    }
+
     public ErrorResponse(String message, HttpStatus status, Object errors) {
         this.message = message;
         this.code = status.value();

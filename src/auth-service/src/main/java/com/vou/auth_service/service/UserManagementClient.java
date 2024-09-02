@@ -37,7 +37,7 @@ public class UserManagementClient {
 
     public Boolean createAdmin(Admin admin) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl + "/", admin, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(adminUrl, admin, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -52,7 +52,7 @@ public class UserManagementClient {
 
     public Boolean createBrand(Brand brand) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl + "/", brand, Boolean.class);
+            ResponseEntity<Boolean> response = restTemplate.postForEntity(brandUrl, brand, Boolean.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return true;
             } else {
@@ -65,18 +65,18 @@ public class UserManagementClient {
         }
     }
 
-    public Boolean createPlayer(Player player) {
+    public Long createPlayer(Player player) {
         try {
-            ResponseEntity<Boolean> response = restTemplate.postForEntity(playerUrl + "/", player, Boolean.class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return true;
+            ResponseEntity<Long> response = restTemplate.postForEntity(playerUrl + "/", player, Long.class);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
             } else {
                 System.err.println("Failed to create player, status code: " + response.getStatusCode());
-                return false;
+                return null;
             }
         } catch (RestClientException e) {
             System.err.println("RestClientException when creating player: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -208,6 +208,19 @@ public class UserManagementClient {
             return Optional.empty();
         } catch (Exception e) {
             System.err.println("Error retrieving sessions: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<User> getUserByUsernameAndEmail(String username, String email){
+        try {
+            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/query" +"?username=" + username + "&email=" + email, User.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            System.out.println("Error in getUserByUsernameAndEmail: " + e.getMessage());
             return Optional.empty();
         }
     }

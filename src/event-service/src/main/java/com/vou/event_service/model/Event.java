@@ -29,4 +29,10 @@ public class Event {
 
     @Column(name = "end_date", nullable = false)
     private Timestamp endDate;
+
+    @Column(name = "deleted_date")
+    private Timestamp deletedDate;
+
+    @Column(name = "created_by")
+    private Long createdBy;
 }

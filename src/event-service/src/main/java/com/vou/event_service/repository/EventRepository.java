@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -14,6 +15,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findByEventNameContainingIgnoreCase(String eventName);
     Event findByIdEvent(Long idEvent);
 
-    @Query("SELECT e FROM Event e WHERE e.startDate <= :currentTimestamp AND e.endDate >= :currentTimestamp")
+    @Query("SELECT e FROM Event e WHERE e.startDate <= :currentTimestamp AND e.endDate >= :currentTimestamp AND e.deletedDate IS NULL")
     List<Event> findActiveEvents(@Param("currentTimestamp") Timestamp currentTimestamp);
+
+    Event findByIdEventAndEndDateAfterAndDeletedDateIsNull(Long idEvent, Date currentDate);
 }
