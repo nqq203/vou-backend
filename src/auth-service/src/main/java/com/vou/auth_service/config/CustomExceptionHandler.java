@@ -21,7 +21,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleInternalServerException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Yêu cầu không dụng"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Yêu cầu không khả dụng"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
