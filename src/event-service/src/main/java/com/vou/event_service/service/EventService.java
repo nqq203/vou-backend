@@ -100,6 +100,7 @@ public class EventService {
         newEvent.setEndDate(request.getEndDate());
         newEvent.setCreatedBy(request.getCreatedBy());
         newEvent.setDeletedDate(null);
+        newEvent.setRemainingVouchers(request.getNumberOfVouchers());
         try {
             return eventRepository.save(newEvent);
         } catch (Exception e) {
@@ -164,6 +165,14 @@ public class EventService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
+        }
+    }
+
+    public int updateRemainingVouchers(Long eventId) throws Exception {
+        try {
+            return eventRepository.decreaseEventRemainingVoucherByIdEvent(eventId);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 }

@@ -9,7 +9,6 @@ import com.vou.event_service.entity.EventImageResponse;
 import com.vou.event_service.dto.EventDTO;
 import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.InventoryDTO;
-import com.vou.event_service.dto.QuizDTO;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.model.Game;
@@ -26,9 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vou.event_service.repository.BrandsCooperationRepository;
 import com.vou.event_service.service.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -112,9 +109,10 @@ public class EventController {
             System.out.println("GameInfoIto: " + gameInfoDTO);
             quizService.createQuiz(gameInfoDTO);
             inventoryService.createInventory(inventoryDTO);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse("Tạo sự kiện mới thành công", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng tạo sự kiên mới"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));
         }
     }
 
@@ -166,39 +164,46 @@ public class EventController {
             boolean hasError = false;
 
             List<BrandsCooperation> brandsCooperations = eventDetailDTO.getBrandId();
-            brandsCooperationRepository.saveAll(brandsCooperations);
+            if (brandsCooperations != null) {
+                brandsCooperationRepository.saveAll(brandsCooperations);
+            }
             Event result = eventService.updateEventById(id, request);
-            try {
-                quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
-            } catch (Exception e) {
-                hasError = true;
+            if (eventDetailDTO.getGameInfoDTO() != null) {
+                try {
+                    quizService.updateGameInfo(eventDetailDTO.getGameInfoDTO());
+                } catch (Exception e) {
+                    hasError = true;
+                }
+                if (hasError) {
+                    return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin trò chơi!"));
+                }
             }
-            if (hasError) {
-                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin trò chơi!"));
-            }
-            List<ItemDetailDTO> itemDetailDTOS= eventDetailDTO.getInventoryInfo().getItems();
-            List<Long> itemIds = itemDetailDTOS.stream()
-                    .map(ItemDetailDTO::getIdItem)
-                    .collect(Collectors.toList());
-            InventoryDTO inventoryDTO =new InventoryDTO(
-                    eventDetailDTO.getGameInfoDTO().getGameType(),
-                    eventDetailDTO.getInventoryInfo().getVoucher_type(),
-                    eventDetailDTO.getInventoryInfo().getVoucher_code(),
-                    eventDetailDTO.getInventoryInfo().getVoucher_description(),
-                    eventDetailDTO.getInventoryInfo().getVoucher_name(),
-                    eventDetailDTO.getInventoryInfo().getVoucher_price(),
-                    eventDetailDTO.getInventoryInfo().getAim_coin(),
-                    eventDetailDTO.getInventoryInfo().getExpiration_date(),
-                    itemIds,
-                    eventDetailDTO.getInventoryInfo().getEvent_id()
-            );
-            try {
-                inventoryService.updateInventory(inventoryDTO);
-            } catch (Exception e) {
-                hasError = true;
-            }
-            if (hasError) {
-                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin voucher!"));
+
+            if (eventDetailDTO.getInventoryInfo() != null) {
+                List<ItemDetailDTO> itemDetailDTOS= eventDetailDTO.getInventoryInfo().getItems();
+                List<Long> itemIds = itemDetailDTOS.stream()
+                        .map(ItemDetailDTO::getIdItem)
+                        .collect(Collectors.toList());
+                InventoryDTO inventoryDTO = new InventoryDTO(
+                        eventDetailDTO.getGameInfoDTO().getGameType(),
+                        eventDetailDTO.getInventoryInfo().getVoucher_type(),
+                        eventDetailDTO.getInventoryInfo().getVoucher_code(),
+                        eventDetailDTO.getInventoryInfo().getVoucher_description(),
+                        eventDetailDTO.getInventoryInfo().getVoucher_name(),
+                        eventDetailDTO.getInventoryInfo().getVoucher_price(),
+                        eventDetailDTO.getInventoryInfo().getAim_coin(),
+                        eventDetailDTO.getInventoryInfo().getExpiration_date(),
+                        itemIds,
+                        eventDetailDTO.getInventoryInfo().getEvent_id()
+                );
+                try {
+                    inventoryService.updateInventory(inventoryDTO);
+                } catch (Exception e) {
+                    hasError = true;
+                }
+                if (hasError) {
+                    return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng cập nhật lại thông tin voucher!"));
+                }
             }
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Cập nhật sự kiện thành công", HttpStatus.OK, result));
         } catch (NotFoundException e) {
@@ -224,7 +229,7 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError());
         }
     }
-//
+
 //    @GetMapping("brands-cooperation")
 //    public ResponseEntity<?> fetchBrandCoperation(){
 //        List<BrandsCooperation> data = brandsCoperationRepository.findAll();
@@ -300,5 +305,17 @@ public class EventController {
 
     private boolean isImageFile(MultipartFile file) {
         return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
+    }
+
+    @PutMapping("/{id_event}/remaining-vouchers")
+    public ResponseEntity<?> updateRemainingVoucher(@PathVariable("id_event") Long id_event) {
+        try {
+            int result = eventService.updateRemainingVouchers(id_event);
+            if (result == 1)
+            return ResponseEntity.ok("Cập nhật thành công");
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

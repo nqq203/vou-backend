@@ -26,14 +26,14 @@ public class ItemRepoService {
         Optional.ofNullable(voucher.getIdItem4()).ifPresent(action -> itemIds.add(voucher.getIdItem4()));
 
         for (Long itemId : itemIds) {
-            if (!itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(userId, itemId, (long) 0)) {
+            if (!itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(itemId, userId, (long) 0)) {
                 throw new Exception("Not have enough items to exchange for this voucher");
             }
         }
 
 
         if (voucher.getIdItem5() != null) {
-            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(userId, voucher.getIdItem5(), voucher.getAimCoin());
+            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(voucher.getIdItem5(), userId, voucher.getAimCoin());
             if (enoughCoin) {
                 return true;
             } else {

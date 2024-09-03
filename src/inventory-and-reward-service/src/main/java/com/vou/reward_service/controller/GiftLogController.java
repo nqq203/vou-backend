@@ -24,7 +24,7 @@ public class GiftLogController {
     @PostMapping("")
     public ResponseEntity<ApiResponse> giftAnItem(@RequestBody GiftItemRequest request) {
         try {
-            giftLogService.giftAnItemForUser(request.getItemId(), request.getReceiverId(), request.getSenderId(), request.getAmount());
+            giftLogService.giftAnItemForUser(request);
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Gửi thành công vật phẩm", HttpStatus.CREATED.value()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));
@@ -32,7 +32,7 @@ public class GiftLogController {
     }
 
     @GetMapping("/users/{id_user}")
-    public ResponseEntity<ApiResponse> getGiftingHistoryByUserId(@RequestParam Long id_user) {
+    public ResponseEntity<ApiResponse> getGiftingHistoryByUserId(@PathVariable Long id_user) {
         try {
             HashMap<String, Object> giftingHistory = giftLogService.getGiftingHistoryByUserId(id_user);
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Lấy thành công lịch sử tặng quà", HttpStatus.OK, giftingHistory));
