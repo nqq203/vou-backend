@@ -26,7 +26,7 @@ public class ItemRepoService {
         Optional.ofNullable(voucher.getIdItem4()).ifPresent(action -> itemIds.add(voucher.getIdItem4()));
 
         for (Long itemId : itemIds) {
-            if (!itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(userId, itemId, (long) 0)) {
+            if (!itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(itemId, userId, (long) 0)) {
                 throw new Exception("Not have enough items to exchange for this voucher");
             }
         }

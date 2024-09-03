@@ -30,7 +30,7 @@ public class ApiGatewayConfiguration {
                         .filters(f -> f.filter(new AuthenticationFilter(webClientBuilder)))
                         .uri("lb://streaming-service")
                 )
-                .route("inventory-and-reward-service", r -> r.path("/api/v1/vouchers/**", "/api/v1/items/**", "/api/v1/item-repos/**")
+                .route("inventory-and-reward-service", r -> r.path("/api/v1/vouchers/**", "/api/v1/items/**", "/api/v1/item-repos/**", "/api/v1/gifts/**")
                         .filters(f -> f.filter(new AuthenticationFilter(webClientBuilder)))
                         .uri("lb://inventory-and-reward-service")
                 )
