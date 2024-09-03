@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,16 +71,17 @@ public class MessageController{
         return ResponseEntity.ok(messageService.getPlayers(room));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createGame(){
-
-        String date = messageService.startGame(1231123L);
-        return ResponseEntity.ok(date);
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<String> createGame(){
+//
+//        String date = messageService.startGame(1231123L);
+//        return ResponseEntity.ok(date);
+//    }
 
     @PostMapping("/quiz/create")
     public ResponseEntity<String> createQuiz(@RequestBody GameInfoDTO gameInfoDTO){
         List<QuizDTO> quizzdto = gameInfoDTO.getQuiz();
+        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
         Game game = new Game(gameInfoDTO.getName(),gameInfoDTO.getGameType(), gameInfoDTO.getEventId());
         System.out.println(game);
         gameRepository.save(game);

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -16,4 +17,5 @@ public class GameInfoDTO {
     private String gameType;
     private List<QuizDTO> quiz;
     private Long eventId;
+    private Timestamp startedAt;
 }
