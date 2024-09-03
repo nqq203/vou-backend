@@ -180,6 +180,7 @@ services:
       context: ./src/streaming-service
     ports: 
       - "8086:8086"
+      - "8085:8085" 
     depends_on:
       - service-registry
       - game-database
