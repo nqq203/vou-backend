@@ -17,12 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -61,6 +60,9 @@ public class MessageController{
     @Autowired
     private PlayerService playerService;
 
+    @Autowired
+    private GameService gameService;
+
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
         return ResponseEntity.ok(messageService.getPlayers(room));
@@ -68,15 +70,17 @@ public class MessageController{
 
 //    @PostMapping("/create")
 //    public ResponseEntity<String> createGame(){
-//
-//        String date = messageService.startGame(1231123L);
+//        List<QuizDTO> list = new ArrayList<>();
+//        Timestamp time = Timestamp.valueOf("2024-09-04 01:20:30.123");
+//        String date = messageService.startGame( list, 12312L, time);
 //        return ResponseEntity.ok(date);
 //    }
 
     @PostMapping("/quiz/create")
     public ResponseEntity<String> createQuiz(@RequestBody GameInfoDTO gameInfoDTO){
+        System.out.println("gameInfoDTO" +  gameInfoDTO);
         List<QuizDTO> quizzdto = gameInfoDTO.getQuiz();
-        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
+
         Game game = new Game(gameInfoDTO.getName(),gameInfoDTO.getGameType(), gameInfoDTO.getEventId());
         System.out.println(game);
         gameRepository.save(game);
@@ -85,12 +89,13 @@ public class MessageController{
             shakeGame.setGame(game);
             shakeGameRepository.save(shakeGame);
             return ResponseEntity.ok("Save successfully");
-
         }
+
+        game.setStartedAt(gameInfoDTO.getStartedAt());
         QuizGame quizGame = new QuizGame(4);
         quizGame.setGame(game);
         quizGameRepository.save(quizGame);
-
+        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
         List<Quiz> quizzes = quizzdto.stream().map(quizz-> new Quiz(quizz, game.getIdGame())).collect(Collectors.toList());
         quizService.saveQuizzes(quizzes);
         return ResponseEntity.ok("Save successfully");
@@ -203,11 +208,11 @@ public class MessageController{
         try {
             PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(idGame, idPlayer);
             if (playSession == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy lượt chơi"));
             }
-            return ResponseEntity.ok(playSession.getTurns());
+            return ResponseEntity.ok(new SuccessResponse("Truy cập số lượt còn lại của người chơi thành công!", HttpStatus.OK, playSession));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi khi cố truy cập số lượt chơi của người dùng!"));
         }
     }
 
@@ -244,6 +249,19 @@ public class MessageController{
             return ResponseEntity.ok(new SuccessResponse("Tặng thành công", HttpStatus.OK, null));
         } catch (Exception e ) {
             return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi tặng lượt chơi!"));
+        }
+    }
+
+    @GetMapping("/{idGame}")
+    public ResponseEntity<?> findGameByIdGame(@PathVariable Long idGame) {
+        try {
+            Game game = gameService.findGameByIdGame(idGame);
+            if (game == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(game);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

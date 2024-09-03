@@ -4,12 +4,14 @@ import com.vou.event_service.common.*;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.entity.CreateEventRequest;
 import com.vou.event_service.dto.*;
+import com.vou.event_service.entity.EventDetail;
 import com.vou.event_service.entity.EventImageResponse;
 import com.vou.event_service.dto.EventDTO;
 import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.InventoryDTO;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.model.Event;
+import com.vou.event_service.model.Game;
 import com.vou.event_service.repository.EventRepository;
 import com.vou.event_service.service.BrandsCooperationService;
 import com.vou.event_service.service.EventService;
@@ -49,6 +51,8 @@ public class EventController {
     private BrandClient brandClient;
     @Autowired
     private EventProducer eventProducer;
+    @Autowired
+    private GameClient gameClient;
 
 
     @GetMapping("")
@@ -102,6 +106,7 @@ public class EventController {
             }
             gameInfoDTO.setEventId(result.getIdEvent());
             inventoryDTO.setEvent_id(result.getIdEvent());
+            System.out.println("GameInfoIto: " + gameInfoDTO);
             quizService.createQuiz(gameInfoDTO);
             inventoryService.createInventory(inventoryDTO);
 
@@ -126,7 +131,8 @@ public class EventController {
             GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
             InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
             List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
-            EventDetailDTO eventDetailDTO = new EventDetailDTO(
+            Game game = gameClient.findGameByIdGame(gameInfoDTO.getGameId()).orElse(null);
+            EventDetail eventDetail = new EventDetail(
                     event.getIdEvent(),
                     event.getEventName(),
                     event.getNumberOfVouchers(),
@@ -137,9 +143,10 @@ public class EventController {
                     event.getEndDate(),
                     brandsCooperations,
                     gameInfoDTO,
-                    inventoryDetailDTO
+                    inventoryDetailDTO,
+                    game.getInstruction()
             );
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập chi tiết sự kiện thành công!", HttpStatus.OK, eventDetailDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập chi tiết sự kiện thành công!", HttpStatus.OK, eventDetail));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập sự kiện!"));
         }
