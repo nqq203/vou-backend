@@ -115,7 +115,7 @@ public class MessageService {
         saveQuizzes(quizz);
         List<Quiz> questions = getQuizzes();
         Instant instant = startedAt.toInstant();
-        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(10);
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
 //        System.out.println("Question1231: " + zonedDateTime.toLocalDateTime());
 //
 ////        ZonedDateTime zonedDateTime2 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
