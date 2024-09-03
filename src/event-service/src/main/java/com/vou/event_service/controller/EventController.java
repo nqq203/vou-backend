@@ -105,10 +105,11 @@ public class EventController {
             }
             gameInfoDTO.setEventId(result.getIdEvent());
             inventoryDTO.setEvent_id(result.getIdEvent());
+            System.out.println("GameInfoIto: " + gameInfoDTO);
             quizService.createQuiz(gameInfoDTO);
             inventoryService.createInventory(inventoryDTO);
-            eventProducer.sendMessage("Event is created!!!");
-            eventProducer.checkUpcomingEvents();
+            // eventProducer.sendMessage("Event is created!!!");
+            // eventProducer.checkUpcomingEvents();
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse("Tạo sự kiện mới thành công", result));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng tạo sự kiên mới"));

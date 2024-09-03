@@ -17,12 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,17 +65,19 @@ public class MessageController{
         return ResponseEntity.ok(messageService.getPlayers(room));
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<String> createGame(){
-//
-//        String date = messageService.startGame(1231123L);
-//        return ResponseEntity.ok(date);
-//    }
+    @PostMapping("/create")
+    public ResponseEntity<String> createGame(){
+        List<QuizDTO> list = new ArrayList<>();
+        Timestamp time = Timestamp.valueOf("2024-09-04 01:20:30.123");
+        String date = messageService.startGame( list, 12312L, time);
+        return ResponseEntity.ok(date);
+    }
 
     @PostMapping("/quiz/create")
     public ResponseEntity<String> createQuiz(@RequestBody GameInfoDTO gameInfoDTO){
+        System.out.println("gameInfoDTO" +  gameInfoDTO);
         List<QuizDTO> quizzdto = gameInfoDTO.getQuiz();
-        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
+
         Game game = new Game(gameInfoDTO.getName(),gameInfoDTO.getGameType(), gameInfoDTO.getEventId());
         System.out.println(game);
         gameRepository.save(game);
@@ -85,12 +86,13 @@ public class MessageController{
             shakeGame.setGame(game);
             shakeGameRepository.save(shakeGame);
             return ResponseEntity.ok("Save successfully");
-
         }
+
+        game.setStartedAt(gameInfoDTO.getStartedAt());
         QuizGame quizGame = new QuizGame(4);
         quizGame.setGame(game);
         quizGameRepository.save(quizGame);
-
+        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
         List<Quiz> quizzes = quizzdto.stream().map(quizz-> new Quiz(quizz, game.getIdGame())).collect(Collectors.toList());
         quizService.saveQuizzes(quizzes);
         return ResponseEntity.ok("Save successfully");
