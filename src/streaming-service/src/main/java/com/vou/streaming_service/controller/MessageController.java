@@ -61,6 +61,9 @@ public class MessageController{
     @Autowired
     private PlayerService playerService;
 
+    @Autowired
+    private GameService gameService;
+
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
         return ResponseEntity.ok(messageService.getPlayers(room));
@@ -203,11 +206,11 @@ public class MessageController{
         try {
             PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(idGame, idPlayer);
             if (playSession == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy lượt chơi"));
             }
-            return ResponseEntity.ok(playSession.getTurns());
+            return ResponseEntity.ok(new SuccessResponse("Truy cập số lượt còn lại của người chơi thành công!", HttpStatus.OK, playSession));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi khi cố truy cập số lượt chơi của người dùng!"));
         }
     }
 
@@ -244,6 +247,19 @@ public class MessageController{
             return ResponseEntity.ok(new SuccessResponse("Tặng thành công", HttpStatus.OK, null));
         } catch (Exception e ) {
             return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi tặng lượt chơi!"));
+        }
+    }
+
+    @GetMapping("/{idGame}")
+    public ResponseEntity<?> findGameByIdGame(@PathVariable Long idGame) {
+        try {
+            Game game = gameService.findGameByIdGame(idGame);
+            if (game == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(game);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
