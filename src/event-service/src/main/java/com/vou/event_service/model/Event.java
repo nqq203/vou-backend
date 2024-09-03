@@ -24,6 +24,9 @@ public class Event {
     @Column(name = "number_of_vouchers")
     private Integer numberOfVouchers;
 
+    @Column(name = "remaining_vouchers")
+    private Integer remainingVouchers;
+
     @Column(name = "start_date", nullable = false)
     private Timestamp startDate;
 

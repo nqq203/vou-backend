@@ -33,7 +33,7 @@ public class ItemRepoService {
 
 
         if (voucher.getIdItem5() != null) {
-            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(userId, voucher.getIdItem5(), voucher.getAimCoin());
+            Boolean enoughCoin = itemRepoRepository.existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(voucher.getIdItem5(), userId, voucher.getAimCoin());
             if (enoughCoin) {
                 return true;
             } else {

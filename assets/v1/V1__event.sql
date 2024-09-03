@@ -4,6 +4,7 @@ CREATE TABLE Event (
     event_name VARCHAR(100),
     image_url VARCHAR(255) DEFAULT NULL,
     number_of_vouchers INT DEFAULT 0,
+    remaining_vouchers INT DEFAULT 0,
     start_date TIMESTAMP,
     end_date TIMESTAMP,
     deleted_date TIMESTAMP DEFAULT NULL,
