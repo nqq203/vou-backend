@@ -115,8 +115,8 @@ public class EventController {
         }
     }
 
-    @GetMapping("/{id_event}")
-    public ResponseEntity<ApiResponse> getEventById(@PathVariable("id_event") long id_event){
+    @GetMapping("/{id_event}/players/{id_player}")
+    public ResponseEntity<ApiResponse> getEventById(@PathVariable("id_event") long id_event, @PathVariable("id_player") long id_player) {
         try {
 
             Event event = eventRepository.findByIdEvent(id_event);
@@ -130,7 +130,10 @@ public class EventController {
             GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
             InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
             List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
-
+            int turns = quizService.getTurns(id_player, gameInfoDTO.getGameId());
+            if (turns == null) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi khi cố gắng truy cập lượt chơi của người dùng"));
+            }
             EventDetailDTO eventDetailDTO = new EventDetailDTO(
                     event.getIdEvent(),
                     event.getEventName(),
@@ -142,7 +145,8 @@ public class EventController {
                     event.getEndDate(),
                     brandsCooperations,
                     gameInfoDTO,
-                    inventoryDetailDTO
+                    inventoryDetailDTO,
+                    turns
             );
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Truy cập chi tiết sự kiện thành công!", HttpStatus.OK, eventDetailDTO));
         } catch (Exception e) {

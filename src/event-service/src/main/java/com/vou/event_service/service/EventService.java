@@ -34,6 +34,8 @@ public class EventService {
     private BrandsCooperationRepository brandsCooperationRepository;
     @Autowired
     private FavouriteEventRepository favouriteEventRepository;
+    @Autowired
+    private BrandClient brandClient;
 
     public List<Event> getAllEvents() throws Exception{
         try {
@@ -51,7 +53,7 @@ public class EventService {
 
         List<Event> events =  eventRepository.findAllById(eventIds);
         return events.stream()
-                .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
+                .map(event -> new ListEventDTO(event, brandClient.getBrandLogo(event.getCreatedBy()).orElse(null)))  // Convert each Event to ListEventDTO using the constructor
                 .collect(Collectors.toList());
     }
     public List<ListEventDTO> getAllEventActive(){
@@ -59,11 +61,9 @@ public class EventService {
         List<Event> events = eventRepository.findActiveEvents(currentTimestamp);
         System.out.println("Danh sách events: " + events);
         System.out.println("Vào getAllEventActive và đã tìm xong");
-        for (Event event : events) {
-            System.out.println(event.getClass());
-        }
+
         return events.stream()
-                .map(ListEventDTO::new)  // Convert each Event to ListEventDTO using the constructor
+                .map(event -> new ListEventDTO(event, brandClient.getBrandLogo(event.getCreatedBy()).orElse(null)))  // Convert each Event to ListEventDTO using the constructor
                 .collect(Collectors.toList());
 
     }

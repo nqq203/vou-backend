@@ -5,30 +5,22 @@
  */
 package com.vou.streaming_service.controller;
 
-import com.vou.streaming_service.common.BadRequest;
-import com.vou.streaming_service.common.InternalServerError;
-import com.vou.streaming_service.common.NotFoundResponse;
-import com.vou.streaming_service.common.SuccessResponse;
-import com.vou.streaming_service.dto.GameInfoDTO;
-import com.vou.streaming_service.dto.QuizDTO;
-import com.vou.streaming_service.dto.RewardDTO;
+import com.vou.streaming_service.common.*;
+import com.vou.streaming_service.dto.*;
 import com.vou.streaming_service.libs.RedisCache;
 import com.vou.streaming_service.model.*;
 import com.vou.streaming_service.repository.*;
-//import com.vou.streaming_service.repository.ItemRepoRepository;
 import com.vou.streaming_service.service.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 @RestController
@@ -63,6 +55,9 @@ public class MessageController{
 
     @Autowired
     private PlaySessionService playSessionService;
+
+    @Autowired
+    private PlayerService playerService;
 
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
@@ -134,7 +129,13 @@ public class MessageController{
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Rất tiếc. Có lỗi xảy ra khi nhận thưởng!"));
                 }
                 playSessionRepository.decrementTurns(id_player, id_game);
-                return ResponseEntity.ok(new SuccessResponse("Bạn đã trúng được 1 " + updatedReward.getItemName(), HttpStatus.OK, updatedReward));
+                RewardDetail rewardDetail;
+                if  (playSession.getTurns() > 0) {
+                    rewardDetail = new RewardDetail(updatedReward, playSession.getTurns() - 1);
+                } else {
+                    rewardDetail = new RewardDetail(updatedReward, playSession.getTurns());
+                }
+                return ResponseEntity.ok(new SuccessResponse("Bạn đã trúng được 1 " + updatedReward.getItemName(), HttpStatus.OK, rewardDetail));
             } else {
                 return ResponseEntity.ok(new SuccessResponse("Hụt mất rồi. Hãy thử lại vào lần sau nhé!", HttpStatus.OK, null));
             }
@@ -194,9 +195,54 @@ public class MessageController{
         return ResponseEntity.ok(gameInfoDTO);
     }
 
+    @GetMapping("/{idGame}/players/{idPlayer}/turns")
+    public ResponseEntity<?> getTurns(@PathVariable Long idGame, @PathVariable Long idPlayer) {
+        try {
+            PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(idGame, idPlayer);
+            if (playSession == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(playSession.getTurns());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 //    public boolean checkTurnRecords(Long idPlayer, Long idGame) {
 //        return playSessionRepository.decrementTurns(idPlayer, idGame) == 1;
 //    }
+
+    @PostMapping("/turns")
+    public ResponseEntity<ApiResponse> giftTurns(@RequestBody GiftTurnRequest giftTurnRequest) {
+        try {
+            PlayerDTO playerDTO = null;
+            if (giftTurnRequest.getEmail() != null) {
+                playerDTO = playerService.findPlayerByIdentifier(giftTurnRequest.getEmail(), null, null).orElse(null);
+            } else if (giftTurnRequest.getUsername() != null) {
+                playerDTO = playerService.findPlayerByIdentifier(null, giftTurnRequest.getUsername(), null).orElse(null);
+            } else if (giftTurnRequest.getReceiverId() != null) {
+                playerDTO = playerService.findPlayerByIdentifier(null, null, giftTurnRequest.getReceiverId()).orElse(null);
+            }
+            if (playerDTO == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy người dùng hoặc có lỗi khi tìm kiếm người dùng"));
+            }
+            int turns = giftTurnRequest.getTurns();
+            PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getSenderId());
+            if (playSession == null) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố truy cập thông tin lượt chơi của người tặng!"));
+            }
+            if (playSession.getTurns() == 0 || playSession.getTurns() - turns < 0) {
+                return ResponseEntity.ok(new SuccessResponse("Không đủ lượt để tặng", HttpStatus.OK, null));
+            }
+            playSessionRepository.increaseTurns(giftTurnRequest.getReceiverId(), giftTurnRequest.getIdGame(), turns);
+            playSessionRepository.decreaseTurns(giftTurnRequest.getSenderId(), giftTurnRequest.getIdGame(), turns);
+//            PlaySession receiver = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getReceiverId());
+//            PlaySession sender = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getSenderId());
+            return ResponseEntity.ok(new SuccessResponse("Tặng thành công", HttpStatus.OK, null));
+        } catch (Exception e ) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi tặng lượt chơi!"));
+        }
+    }
 }
 
 

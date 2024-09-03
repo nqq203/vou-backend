@@ -22,4 +22,8 @@ public class PlaySessionService {
         newPlaySession.setScore(0);
         return playSessionRepository.save(newPlaySession);
     }
+
+    public PlaySession findPlaySessionByIdGameAndIdPlayer(Long idGame, Long idPlayer) {
+        return playSessionRepository.findPlaySessionByIdPlayerAndIdGame(idPlayer, idGame);
+    }
 }

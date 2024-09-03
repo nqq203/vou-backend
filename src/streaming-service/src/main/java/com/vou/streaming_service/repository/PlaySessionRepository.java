@@ -12,4 +12,12 @@ public interface PlaySessionRepository extends JpaRepository<PlaySession, Long> 
     @Modifying
     @Query("UPDATE PlaySession ps SET ps.turns = ps.turns - 1 WHERE ps.idPlayer = :idPlayer AND ps.idGame = :idGame AND ps.turns > 0")
     void decrementTurns(Long idPlayer, Long idGame);
+    @Transactional
+    @Modifying
+    @Query("UPDATE PlaySession ps SET ps.turns = ps.turns + :turns WHERE ps.idPlayer = :idPlayer AND ps.idGame = :idGame")
+    void increaseTurns(Long idPlayer, Long idGame, int turns);
+    @Transactional
+    @Modifying
+    @Query("UPDATE PlaySession ps SET ps.turns = ps.turns - :turns WHERE ps.idPlayer = :idPlayer AND ps.idGame = :idGame")
+    void decreaseTurns(Long idPlayer, Long idGame, int turns);
 }
