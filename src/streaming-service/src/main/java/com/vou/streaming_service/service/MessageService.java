@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,17 +114,33 @@ public class MessageService {
 
         saveQuizzes(quizz);
         List<Quiz> questions = getQuizzes();
-        System.out.println("Question: " + questions.toString());
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-        ZonedDateTime newTimePlus = zonedDateTime.plusSeconds(10);
-        eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
+        Instant instant = startedAt.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(10);
+//        System.out.println("Question1231: " + zonedDateTime.toLocalDateTime());
+//
+////        ZonedDateTime zonedDateTime2 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+//        ZonedDateTime newTimePlus1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(10);
+//
+//        System.out.println("Scheduling task to run at: " + newTimePlus1);
+//        eventSchedulerService.scheduleJob(newTimePlus1.toLocalDateTime(), () -> {
+//            try {
+//                System.out.println("Task executed at: " + LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+//                // Task logic here
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
+        System.out.println("Scheduling task to run at: " + zonedDateTime);
+        eventSchedulerService.scheduleJob(zonedDateTime.toLocalDateTime(),()->{
+            System.out.println("START GAME QUIZZZZZZ");
             sendMessage(String.valueOf(id_game), quizz.get(0).toString(), "SERVER", null,"start_game");
-            eventSchedulerService.scheduleJob(startedAt.toLocalDateTime(),()->{
+            ZonedDateTime zonedDateTime1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+            ZonedDateTime newTimePlus = zonedDateTime1.plusSeconds(2);
+            eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
                 sendNextQuestion(String.valueOf(id_game));
             });
-
         });
-        return newTimePlus.toString();
+        return startedAt.toString();
     }
     public void saveQuizzes(List<Quiz> quizzes) {
         try {

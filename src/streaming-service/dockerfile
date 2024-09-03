@@ -13,14 +13,20 @@ RUN mvn clean install -DskipTests
 # Check to list the JAR file (for debugging purposes)
 RUN ls /streaming-service/target
 
-# Start a new stage for the final image
+# Stage 2: Create the final image
 FROM eclipse-temurin:21
 WORKDIR /streaming-service
+
+# Set the timezone environment variable
+ENV TZ=Asia/Ho_Chi_Minh
+
+# Install tzdata package to handle timezone
+RUN apt-get update && apt-get install -y tzdata && rm -rf /var/lib/apt/lists/*
 
 # Copy the JAR file from the build stage to the final image
 COPY --from=build /streaming-service/target/streaming-service-*.jar streaming-service.jar
 
-# Expose port 8761 to match the docker-compose settings
+# Expose ports to match the docker-compose settings
 EXPOSE 8086
 EXPOSE 8085
 
