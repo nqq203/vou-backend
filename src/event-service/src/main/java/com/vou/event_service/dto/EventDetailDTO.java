@@ -19,7 +19,7 @@ public class EventDetailDTO {
     private List<BrandsCooperation> brandId;
     private GameInfoDTO gameInfoDTO;
     private InventoryDetailDTO inventoryInfo;
-    private Long turns;
+    private int turns;
 
     public EventDetailDTO(
             Long idEvent,
@@ -33,7 +33,7 @@ public class EventDetailDTO {
             List<BrandsCooperation> brands,
             GameInfoDTO gameInfoDTO,
             InventoryDetailDTO inventoryDetailDTO,
-            Long turns
+            int turns
     ) {
         this.idEvent = idEvent;
         this.eventName = eventName;

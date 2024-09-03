@@ -130,7 +130,7 @@ public class EventController {
             GameInfoDTO gameInfoDTO = quizService.getGameInfo(event.getIdEvent());
             InventoryDetailDTO inventoryDetailDTO = inventoryService.getInventoryInfo(event.getIdEvent());
             List<BrandsCooperation> brandsCooperations = brandsCooperationRepository.findAllByIdEvent(event.getIdEvent());
-            int turns = quizService.getTurns(id_player, gameInfoDTO.getGameId());
+            Integer turns = quizService.getTurns(id_player, gameInfoDTO.getGameId());
             if (turns == null) {
                 return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi khi cố gắng truy cập lượt chơi của người dùng"));
             }
