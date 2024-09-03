@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -106,30 +107,10 @@ public class MessageService {
         socketService.sendMessage(room, message, senderUsername, targetUsername, TOPIC);
     }
 
-    public String startGame(Long id_game){
-        String room = "1";
-        List<Quiz> quizz = Arrays.asList(
-                new Quiz(
-                        new QuizDTO("In what continent is Indonesia?", "South America", "Europe", "Asia", 2),
-                        id_game
-                ),
-                new Quiz(
-                        new QuizDTO("Which continent has the highest population density?", "Asia", "South Africa", "Australia", 0),
-                        id_game
-                ),
-                new Quiz(
-                        new QuizDTO("What is 5x5?", "20", "25", "10", 1),
-                        id_game
-                ),
-                new Quiz(
-                        new QuizDTO("What is the square root of 169?", "20", "23", "13", 2),
-                        id_game
-                ),
-                new Quiz(
-                        new QuizDTO("What is the smallest ocean?", "Atlantic Ocean", "Pacific Ocean", "Arctic Ocean", 2),
-                        id_game
-                )
-        );
+    public String startGame(List<QuizDTO> quizDTOList , Long id_game, Timestamp startedAt){
+        List<Quiz> quizz = quizDTOList.stream()
+                .map(quizDTO -> new Quiz(quizDTO, id_game))
+                .collect(Collectors.toList());
 
         saveQuizzes(quizz);
         List<Quiz> questions = getQuizzes();
@@ -137,11 +118,9 @@ public class MessageService {
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
         ZonedDateTime newTimePlus = zonedDateTime.plusSeconds(10);
         eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
-            sendMessage(room, quizz.get(0).toString(), "SERVER", null,"start_game");
-            ZonedDateTime zonedDateTime1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-            ZonedDateTime newTimePlus1 = zonedDateTime1.plusSeconds(3);
-            eventSchedulerService.scheduleJob(newTimePlus1.toLocalDateTime(),()->{
-                sendNextQuestion(room);
+            sendMessage(String.valueOf(id_game), quizz.get(0).toString(), "SERVER", null,"start_game");
+            eventSchedulerService.scheduleJob(startedAt.toLocalDateTime(),()->{
+                sendNextQuestion(String.valueOf(id_game));
             });
 
         });

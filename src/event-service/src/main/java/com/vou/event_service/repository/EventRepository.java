@@ -19,4 +19,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findActiveEvents(@Param("currentTimestamp") Timestamp currentTimestamp);
 
     Event findByIdEventAndEndDateAfterAndDeletedDateIsNull(Long idEvent, Date currentDate);
+
+
+    @Query("SELECT e FROM Event e WHERE e.startDate BETWEEN :currentDate AND :threeDaysAfter")
+    List<Event> findEventsStartingInThreeDays(@Param("currentDate") Timestamp currentDate,
+                                              @Param("threeDaysAfter") Timestamp threeDaysAfter);
+
 }

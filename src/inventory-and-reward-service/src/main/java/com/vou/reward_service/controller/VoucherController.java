@@ -114,10 +114,41 @@ public class VoucherController {
         }
     }
 
-    @PutMapping("/{code}")
-    public ResponseEntity<ApiResponse> updateVoucherById(@PathVariable String code, @RequestBody CreateVoucherRequest request) {
+    @PutMapping("/info")
+    public ResponseEntity<ApiResponse> updateVoucher(@RequestBody InventoryDTO inventoryDTO, @RequestParam String code) {
         try {
+            CreateVoucherRequest request;
+            if (inventoryDTO.getGameType().equals("shake-game")) {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getItems(),
+                        inventoryDTO.getAim_coin(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+            else {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+
             Integer result = voucherService.updateVoucherByCode(code, request);
+
             ApiResponse response = new SuccessResponse("Cập nhật voucher thành công", 200);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
