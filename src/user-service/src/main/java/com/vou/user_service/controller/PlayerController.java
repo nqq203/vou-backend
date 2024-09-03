@@ -56,4 +56,25 @@ public class PlayerController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> findPlayerByIdentifier(
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value =  "id_user", required = false) Long idUser
+    ) {
+        try {
+            User player;
+            if (email != null) {
+                player = userService.findByIdentifier(email);
+            } else if (username != null) {
+                player = userService.findByIdentifier(username);
+            } else {
+                player = userService.findByIdUser(idUser);
+            }
+            return ResponseEntity.ok(player);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi tìm kiếm user"));
+        }
+    }
 }

@@ -19,7 +19,6 @@ public class EventDetailDTO {
     private List<BrandsCooperation> brandId;
     private GameInfoDTO gameInfoDTO;
     private InventoryDetailDTO inventoryInfo;
-    private int turns;
 
     public EventDetailDTO(
             Long idEvent,
@@ -32,8 +31,7 @@ public class EventDetailDTO {
             Timestamp endDate,
             List<BrandsCooperation> brands,
             GameInfoDTO gameInfoDTO,
-            InventoryDetailDTO inventoryDetailDTO,
-            int turns
+            InventoryDetailDTO inventoryDetailDTO
     ) {
         this.idEvent = idEvent;
         this.eventName = eventName;
@@ -46,6 +44,5 @@ public class EventDetailDTO {
         this.inventoryInfo = inventoryDetailDTO;
         this.createdBy = createdBy;
         this.brandLogo = brandLogo;
-        this.turns = turns;
     }
 }

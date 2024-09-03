@@ -22,6 +22,4 @@ public class PlayerDTO {
     private String status;
     private String address;
     private String avatarUrl;
-    private String gender;
-    private String facebookUrl;
 }

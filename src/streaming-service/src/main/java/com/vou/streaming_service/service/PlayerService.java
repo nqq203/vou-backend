@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 public class PlayerService {
     private final RestTemplate restTemplate;
-    private final String PLAYER_URL = "http://inventory-and-reward-service:8082/api/v1/players";
+    private final String USER_URL = "http://user-service:8082/api/v1/players";
 
     public PlayerService(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
@@ -22,11 +22,11 @@ public class PlayerService {
         try {
             String url;
             if (email != null) {
-                url = PLAYER_URL + "?email=" + email;
+                url = USER_URL + "?email=" + email;
             } else if (username != null) {
-                url = PLAYER_URL + "?username=" + username;
+                url = USER_URL + "?username=" + username;
             } else {
-                url = PLAYER_URL + "?id_user=" + idUser;
+                url = USER_URL + "?id_user=" + idUser;
             }
             ResponseEntity<PlayerDTO> response = restTemplate.getForEntity(url, PlayerDTO.class);
 

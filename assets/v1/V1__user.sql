@@ -9,7 +9,7 @@ CREATE TABLE users (
     role VARCHAR(50) NOT NULL CHECK (role IN ('PLAYER', 'ADMIN', 'BRAND')),
     status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('ACTIVE', 'INACTIVE', 'PENDING')),
     address VARCHAR(255),
-    avatar_url VARCHAR(255)
+    avatar_url TEXT
 );
 
 -- Creating the Session table

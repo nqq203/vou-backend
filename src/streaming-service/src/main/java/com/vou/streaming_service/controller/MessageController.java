@@ -237,7 +237,7 @@ public class MessageController{
             if (playSession.getTurns() == 0 || playSession.getTurns() - turns < 0) {
                 return ResponseEntity.ok(new SuccessResponse("Không đủ lượt để tặng", HttpStatus.OK, null));
             }
-            playSessionRepository.increaseTurns(giftTurnRequest.getReceiverId(), giftTurnRequest.getIdGame(), turns);
+            playSessionRepository.increaseTurns(playerDTO.getIdUser(), giftTurnRequest.getIdGame(), turns);
             playSessionRepository.decreaseTurns(giftTurnRequest.getSenderId(), giftTurnRequest.getIdGame(), turns);
 //            PlaySession receiver = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getReceiverId());
 //            PlaySession sender = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getSenderId());

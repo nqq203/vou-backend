@@ -3,7 +3,7 @@ CREATE TABLE Item (
     id_item SERIAL PRIMARY KEY,
     item_name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    image_url VARCHAR(255) DEFAULT NULL,
+    image_url TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_event INT
@@ -34,10 +34,10 @@ CREATE TABLE GiftLog (
 -- Create the Voucher table
 CREATE TABLE Voucher (
     code VARCHAR(50) PRIMARY KEY,
-    qr_code VARCHAR(255) DEFAULT NULL,
+    qr_code TEXT DEFAULT NULL,
     voucher_name VARCHAR(100) NOT NULL,
     voucher_price INT DEFAULT 10000,
-    image_url VARCHAR(255) DEFAULT NULL,
+    image_url TEXT DEFAULT NULL,
     expiration_date DATE NOT NULL,
     description TEXT DEFAULT NULL,
     type VARCHAR(10) DEFAULT 'online' CHECK (type IN ('online', 'offline')),
