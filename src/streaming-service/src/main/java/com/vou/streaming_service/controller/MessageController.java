@@ -264,6 +264,21 @@ public class MessageController{
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/turns/{idUser}/{idGame}")
+    public ResponseEntity<ApiResponse> shareToGetTurn(@PathVariable Long idUser, @PathVariable Long idGame) {
+        PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(idGame, idUser);
+        if (playSession == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy người dùng hoặc trò chơi"));
+        }
+        try {
+            playSessionService.shareToGetTurns(idGame, idUser);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi share lượt"));
+        }
+        playSession.setTurns(playSession.getTurns() + 1);
+        return ResponseEntity.ok(new SuccessResponse("Chúc mừng bạn đã nhận được 1 lượt", HttpStatus.OK, playSession));
+    }
 }
 
 

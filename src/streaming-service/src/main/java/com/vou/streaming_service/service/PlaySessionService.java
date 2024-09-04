@@ -26,4 +26,8 @@ public class PlaySessionService {
     public PlaySession findPlaySessionByIdGameAndIdPlayer(Long idGame, Long idPlayer) {
         return playSessionRepository.findPlaySessionByIdPlayerAndIdGame(idPlayer, idGame);
     }
+
+    public void shareToGetTurns(Long idGame, Long idPlayer) {
+        playSessionRepository.increaseTurns(idPlayer, idGame, 1);
+    }
 }
