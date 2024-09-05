@@ -104,10 +104,11 @@ public class MessageService {
     }
 
     public void sendMessage(String room, String message, String senderUsername, String targetUsername, String TOPIC) {
+        System.out.println("Send: "+message);
         socketService.sendMessage(room, message, senderUsername, targetUsername, TOPIC);
     }
 
-    public String startGame(List<QuizDTO> quizDTOList , Long id_game, Timestamp startedAt){
+    public String startGame(List<QuizDTO> quizDTOList , Long id_game, Long id_event, Timestamp startedAt){
         List<Quiz> quizz = quizDTOList.stream()
                 .map(quizDTO -> new Quiz(quizDTO, id_game))
                 .collect(Collectors.toList());
@@ -133,11 +134,11 @@ public class MessageService {
         System.out.println("Scheduling task to run at: " + zonedDateTime);
         eventSchedulerService.scheduleJob(zonedDateTime.toLocalDateTime(),()->{
             System.out.println("START GAME QUIZZZZZZ");
-            sendMessage(String.valueOf(id_game), quizz.get(0).toString(), "SERVER", null,"start_game");
+            sendMessage(String.valueOf(id_event), "START GAME QUIZ", "SERVER", null,"start_game");
             ZonedDateTime zonedDateTime1 = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-            ZonedDateTime newTimePlus = zonedDateTime1.plusSeconds(2);
+            ZonedDateTime newTimePlus = zonedDateTime1.plusSeconds(3);
             eventSchedulerService.scheduleJob(newTimePlus.toLocalDateTime(),()->{
-                sendNextQuestion(String.valueOf(id_game));
+                sendNextQuestion(String.valueOf(id_event));
             });
         });
         return startedAt.toString();

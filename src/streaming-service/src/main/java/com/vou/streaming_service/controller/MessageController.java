@@ -95,7 +95,7 @@ public class MessageController{
         QuizGame quizGame = new QuizGame(4);
         quizGame.setGame(game);
         quizGameRepository.save(quizGame);
-        messageService.startGame(quizzdto, gameInfoDTO.getGameId(), gameInfoDTO.getStartedAt());
+        messageService.startGame(quizzdto, gameInfoDTO.getGameId(),gameInfoDTO.getEventId(), gameInfoDTO.getStartedAt());
         List<Quiz> quizzes = quizzdto.stream().map(quizz-> new Quiz(quizz, game.getIdGame())).collect(Collectors.toList());
         quizService.saveQuizzes(quizzes);
         return ResponseEntity.ok("Save successfully");
