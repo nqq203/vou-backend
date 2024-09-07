@@ -25,11 +25,12 @@ public class FavouriteEventService {
     @Autowired
     private BrandClient brandClient;
 
-    public FavouriteEvent addFavouriteEvent(Long idEvent, Long idPlayer, Event event) {
+    public FavouriteEvent addFavouriteEvent(Long idEvent, Long idPlayer, String username, Event event) {
         try {
             FavouriteEvent favouriteEvent = new FavouriteEvent();
             favouriteEvent.setIdEvent(idEvent);
             favouriteEvent.setIdPlayer(idPlayer);
+            favouriteEvent.setUsername(username);
             favouriteEvent.setStartDate(event.getStartDate());
             favouriteEvent.setEndDate(event.getEndDate());
             favouriteEvent.setDeletedDate(null);
