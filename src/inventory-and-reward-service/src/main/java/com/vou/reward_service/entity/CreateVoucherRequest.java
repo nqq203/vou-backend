@@ -57,7 +57,7 @@ public class CreateVoucherRequest {
         this.qrCode = qrCode;
         this.voucherName = voucherName;
         this.imageUrl = imageUrl;
-        this.expirationDate = subtractSevenHours(expirationDate);
+        this.expirationDate = expirationDate;
         this.description = description;
         this.voucherPrice = voucherPrice;
         this.type = type;
@@ -88,18 +88,12 @@ public class CreateVoucherRequest {
         this.qrCode = qrCode;
         this.voucherName = voucherName;
         this.imageUrl = imageUrl;
-        this.expirationDate = subtractSevenHours(expirationDate);
+        this.expirationDate = expirationDate;
         this.voucherPrice=voucherPrice;
         this.description = description;
         this.type = type;
         this.idEvent = idEvent;
     }
 
-    public static Timestamp subtractSevenHours(Timestamp timestamp) {
-        if (timestamp == null) {
-            return null;
-        }
-        LocalDateTime localDateTime = timestamp.toLocalDateTime().minusHours(7);
-        return Timestamp.valueOf(localDateTime);
-    }
+
 }
