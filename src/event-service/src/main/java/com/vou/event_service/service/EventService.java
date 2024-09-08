@@ -185,8 +185,11 @@ public class EventService {
             Timestamp currentDate = Timestamp.valueOf(now);
             Timestamp startDateCheck = Timestamp.valueOf(threeDaysBefore);
             return eventRepository.findEventStartingInThreeDaysUserName(username,currentDate,startDateCheck);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
-    
+
     public Event getEventById(Long id_event) throws Exception {
         try {
             return eventRepository.findByIdEvent(id_event);
