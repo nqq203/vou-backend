@@ -31,4 +31,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Transactional
     @Query("UPDATE Event e SET e.remainingVouchers = e.remainingVouchers - 1 WHERE e.idEvent = :idEvent")
     int decreaseEventRemainingVoucherByIdEvent(@Param("idEvent") Long idEvent);
+    @Query("SELECT e FROM Event e JOIN FavouriteEvent f ON e.idEvent = f.idEvent WHERE e.startDate BETWEEN :currentDate AND :threeDaysAfter AND f.username = :username")
+    List<Event> findEventStartingInThreeDaysUserName(
+            @Param("username") String username,
+            @Param("currentDate") Timestamp currentDate,
+            @Param("threeDaysAfter") Timestamp threeDaysAfter);
+
+
 }

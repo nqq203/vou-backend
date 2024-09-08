@@ -27,8 +27,8 @@ public class FavouriteEventController {
     private EventService eventService;
 
 
-    @PostMapping("/{id_event}/users/{id_player}")
-    public ResponseEntity<?> addOrRemoveFavouriteEvent(@PathVariable Long id_event, @PathVariable Long id_player) {
+    @PostMapping("/{id_event}/users/{id_player}/{username}")
+    public ResponseEntity<?> addOrRemoveFavouriteEvent(@PathVariable Long id_event, @PathVariable Long id_player, @PathVariable String username) {
         try {
             Event existEvent = eventService.findEventById(id_event);
             if (existEvent == null) {
@@ -42,7 +42,7 @@ public class FavouriteEventController {
                 }
                 return ResponseEntity.ok(new SuccessResponse("Xóa khỏi danh sách sự kiện yêu thích thành công!", HttpStatus.OK, null));
             }
-            FavouriteEvent favouriteEvent = favouriteEventService.addFavouriteEvent(id_event, id_player, existEvent);
+            FavouriteEvent favouriteEvent = favouriteEventService.addFavouriteEvent(id_event, id_player,username, existEvent);
             if (favouriteEvent == null) {
                 return ResponseEntity.internalServerError().body(new InternalServerError("Cố lỗi xảy ra khi cố gắng thêm sự kiện yêu thích, hãy thử lại sau!"));
             }
@@ -71,6 +71,15 @@ public class FavouriteEventController {
             }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new InternalServerError("Có lỗi xảy ra khi cố gắng truy cập danh sách sự kiện yêu thích, hãy thử lại sau!"));
+        }
+    }
+    @GetMapping("/notification-event")
+    public ResponseEntity<?> getNotification(@RequestParam("username") String username){
+        try{
+           List<Event> events= eventService.findEventStartByUserName(username);
+            return  ResponseEntity.ok(events);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

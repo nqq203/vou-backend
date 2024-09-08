@@ -12,7 +12,6 @@ import java.util.List;
 public interface FavouriteEventRepository extends JpaRepository<FavouriteEvent, Long> {
     List<FavouriteEvent> findAllByIdPlayerAndEndDateAfterAndDeletedDateIsNull(Long idPlayer, Date currentDate);
     List<FavouriteEvent> findAllByIdEvent(Long idEvent);
-//    FavouriteEvent findByIdEvent(Long idEvent);
     FavouriteEvent findByIdEventAndIdPlayer(Long idEvent, Long idPlayer);
 
 }

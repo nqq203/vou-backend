@@ -19,6 +19,9 @@ public class FavouriteEvent {
     @Column(name = "id_player", nullable = false)
     private Long idPlayer;
 
+    @Column(name= "username")
+    private String username;
+
     @Column(name = "id_event", nullable = false)
     private Long idEvent;
 
