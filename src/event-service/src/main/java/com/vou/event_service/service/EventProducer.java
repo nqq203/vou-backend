@@ -37,10 +37,8 @@ public class EventProducer {
     public void checkUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
 
-        // Tính toán thời gian cách hiện tại 3 ngày
         LocalDateTime threeDaysBefore = now.plusDays(3);
 
-        // Chuyển đổi LocalDateTime sang Timestamp
         Timestamp currentDate = Timestamp.valueOf(now);
         Timestamp startDateCheck = Timestamp.valueOf(threeDaysBefore);
 
@@ -58,7 +56,7 @@ public class EventProducer {
                 MessageData messageData = new MessageData(
                         event.getIdEvent(),
                         event.getImageUrl(),
-                        "Sự kiện " + event.getEventName() + " sẽ sớm được bắt đầu!",
+                        "Sự kiện " + event.getEventName() + " sắp kết thúc!",
                         (int)days
                 );
                 String messageJson = username+ "--"+convertToJsonString(messageData);

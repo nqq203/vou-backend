@@ -55,7 +55,7 @@ public class NotificationConsumerService {
         Notification notification = new Notification();
         notification.setIdEvent(eventDTO.getIdEvent());
         notification.setImageUrl(eventDTO.getImageUrl());
-        notification.setMessage("Sự kiện "+ eventDTO.getEventName()+ " sẽ sớm được bắt đầu!");
+        notification.setMessage("Sự kiện "+ eventDTO.getEventName()+ " sẽ sớm kết thúc!");
 
         long days = (eventDTO.getStartDate().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
         notification.setNumDay((int) days);

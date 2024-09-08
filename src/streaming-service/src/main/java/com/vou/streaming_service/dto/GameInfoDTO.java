@@ -24,16 +24,10 @@ public class GameInfoDTO {
         this.gameId = gameId;
         this.name = name;
         this.gameType = gameType;
-        this.startedAt = subtractSevenHours(startedAt);
+        this.startedAt = startedAt;
         this.eventId = eventId;
         this.quiz =quiz;
     }
-    public static Timestamp subtractSevenHours(Timestamp timestamp) {
-        if (timestamp == null) {
-            return null;
-        }
-        LocalDateTime localDateTime = timestamp.toLocalDateTime().minusHours(7);
-        return Timestamp.valueOf(localDateTime);
-    }
+
 
 }

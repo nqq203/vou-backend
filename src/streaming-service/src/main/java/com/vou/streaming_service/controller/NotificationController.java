@@ -32,7 +32,7 @@ public class NotificationController {
     @GetMapping("/notification")
     public ResponseEntity<?> getNotificationByUserName(@RequestParam String username){
         List<Notification> event = notificationConsumerService.getEventNotification(username);
-        return ResponseEntity.ok(event);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Đã gửi thông báo sự kiện sắp kết thúc!", HttpStatus.OK, event));
     }
 
     @PostMapping("/ask-for-turn")

@@ -32,7 +32,10 @@ public class SecurityConfig  {
                                "/api/v1/auth/register",
                                "/api/v1/auth/resend-otp",
                                "/api/v1/auth/validate-token",
-                               "/api/v1/auth/verify-otp/**").permitAll()
+                               "/api/v1/auth/verify-otp/**",
+                               "/v3/api-docs/**",
+                               "/swagger-ui/**",
+                               "/swagger-ui.html").permitAll()
                        .requestMatchers("/api/v1/auth/change-password",
                                "/api/v1/auth/logout").authenticated())
                .csrf(csrf -> csrf.disable())
