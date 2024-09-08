@@ -21,6 +21,9 @@ public class Event {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "share_count")
+    private Long shareCount;
+
     @Column(name = "number_of_vouchers")
     private Integer numberOfVouchers;
 

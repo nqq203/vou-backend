@@ -20,4 +20,6 @@ public interface PlaySessionRepository extends JpaRepository<PlaySession, Long> 
     @Modifying
     @Query("UPDATE PlaySession ps SET ps.turns = ps.turns - :turns WHERE ps.idPlayer = :idPlayer AND ps.idGame = :idGame")
     void decreaseTurns(Long idPlayer, Long idGame, int turns);
+
+    int countDistinctByIdGame(Long idGame);
 }
