@@ -185,8 +185,24 @@ public class EventService {
             Timestamp currentDate = Timestamp.valueOf(now);
             Timestamp startDateCheck = Timestamp.valueOf(threeDaysBefore);
             return eventRepository.findEventStartingInThreeDaysUserName(username,currentDate,startDateCheck);
+    }
+    
+    public Event getEventById(Long id_event) throws Exception {
+        try {
+            return eventRepository.findByIdEvent(id_event);
         } catch (Exception e) {
             throw new Exception(e.getMessage());
+        }
+    }
+
+    public int increaseShareCount(Long id_event) throws Exception {
+        try {
+            Event event = eventRepository.findByIdEvent(id_event);
+            event.setShareCount(event.getShareCount() + 1);
+            eventRepository.save(event);
+            return 1;
+        } catch (Exception e) {
+            throw new Exception("Error using service to increase share count");
         }
     }
 }

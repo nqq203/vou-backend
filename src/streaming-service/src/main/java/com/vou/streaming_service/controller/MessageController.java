@@ -5,6 +5,7 @@
  */
 package com.vou.streaming_service.controller;
 
+import com.vou.streaming_service.client.EventClient;
 import com.vou.streaming_service.common.*;
 import com.vou.streaming_service.dto.*;
 import com.vou.streaming_service.libs.RedisCache;
@@ -62,6 +63,9 @@ public class MessageController{
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private EventClient eventClient;
 
     @GetMapping("message/{room}")
     public ResponseEntity<List<String>> getMessages(@PathVariable String room) {
@@ -273,11 +277,34 @@ public class MessageController{
         }
         try {
             playSessionService.shareToGetTurns(idGame, idUser);
+            // Call api share count
+            Game game = gameService.findGameByIdGame(idGame);
+            eventClient.increaseShareCount(game.getIdEvent());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi share lượt"));
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi share lượt: " + e.getMessage()));
         }
         playSession.setTurns(playSession.getTurns() + 1);
         return ResponseEntity.ok(new SuccessResponse("Chúc mừng bạn đã nhận được 1 lượt", HttpStatus.OK, playSession));
+    }
+
+    @GetMapping("/events/{id_event}")
+    public ResponseEntity<?> findGameByIdEvent(@PathVariable Long id_event) {
+        try {
+            Game game = gameService.findGameByIdEvent(id_event);
+            return ResponseEntity.ok(game);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/{id_event}/participants")
+    public ResponseEntity<?> findParticipantsByEvent(@PathVariable Long id_event) {
+        try {
+            int numberParticipants = playSessionService.countParticipantsByIdEvent(id_event);
+            return ResponseEntity.ok(numberParticipants);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
 

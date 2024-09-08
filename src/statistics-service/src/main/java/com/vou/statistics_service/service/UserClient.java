@@ -1,32 +1,35 @@
 package com.vou.statistics_service.service;
 
 import com.vou.statistics_service.model.Event;
+import com.vou.statistics_service.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EventClient {
-
+public class UserClient {
     private final RestTemplate restTemplate;
-    private final String EVENTS_URL = "http://event-service:8083/api/v1/events";
+    private final String EVENTS_URL = "http://user-service:8082/api/v1/users";
 
     @Autowired
-    public EventClient(RestTemplate restTemplate) {
+    public UserClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<Event> getEvent(Long eventId) {
+    public Optional<List<User>> getUsers(List<Long> userIds) {
         try {
-            ResponseEntity<Event> response = restTemplate.exchange(
-                    EVENTS_URL + "/event-statistics/" + eventId,
-                    HttpMethod.GET,
-                    null,
+            HttpEntity<List<Long>> requestEntity = new HttpEntity<>(userIds);
+            ResponseEntity<List<User>> response = restTemplate.exchange(
+                    EVENTS_URL + "/statistics/users",
+                    HttpMethod.POST,
+                    requestEntity,
                     new ParameterizedTypeReference<>() {}
             );
             if (response.getStatusCode().is2xxSuccessful()) {
@@ -34,7 +37,7 @@ public class EventClient {
             }
             return Optional.empty();
         } catch (Exception e) {
-            System.err.println("Error event client in streaming: " + e.getMessage());
+            System.err.println("Error user client in statistics: " + e.getMessage());
             return Optional.empty();
         }
     }

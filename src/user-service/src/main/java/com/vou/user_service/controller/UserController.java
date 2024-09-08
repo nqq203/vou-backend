@@ -134,4 +134,17 @@ public class UserController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/statistics/users")
+    public ResponseEntity<?> getListUserForStatistics(@RequestBody List<Long> userIds) {
+        try {
+            List<User> users = userService.findUsersByUserIds(userIds);
+            if (users == null || users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(users);
+            }
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập danh sách người dùng!"));
+        }
+    }
 }

@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class QuizStatistics extends StatisticsResponse{
     private List<User> winners;
+    private List<QuestionCorrectRates> correctRates;
 
     public QuizStatistics(Long participants) {
         super(participants);

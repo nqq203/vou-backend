@@ -200,11 +200,8 @@ public class MessageService {
         List<UserResult> results = calculateResults(room);
         quizzes.remove(0);
         if (quizzes.isEmpty()) {
-//            sendMessage(room, "Game has ended", "SERVER", null, "game_end");
-//            ZonedDateTime sendResultsTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusSeconds(2);
-//            eventSchedulerService.scheduleJob(sendResultsTime.toLocalDateTime(), () -> {
-                sendMessage(room, results.toString() , "SERVER", null, "results");
-//            });
+            // call API để tặng quà cũng như save statistics ở đây
+            sendMessage(room, results.toString(), "SERVER", null, "results");
             return;
         }
 

@@ -158,18 +158,31 @@ services:
     networks: 
       - microservices-network
 
-  # statistics-service: 
-  #   image: statistics-service:latest
-  #   build:
-  #     context: ./src/statistics-service
-  #   ports: 
-  #     - "8084:8084"
-  #   depends_on:
-  #     - service-registry
-  #   volumes:
-  #     - statistics-service-data:/var/statistics-service
-  #   networks: 
-  #     - microservices-network
+  statistics-service:
+     image: statistics-service:latest
+     build:
+       context: ./src/statistics-service
+     ports:
+       - "8015:8015"
+     depends_on:
+       - service-registry
+       - statistics-database
+     environment:
+       SPRING_APPLICATION_NAME: statistics-service
+       SERVER_PORT: 8015
+       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+       SPRING_DATASOURCE_URL: jdbc:postgresql://statistics-database:5432/statistics
+       SPRING_DATASOURCE_USERNAME: admin
+       SPRING_DATASOURCE_PASSWORD: admin
+       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+       SPRING_JPA_SHOW_SQL: true
+       SPRING_JPA_GENERATE_DDL: true
+     volumes:
+       - statistics-service-data:/var/statistics-service
+     networks:
+       - microservices-network
 
   # turn-service: 
   #   image: turn-service:latest
@@ -385,6 +398,20 @@ services:
     networks:
       - microservices-network
 
+  statistics-database:
+    image: postgres:16.3-bullseye
+    environment:
+      POSTGRES_DB: statistics
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5436:5432"
+    volumes:
+      - statistics-data:/var/lib/postgresql/data
+      - ./assets/v1/V1__statistics.sql:/docker-entrypoint-initdb.d/V1__statistics.sql
+    networks:
+      - microservices-network
+
 networks:
   microservices-network:
     driver: bridge
@@ -395,7 +422,7 @@ volumes:
   auth-service-data:
   user-service-data:
   event-service-data:
-  # statistics-service-data:
+  statistics-service-data:
   # turn-service-data:
   streaming-service-data:
   inventory-and-reward-service-data:
@@ -404,6 +431,7 @@ volumes:
   # eventdb-data:
   # gamedb-data:
   # inventoryandrewarddb-data:
+  statistics-data:
   user-data:
   game-data:
   event-data:
