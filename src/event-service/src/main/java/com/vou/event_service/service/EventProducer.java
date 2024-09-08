@@ -58,7 +58,7 @@ public class EventProducer {
                 MessageData messageData = new MessageData(
                         event.getIdEvent(),
                         event.getImageUrl(),
-                        "- Sự kiện " + event.getEventName() + " sẽ sớm được bắt đầu!",
+                        "Sự kiện " + event.getEventName() + " sẽ sớm được bắt đầu!",
                         (int)days
                 );
                 String messageJson = username+ "--"+convertToJsonString(messageData);
