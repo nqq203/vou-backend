@@ -72,7 +72,6 @@ public class SocketModule {
             String room = params.get("room").stream().collect(Collectors.joining());
             String username = params.get("username").stream().collect(Collectors.joining());
             client.joinRoom(room);
-            log.info("anshdasd");
             log.info("Socket ID [{}] - room [{}] - username [{}] Connected to chat module", client.getSessionId(), room, username);
             clients.put(username, client);
             serviceService.saveMessage(room, username, "0");
