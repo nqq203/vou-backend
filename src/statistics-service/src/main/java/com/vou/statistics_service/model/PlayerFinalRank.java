@@ -5,12 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateQuizWinnerRequest {
+public class PlayerFinalRank {
     private Long idEvent;
 
-    private Long idGame;
-
-    private Long userId;
+    private Long playerId;
 
     private Integer rank;
 }

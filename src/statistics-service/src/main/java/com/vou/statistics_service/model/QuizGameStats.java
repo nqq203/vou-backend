@@ -17,9 +17,15 @@ public class QuizGameStats {
     @Column(name = "id_event")
     private Long idEvent;
 
-    @Column(name = "id_game")
-    private Long idGame;
-
     @Column(name = "number_of_participants")
     private Long numberOfParticipants;
+
+    public QuizGameStats(Long idEvent, Long numberOfParticipants) {
+        this.idEvent = idEvent;
+        this.numberOfParticipants = numberOfParticipants;
+    }
+
+    public QuizGameStats() {
+
+    }
 }

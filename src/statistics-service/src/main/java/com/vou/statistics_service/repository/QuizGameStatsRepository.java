@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QuizGameStatsRepository extends JpaRepository<QuizGameStats, Long> {
-    QuizGameStats findByIdEventAndIdGame(Long idEvent, Long idGame);
+    QuizGameStats findByIdEvent(Long idEvent);
 }

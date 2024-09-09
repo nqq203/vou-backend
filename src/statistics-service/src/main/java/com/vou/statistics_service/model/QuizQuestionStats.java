@@ -13,9 +13,6 @@ public class QuizQuestionStats {
     @Column(name = "id_quiz_question")
     private Long idQuizQuestion;
 
-    @Column(name = "id_game")
-    private Long idGame;
-
     @Column(name = "id_event")
     private Long idEvent;
 
