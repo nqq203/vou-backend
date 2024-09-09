@@ -46,8 +46,8 @@ services:
       SPRING_APPLICATION_NAME: service-registry
       SERVER_PORT: 8761
       EUREKA_INSTANCE_HOSTNAME: localhost
-      EUREKA_CLIENT_FETCH_REGISTRY: false
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
     volumes:
       - service-registry-data:/var/service-registry
     networks: 
@@ -72,11 +72,11 @@ services:
       SPRING_APPLICATION_NAME: api-gateway
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
-      MANAGEMENT_ENDPOINT_GATEWAY_ENABLED: true
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: true
-      EUREKA_CLIENT_FETCH_REGISTRY: true
-      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED: true
-      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID: true
+      MANAGEMENT_ENDPOINT_GATEWAY_ENABLED: "true"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+      EUREKA_CLIENT_FETCH_REGISTRY: "true"
+      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED: "true"
+      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID: "true"
     volumes:
       - api-gateway-data:/var/api-gateway
     networks: 
@@ -118,14 +118,14 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
       SPRING_MAIL_USERNAME: nqquy21@clc.fitus.edu.vn
       SPRING_MAIL_PASSWORD: ljkwzpvsurwnejai
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
       SPRINGDOC_API_DOCS_PATH: /v3/api-docs
       SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
       SPRING_PROFILES_ACTIVE: prod
@@ -151,8 +151,8 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
     volumes:
       - event-service-data:/var/event-service
     networks: 
@@ -210,8 +210,8 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
       TZ: Asia/Ho_Chi_Minh
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_GROUP_ID: group_id
@@ -253,8 +253,8 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
     volumes:
       - inventory-and-reward-service-data:/var/inventory-and-reward-service
     networks: 

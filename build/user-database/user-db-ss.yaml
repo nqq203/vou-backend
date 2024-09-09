@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: user-database
+spec:
+  serviceName: "user-database"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-database
+  template:
+    metadata:
+      labels:
+        app: user-database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16.3-bullseye
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "user"
+        - name: POSTGRES_USER
+          value: "user"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        volumeMounts:
+        - name: db-volume
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi

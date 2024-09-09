@@ -4,7 +4,7 @@ import com.vou.event_service.common.*;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.service.BrandsCooperationService;
-import jakarta.ws.rs.BadRequestException;
+// import jakarta.ws.rs.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +45,8 @@ public class BrandsCooperationController {
         try {
             BrandsCooperation createdBrandsCooperation = brandsCooperationService.createBrandsCooperation(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedResponse("Brand cooperation created", createdBrandsCooperation));
-        } catch (BadRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        // } catch (BadRequestException e) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
