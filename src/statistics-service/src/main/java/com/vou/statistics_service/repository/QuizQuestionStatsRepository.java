@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface QuizQuestionStatsRepository extends JpaRepository<QuizQuestionStats, Long> {
-    QuizQuestionStats findByIdQuizQuestion(Long quizQuestionId);
-
-    List<QuizQuestionStats> findQuizQuestionStatsByIdEventAndIdGame(Long idEvent, Long idGame);
+//    QuizQuestionStats findByIdQuizQuestion(Long quizQuestionId);
+//
+//    List<QuizQuestionStats> findQuizQuestionStatsByIdEventAndIdGame(Long idEvent, Long idGame);
 }

@@ -141,9 +141,9 @@ public class UserController {
     }
 
     @PostMapping("/statistics/users")
-    public ResponseEntity<?> getListUserForStatistics(@RequestBody List<Long> userIds) {
+    public ResponseEntity<?> getListUserForStatistics(@RequestBody List<String> usernames) {
         try {
-            List<User> users = userService.findUsersByUserIds(userIds);
+            List<User> users = userService.findUsersByUsernames(usernames);
             if (users == null || users.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(users);
             }

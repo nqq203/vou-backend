@@ -16,18 +16,18 @@ import java.util.Optional;
 @Service
 public class UserClient {
     private final RestTemplate restTemplate;
-    private final String EVENTS_URL = "http://user-service:8082/api/v1/users";
+    private final String USER_URL = "http://user-service:8082/api/v1/users";
 
     @Autowired
     public UserClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<List<User>> getUsers(List<Long> userIds) {
+    public Optional<List<User>> getUsers(List<String> usernames) {
         try {
-            HttpEntity<List<Long>> requestEntity = new HttpEntity<>(userIds);
+            HttpEntity<List<String>> requestEntity = new HttpEntity<>(usernames);
             ResponseEntity<List<User>> response = restTemplate.exchange(
-                    EVENTS_URL + "/statistics/users",
+                    USER_URL + "/statistics/users",
                     HttpMethod.POST,
                     requestEntity,
                     new ParameterizedTypeReference<>() {}
