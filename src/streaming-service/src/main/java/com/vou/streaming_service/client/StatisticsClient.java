@@ -31,14 +31,14 @@ public class StatisticsClient {
                 return Integer.compare(score1, score2);
             });
             List<PlayerResult> rawRequest = IntStream.range(0, userResult.size())
-                    .mapToObj(i -> new PlayerResult(id_event, userResult.get(i).getUserId(), i))
+                    .mapToObj(i -> new PlayerResult(id_event, userResult.get(i).getUserId(), i+1))
                     .collect(Collectors.toList());
             HttpEntity<PlayerResultRequest> request = new HttpEntity<>(new PlayerResultRequest(rawRequest));
             ResponseEntity<String> response = restTemplate.exchange(
                     STATISTICS_URL + "/player-result",
                     HttpMethod.POST,
                     request,
-                    new ParameterizedTypeReference<>() {}
+                    String.class
             );
             if (response.getStatusCode().is2xxSuccessful()) {
                 return Optional.ofNullable(response.getBody());
