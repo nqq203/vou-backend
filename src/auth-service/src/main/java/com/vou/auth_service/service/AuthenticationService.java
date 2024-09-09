@@ -32,12 +32,14 @@ public class AuthenticationService {
         }
         User user = response.get();
 
-        if (user.getStatus() != Status.ACTIVE) {
+        if (user.getStatus() == Status.PENDING) {
             if (user.getRole() == Role.PLAYER) {
                 resendOtp(user.getUsername(), user.getEmail());
                 return "1";
             }
             return "2";
+        } else if (user.getStatus() == Status.INACTIVE) {
+            return "3";
         }
 
         if (passwordEncoder.matches(password, user.getPassword())) {

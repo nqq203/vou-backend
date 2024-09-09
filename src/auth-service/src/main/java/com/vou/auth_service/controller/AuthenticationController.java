@@ -50,6 +50,9 @@ public class AuthenticationController {
                             HttpStatus.UNAUTHORIZED, null));
         }
 
+        if (token.equals("3")) {
+            return ResponseEntity.badRequest().body(new BadRequest("Tài khoản của bạn đã bị khóa!"));
+        }
 
         User user = authenticationService.loadUserByUsername(loginRequest.getUsername());
 

@@ -67,8 +67,8 @@ CREATE TABLE VoucherRepo (
 
 INSERT INTO Item (item_name, image_url)
 VALUES
-('Chó', 'https://img.lovepik.com/free-png/20211103/lovepik-dog-png-image_400241070_wh1200.png'),
-('Mèo', 'https://as1.ftcdn.net/v2/jpg/02/22/70/26/1000_F_222702680_SucVlcjUEbGTizsKsX9yzbHFjDaO5vrO.jpg'),
-('Gà', 'https://i.pinimg.com/originals/81/e7/b6/81e7b6c5e76935b7ab5f9e680390474c.jpg'),
-('Rùa', 'https://drive.google.com/file/d/180Vvg09g1Ni5hScoG4DnJZwcdOpOtmLe/view?usp=sharing'),
-('Xu', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtYHA7PEb_VmsymxDsrrnncvhuq06oxb5fBg&s');
+('Chó', 'https://vou-storage.s3.ap-southeast-2.amazonaws.com/happy.png'),
+('Mèo', 'https://vou-storage.s3.ap-southeast-2.amazonaws.com/kitty.png'),
+('Gà', 'https://vou-storage.s3.ap-southeast-2.amazonaws.com/hen.png'),
+('Rùa', 'https://vou-storage.s3.ap-southeast-2.amazonaws.com/turtle.png'),
+('Xu', 'https://vou-storage.s3.ap-southeast-2.amazonaws.com/coin.png');
