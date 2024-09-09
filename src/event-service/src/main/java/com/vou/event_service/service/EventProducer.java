@@ -35,6 +35,7 @@ public class EventProducer {
 
     @Scheduled(fixedRate = 60000)
     public void checkUpcomingEvents() {
+        System.out.println("Checking upcoming events....");
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime threeDaysBefore = now.plusDays(3);
@@ -74,7 +75,11 @@ public class EventProducer {
         }
     }
     public void sendMessage(String message) {
-        logger.info(String.format("#### -> Producing message -> %s", message));
-        this.kafkaTemplate.send(TOPIC, message);
+         try {
+             logger.info(String.format("#### -> Producing message -> %s", message));
+             this.kafkaTemplate.send(TOPIC, message);
+         } catch (Exception e) {
+             logger.info(e.getMessage());
+         }
     }
 }

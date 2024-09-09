@@ -28,11 +28,15 @@ public class PlayerRegistration implements IRegistration {
 
     @Override
     public byte register(User user) {
-        User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
-        if (existUser != null) {
-            return 0;
+        try {
+            User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+            if (existUser != null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 2;
         }
-        System.out.println("Qua day 1");
+        System.out.println("Co user" + user.getIdUser());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         Player player = new Player(user, encodedPassword);
         try {

@@ -113,10 +113,15 @@ public class UserController {
     @GetMapping("/query")
     public ResponseEntity<?> getUserByUsernameAndEmail(@RequestParam("username") String username, @RequestParam("email") String email) {
         try {
+            System.out.println("username :" + username);
+            System.out.println("email: " + email);
             User existUser = userService.findUserByUsernameAndEmail(username, email);
+            System.out.println("Trên đây!!");
+            System.out.println("User nè: " + existUser);
             if (existUser == null) {
                 return ResponseEntity.notFound().build();
             }
+            System.out.println("Xuống đây!!");
             return ResponseEntity.ok(existUser);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Lỗi hệ thống khi kiểm tra người dùng tồn tại");

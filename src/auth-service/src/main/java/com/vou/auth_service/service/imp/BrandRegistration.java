@@ -1,8 +1,5 @@
 package com.vou.auth_service.service.imp;
 
-import com.vou.auth_service.constant.Role;
-import com.vou.auth_service.constant.Status;
-import com.vou.auth_service.model.Admin;
 import com.vou.auth_service.model.Brand;
 import com.vou.auth_service.model.User;
 import com.vou.auth_service.service.UserManagementClient;
@@ -10,8 +7,6 @@ import com.vou.auth_service.service.registration_interface.IRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class BrandRegistration implements IRegistration {
@@ -22,10 +17,15 @@ public class BrandRegistration implements IRegistration {
 
     @Override
     public byte register(User user) {
-        User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
-        if (existUser != null) {
-            return 0;
+        try {
+            User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+            if (existUser != null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 2;
         }
+
         String password = passwordEncoder.encode(user.getPassword());
         Brand brand = new Brand(user, password);
         try {

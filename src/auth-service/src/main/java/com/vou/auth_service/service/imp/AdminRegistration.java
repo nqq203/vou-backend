@@ -20,10 +20,15 @@ public class AdminRegistration implements IRegistration {
 
     @Override
     public byte register(User user) {
-        User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
-        if (existUser != null) {
-            return 0;
+        try {
+            User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+            if (existUser != null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 2;
         }
+
 
         String password = passwordEncoder.encode(user.getPassword());
         Admin admin = new Admin(user, password);

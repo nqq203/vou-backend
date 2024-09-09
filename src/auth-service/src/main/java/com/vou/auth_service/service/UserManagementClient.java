@@ -1,6 +1,7 @@
 package com.vou.auth_service.service;
 
 import com.vou.auth_service.model.*;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -212,16 +215,28 @@ public class UserManagementClient {
         }
     }
 
-    public Optional<User> getUserByUsernameAndEmail(String username, String email){
+    public Optional<User> getUserByUsernameAndEmail(String username, String email) throws Exception {
         try {
-            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/query" +"?username=" + username + "&email=" + email, User.class);
+            ResponseEntity<User> response = restTemplate.getForEntity(userUrl + "/query" + "?username=" + username + "&email=" + email, User.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
+            } else if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return Optional.empty();
+            } else {
+                System.out.println("Unexpected status received: " + response.getStatusCode());
+                return Optional.empty();
             }
+        } catch (HttpClientErrorException.NotFound e) {
             return Optional.empty();
+        } catch (HttpClientErrorException ex) {
+            System.out.println("Client error: " + ex.getStatusCode());
+            throw new RuntimeException(ex);
+        } catch (HttpServerErrorException ex) {
+            System.out.println("Server error: " + ex.getStatusCode());
+            throw new RuntimeException(ex);
         } catch (Exception e) {
             System.out.println("Error in getUserByUsernameAndEmail: " + e.getMessage());
-            return Optional.empty();
+            throw new RuntimeException("Error retrieving user by username and email", e);
         }
     }
 }
