@@ -10,6 +10,8 @@ import com.vou.streaming_service.model.Quiz;
 import com.vou.streaming_service.service.NotificationConsumerService;
 import com.vou.streaming_service.socket.SocketModule;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 public class NotificationController {
     @Autowired
     NotificationConsumerService notificationConsumerService;
-
+    private final Logger logger = LoggerFactory.getLogger(NotificationConsumerService.class);
     @Autowired
     SocketModule socketModule;
     @GetMapping("/notification")
@@ -43,6 +45,7 @@ public class NotificationController {
         response.put("receiver", receiver);
         response.put("message",message);
         socketModule.sendNotification(message, sender, receiver, "turn_notification");
+        logger.info("sender"+ message+"cua"+ receiver);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Đã gửi thông báo xin lượt!", HttpStatus.OK, response));
     }
 }

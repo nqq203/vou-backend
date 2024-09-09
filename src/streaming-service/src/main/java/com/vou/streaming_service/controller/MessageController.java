@@ -240,7 +240,7 @@ public class MessageController{
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy người dùng hoặc có lỗi khi tìm kiếm người dùng"));
             }
             int turns = giftTurnRequest.getTurns();
-            PlaySession playSession = playSessionService.findPlaySessionByIdGameAndIdPlayer(giftTurnRequest.getIdGame(), giftTurnRequest.getSenderId());
+            PlaySession playSession = playSessionService.findOrCreatePlaySession(giftTurnRequest.getIdGame(), giftTurnRequest.getSenderId());
             if (playSession == null) {
                 return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố truy cập thông tin lượt chơi của người tặng!"));
             }
