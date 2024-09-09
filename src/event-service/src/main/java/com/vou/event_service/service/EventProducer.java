@@ -51,7 +51,7 @@ public class EventProducer {
             List<String> usernames = favouriteEvents.stream()
                     .map(FavouriteEvent::getUsername) // Lấy idUser từ mỗi FavouriteEvent
                     .collect(Collectors.toList());
-            long days = (event.getStartDate().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
+            long days = (event.getEndDate().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24);
             for (String username: usernames) {
                 MessageData messageData = new MessageData(
                         event.getIdEvent(),
