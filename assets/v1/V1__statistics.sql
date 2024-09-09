@@ -8,7 +8,7 @@ CREATE TABLE Player_Result
 (
     id_player_result SERIAL PRIMARY KEY ,
     id_event  INT,
-    player_id INT,
+    player_username TEXT,
     rank      INT
 );
 

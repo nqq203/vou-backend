@@ -8,7 +8,7 @@ import lombok.Setter;
 public class PlayerFinalRank {
     private Long idEvent;
 
-    private Long playerId;
+    private String playerUsername;
 
     private Integer rank;
 }

@@ -8,10 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,15 +55,15 @@ public class StatisticsService {
         } else {
             if (game.isPresent()) {
                 // Lấy thông tin người chiến thắng từ DB
-                List<PlayerResult> winners = playerResultRepository.findPlayerResultByIdEventAndRankIsBetween(id_event, 1, 3);
+                List<PlayerResult> winners = playerResultRepository.findPlayerResultByIdEvent(id_event);
                 if (winners == null)
                 {
                     System.out.println("Winner is null");
                     return new QuizStatistics();
                 }
 
-                List<Long> requestUserIds = winners.stream().map(PlayerResult::getPlayerId).collect(Collectors.toList());
-                Optional<List<User>> users = userClient.getUsers(requestUserIds);
+                List<String> requestUsernames = winners.stream().map(PlayerResult::getPlayerUsername).collect(Collectors.toList());
+                Optional<List<User>> users = userClient.getUsers(requestUsernames);
                 List<User> userList = null;
                 if (users.isEmpty()) {
                     System.out.println("User list is empty");
@@ -77,7 +74,7 @@ public class StatisticsService {
                     QuizWinnerMetadata quizWinnerMetadata = mapper.map(user, QuizWinnerMetadata.class);
                     // Tìm PlayerResult tương ứng với user
                     Optional<PlayerResult> correspondingWinner = winners.stream()
-                            .filter(winner -> winner.getPlayerId().equals(quizWinnerMetadata.getIdUser()))
+                            .filter(winner -> winner.getPlayerUsername().equals(quizWinnerMetadata.getUsername()))
                             .findFirst();
 
                     // Thiết lập giá trị rank nếu tìm thấy người thắng tương ứng
@@ -85,7 +82,7 @@ public class StatisticsService {
 
                     return quizWinnerMetadata;
                 })
-                        .toList();
+                        .sorted(Comparator.comparingInt(QuizWinnerMetadata::getRank)).toList();
                 // Lấy danh sách thống kê câu hỏi
                 //List<QuizQuestionStats> quizQuestionStats = quizQuestionStatsRepository.findQuizQuestionStatsByIdEventAndIdGame(id_event, game.get().getIdGame());
                 List<QuestionCorrectRates> correctRates = new ArrayList<>();//quizQuestionStats.stream().map(quizQuestionStats1 -> new QuestionCorrectRates(quizQuestionStats1.getIdQuizQuestion(),  ((double) quizQuestionStats1.getCorrectCount() / (double) (quizQuestionStats1.getCorrectCount() + quizQuestionStats1.getIncorrectCount())))).collect(Collectors.toList());

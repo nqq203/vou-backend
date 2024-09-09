@@ -17,17 +17,17 @@ public class PlayerResult {
     @Column(name = "id_event")
     private Long idEvent;
 
-    @Column(name = "player_id")
-    private Long playerId;
+    @Column(name = "player_username")
+    private String playerUsername;
 
     @Column(name = "rank")
     private Integer rank;
 
     public PlayerResult() {}
 
-    public PlayerResult(Long idEvent, Integer rank, Long playerId) {
+    public PlayerResult(Long idEvent, Integer rank, String playerUsername) {
         this.idEvent = idEvent;
         this.rank = rank;
-        this.playerId = playerId;
+        this.playerUsername = playerUsername;
     }
 }

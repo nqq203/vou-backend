@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface PlayerResultRepository extends JpaRepository<PlayerResult, Long> {
     //PlayerResult findByIdEvent(Long idEvent);
-    List<PlayerResult> findPlayerResultByIdEventAndRankIsBetween(Long idEvent, Integer rank, Integer rank2);
+    List<PlayerResult> findPlayerResultByIdEvent(Long idEvent);
 }
