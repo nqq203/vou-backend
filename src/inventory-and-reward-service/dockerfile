@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM maven:3.9.8-eclipse-temurin-21 AS build
+FROM maven:3.9.8-eclipse-temurin-17 AS build
 WORKDIR /inventory-and-reward-service
 
 # Copy the pom.xml and download dependencies
@@ -14,7 +14,7 @@ RUN mvn clean package -DskipTests
 RUN ls /inventory-and-reward-service/target
 
 # Start a new stage for the final image
-FROM eclipse-temurin:21
+FROM eclipse-temurin:17
 WORKDIR /inventory-and-reward-service
 
 # Copy the JAR file from the build stage to the final image
