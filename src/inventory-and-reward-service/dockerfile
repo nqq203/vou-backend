@@ -8,7 +8,7 @@ RUN mvn dependency:go-offline -B
 
 # Copy the source code and build the application
 COPY src ./src
-RUN mvn clean install -DskipTests
+RUN mvn clean package -DskipTests
 
 # Check to list the JAR file (for debugging purposes)
 RUN ls /inventory-and-reward-service/target

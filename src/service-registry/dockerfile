@@ -1,20 +1,17 @@
 # Stage 1: Build the application
-FROM maven:3.9.8-eclipse-temurin-21 AS build
+FROM maven:3.9.8-eclipse-temurin-17 AS build
 WORKDIR /service-registry
 
 # Copy the pom.xml and download dependencies
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:resolve-plugins
 
 # Copy the source code and build the application
 COPY src ./src
-RUN mvn clean install -DskipTests
-
-# Check to list the JAR file (for debugging purposes)
-RUN ls /service-registry/target
+RUN mvn clean package -DskipTests
 
 # Start a new stage for the final image
-FROM eclipse-temurin:21
+FROM eclipse-temurin:17
 WORKDIR /service-registry
 
 # Copy the JAR file from the build stage to the final image

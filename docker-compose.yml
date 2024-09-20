@@ -46,8 +46,8 @@ services:
       SPRING_APPLICATION_NAME: service-registry
       SERVER_PORT: 8761
       EUREKA_INSTANCE_HOSTNAME: localhost
-      EUREKA_CLIENT_FETCH_REGISTRY: false
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
     volumes:
       - service-registry-data:/var/service-registry
     networks: 
@@ -64,19 +64,18 @@ services:
       - auth-service
       - user-service
       - event-service
-      # - statistics-service
-      # - turn-service
+      - statistics-service
       - streaming-service
-      # - inventory-and-reward-service
+      - inventory-and-reward-service
     environment:
       SPRING_APPLICATION_NAME: api-gateway
       SERVER_PORT: 8080
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
-      MANAGEMENT_ENDPOINT_GATEWAY_ENABLED: true
-      EUREKA_CLIENT_REGISTER_WITH_EUREKA: true
-      EUREKA_CLIENT_FETCH_REGISTRY: true
-      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED: true
-      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID: true
+      MANAGEMENT_ENDPOINT_GATEWAY_ENABLED: "true"
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+      EUREKA_CLIENT_FETCH_REGISTRY: "true"
+      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED: "true"
+      SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_LOWER_CASE_SERVICE_ID: "true"
     volumes:
       - api-gateway-data:/var/api-gateway
     networks: 
@@ -96,6 +95,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka
     volumes:
       - auth-service-data:/var/auth-service
+      - maven-repo:/root/.m2
     networks: 
       - microservices-network
 
@@ -103,6 +103,10 @@ services:
     image: user-service:latest
     build:
       context: ./src/user-service
+      dockerfile: dockerfile
+    volumes:
+      - user-service-data:/var/user-service
+      - maven-repo:/root/.m2
     ports: 
       - "8082:8082"
     depends_on:
@@ -118,14 +122,14 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
       SPRING_MAIL_USERNAME: nqquy21@clc.fitus.edu.vn
       SPRING_MAIL_PASSWORD: ljkwzpvsurwnejai
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
       SPRINGDOC_API_DOCS_PATH: /v3/api-docs
       SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
       SPRING_PROFILES_ACTIVE: prod
@@ -151,10 +155,11 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
     volumes:
       - event-service-data:/var/event-service
+      - maven-repo:/root/.m2
     networks: 
       - microservices-network
 
@@ -177,25 +182,13 @@ services:
        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
        SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
        SPRING_JPA_HIBERNATE_DDL_AUTO: update
-       SPRING_JPA_SHOW_SQL: true
-       SPRING_JPA_GENERATE_DDL: true
+       SPRING_JPA_SHOW_SQL: "true"
+       SPRING_JPA_GENERATE_DDL: "true"
      volumes:
        - statistics-service-data:/var/statistics-service
+       - maven-repo:/root/.m2
      networks:
        - microservices-network
-
-  # turn-service: 
-  #   image: turn-service:latest
-  #   build:
-  #     context: ./src/turn-service
-  #   ports: 
-  #     - "8085:8085"
-  #   depends_on:
-  #     - service-registry
-  #   volumes:
-  #     - turn-service-data:/var/turn-service
-  #   networks: 
-  #     - microservices-network
 
   streaming-service: 
     image: streaming-service:latest
@@ -204,7 +197,6 @@ services:
     ports: 
       - "8086:8086"
       - "8085:8085" 
-      # - "6379:6379"
     depends_on:
       - service-registry
       - game-database
@@ -223,8 +215,8 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
       TZ: Asia/Ho_Chi_Minh
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_GROUP_ID: group_id
@@ -233,6 +225,7 @@ services:
       SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER: org.apache.kafka.common.serialization.StringDeserializer
     volumes:
       - streaming-service-data:/var/streaming-service
+      - maven-repo:/root/.m2
     networks: 
       - microservices-network
     healthcheck:
@@ -266,10 +259,11 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
-      SPRING_JPA_GENERATE_DDL: true
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_GENERATE_DDL: "true"
     volumes:
       - inventory-and-reward-service-data:/var/inventory-and-reward-service
+      - maven-repo:/root/.m2
     networks: 
       - microservices-network
 
@@ -289,58 +283,6 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     networks:
       - microservices-network
-      
-  # authdb:
-  #   image: postgres:16.3-bullseye
-  #   environment:
-  #     POSTGRES_DB: authdb
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: admin
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - authdb-data:/var/lib/postgresql/data
-  #   networks:
-  #     - microservices-network
-
-  # eventdb:
-  #   image: postgres:16.3-bullseye
-  #   environment:
-  #     POSTGRES_DB: eventdb
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: admin
-  #   ports:
-  #     - "5433:5432"
-  #   volumes:
-  #     - eventdb-data:/var/lib/postgresql/data
-  #   networks:
-  #     - microservices-network
-
-  # gamedb:
-  #   image: postgres:16.3-bullseye
-  #   environment:
-  #     POSTGRES_DB: gamedb
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: admin
-  #   ports:
-  #     - "5434:5432"
-  #   volumes:
-  #     - gamedb-data:/var/lib/postgresql/data
-  #   networks:
-  #     - microservices-network
-
-  # inventoryandrewarddb:
-  #   image: postgres:16.3-bullseye
-  #   environment:
-  #     POSTGRES_DB: inventoryrewarddb
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: admin
-  #   ports:
-  #     - "5435:5432"
-  #   volumes:
-  #     - inventoryandrewarddb-data:/var/lib/postgresql/data
-  #   networks:
-  #     - microservices-network
 
   user-database:
     image: postgres:16.3-bullseye
@@ -423,17 +365,14 @@ volumes:
   user-service-data:
   event-service-data:
   statistics-service-data:
-  # turn-service-data:
   streaming-service-data:
   inventory-and-reward-service-data:
-  # authdb-data:
   pgadmin-data:
-  # eventdb-data:
-  # gamedb-data:
-  # inventoryandrewarddb-data:
   statistics-data:
   user-data:
   game-data:
   event-data:
   inventory-data:
   redis-data:
+  maven-repo:
+    driver: local

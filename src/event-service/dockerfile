@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM maven:3.9.8-eclipse-temurin-21 AS build
+FROM maven:3.9.8-eclipse-temurin-17 AS build
 WORKDIR /event-service
 
 # Copy the pom.xml and download dependencies
@@ -8,13 +8,13 @@ RUN mvn dependency:go-offline -B
 
 # Copy the source code and build the application
 COPY src ./src
-RUN mvn clean install -DskipTests
+RUN mvn clean package -DskipTests
 
 # Check to list the JAR file (for debugging purposes)
 RUN ls /event-service/target
 
 # Start a new stage for the final image
-FROM eclipse-temurin:21
+FROM eclipse-temurin:17
 WORKDIR /event-service
 
 # Copy the JAR file from the build stage to the final image
