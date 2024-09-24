@@ -1,7 +1,6 @@
 package com.vou.auth_service.service;
 
 import com.vou.auth_service.model.*;
-import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;

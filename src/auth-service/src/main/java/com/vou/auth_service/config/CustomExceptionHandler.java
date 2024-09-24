@@ -1,7 +1,6 @@
 package com.vou.auth_service.config;
 
 import com.vou.auth_service.common.BadRequest;
-import com.vou.auth_service.common.InternalServerError;
 import com.vou.auth_service.common.NotFoundResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

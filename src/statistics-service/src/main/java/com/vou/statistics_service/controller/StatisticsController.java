@@ -25,7 +25,7 @@ public class StatisticsController {
     public ResponseEntity<?> saveQuizWinner(@RequestBody SavePlayerRankRequest request) {
         try {
             boolean result = statisticService.savePlayerResults(request);
-            statisticService.updateQuizParticipants(request.getList().getFirst().getIdEvent(), (long) request.getList().size());
+            statisticService.updateQuizParticipants(request.getList().get(0).getIdEvent(), (long) request.getList().size());
             if (result)
                 return ResponseEntity.ok("Successfully save the players' result");
             return ResponseEntity.internalServerError().body("Error saving player result");

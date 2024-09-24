@@ -1,6 +1,5 @@
 package com.vou.event_service.dto;
 
-import com.vou.event_service.model.Game;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,7 @@
 package com.vou.event_service.dto;
 
 import com.vou.event_service.model.Event;
-import jakarta.persistence.Entity;
 import lombok.Data;
-import org.bouncycastle.util.Times;
 
 import java.sql.Timestamp;
 import java.time.Instant;

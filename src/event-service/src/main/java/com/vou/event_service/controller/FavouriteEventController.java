@@ -6,7 +6,6 @@ import com.vou.event_service.common.SuccessResponse;
 import com.vou.event_service.dto.FavouriteEventDetailDTO;
 import com.vou.event_service.model.Event;
 import com.vou.event_service.model.FavouriteEvent;
-import com.vou.event_service.service.BrandClient;
 import com.vou.event_service.service.EventService;
 import com.vou.event_service.service.FavouriteEventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

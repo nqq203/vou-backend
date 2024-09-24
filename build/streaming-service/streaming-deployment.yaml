@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streaming-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streaming-service
+  template:
+    metadata:
+      labels:
+        app: streaming-service
+    spec:
+      containers:
+      - name: streaming-service
+        image: streaming-service:latest
+        ports:
+        - containerPort: 8086
+        - containerPort: 8085
+        env:
+        - name: SPRING_APPLICATION_NAME
+          value: "streaming-service"
+        - name: SERVER_PORT
+          value: "8086"
+        - name: SOCKET_SERVER_PORT
+          value: "8085"
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        - name: SPRING_CLOUD_KUBERNETES_DISCOVERY_ENABLED
+          value: "true"
