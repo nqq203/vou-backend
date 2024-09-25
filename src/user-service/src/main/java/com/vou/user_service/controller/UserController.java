@@ -1,6 +1,7 @@
 package com.vou.user_service.controller;
 
 import com.vou.user_service.common.*;
+import com.vou.user_service.model.Brand;
 import com.vou.user_service.model.User;
 import com.vou.user_service.service.StorageService;
 import com.vou.user_service.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +45,9 @@ public class UserController {
 
     @PatchMapping ("/{id_user}/avatar")
     public ResponseEntity<?> updateAvatar(@PathVariable Long id_user, @RequestParam("avatar") MultipartFile avatarFile) {
-        if (!avatarFile.getContentType().startsWith("image/")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Invalid file type", HttpStatus.BAD_REQUEST, "Only image files are allowed"));
+        String contentType = avatarFile.getContentType();
+        if (!Arrays.asList("image/png", "image/jpeg", "image/jpg").contains(contentType)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("File không hợp lệ", HttpStatus.BAD_REQUEST, "Chỉ cho phép các định dạng png, jpg, jpeg"));
         }
         try {
             String avatarUrl = storageService.uploadImage(avatarFile);
@@ -91,19 +94,62 @@ public class UserController {
         try {
             user = userService.findByIdUser(id_user);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Bad Request: Invalid user id"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("User id không hợp lệ."));
         }
         if (!user.getRole().toString().equalsIgnoreCase("admin")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ForbiddenResponse("Access Denied: Just admin can get list users"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ForbiddenResponse("Chỉ admin mới có thể sử dụng chức năng này."));
         }
         try {
             List<User> users = userService.findAllUsers();
             if (users == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Empty users list"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Danh sách người dùng rỗng"));
             }
-            return ResponseEntity.ok().body(new SuccessResponse("Get list users successfully", HttpStatus.OK, users));
+            return ResponseEntity.ok().body(new SuccessResponse("Truy cập danh sách người dùng thành công", HttpStatus.OK, users));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Get list users failed by server"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập danh sách người dùng!"));
+        }
+    }
+
+    @GetMapping("/query")
+    public ResponseEntity<?> getUserByUsernameAndEmail(@RequestParam("username") String username, @RequestParam("email") String email) {
+        try {
+            System.out.println("username :" + username);
+            System.out.println("email: " + email);
+            User existUser = userService.findUserByUsernameAndEmail(username, email);
+            System.out.println("Trên đây!!");
+            System.out.println("User nè: " + existUser);
+            if (existUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+            System.out.println("Xuống đây!!");
+            return ResponseEntity.ok(existUser);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Lỗi hệ thống khi kiểm tra người dùng tồn tại");
+        }
+    }
+
+    @GetMapping("/{id_user}/events")
+    public ResponseEntity<?> getBrandLogo(@PathVariable Long id_user) {
+        try {
+            User user = userService.findByIdUser(id_user);
+            return ResponseEntity.ok(user.getAvatarUrl());
+        } catch (NotFoundException e) {
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/statistics/users")
+    public ResponseEntity<?> getListUserForStatistics(@RequestBody List<String> usernames) {
+        try {
+            List<User> users = userService.findUsersByUsernames(usernames);
+            if (users == null || users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(users);
+            }
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập danh sách người dùng!"));
         }
     }
 }

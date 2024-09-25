@@ -1,0 +1,24 @@
+# Stage 1: Build the application
+FROM maven:3.9.8-eclipse-temurin-17 AS build
+WORKDIR /statistics-service
+
+# Copy the pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy the source code and build the application
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Start a new stage for the final image
+FROM eclipse-temurin:17
+WORKDIR /statistics-service
+
+# Copy the JAR file from the build stage to the final image
+COPY --from=build /statistics-service/target/statistics-service-*.jar statistics-service.jar
+
+# Expose port 8761 to match the docker-compose settings
+EXPOSE 8015
+
+# Set the command to execute the JAR file
+ENTRYPOINT ["java", "-jar", "statistics-service.jar"]

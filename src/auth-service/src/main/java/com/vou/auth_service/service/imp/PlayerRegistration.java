@@ -27,38 +27,40 @@ public class PlayerRegistration implements IRegistration {
     private InventoryClient inventoryClient;
 
     @Override
-    public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
-        if (existingUserByUsername.isPresent()) {
-            return false;
+    public byte register(User user) {
+        try {
+            User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+            if (existUser != null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 2;
         }
-        if (existingUserByEmail.isPresent()) {
-            return false;
-        }
-
-        System.out.println("Qua day 1");
+        System.out.println("Co user" + user.getIdUser());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         Player player = new Player(user, encodedPassword);
-        // Set other specific fields for Admin
-
         try {
-            Player isSaved = client.createPlayer(player).orElse(null);
+            Long idUser = client.createPlayer(player);
             System.out.println("Qua day 2");
-            if (isSaved != null) {
-                //Generate and send OTP
+            if (idUser != null) {
                 String otp = otpService.generateOtp();
                 otpService.storeOtp(player.getUsername(), otp);
                 if (player.getEmail() != null) {
                     otpService.sendOtpEmail(player.getEmail(), otp);
                     System.out.println("Qua day 3");
                 }
-                List<ItemRepo> itemRepoList = inventoryClient.createItemRepo(isSaved.getIdUser()).orElse(null);
+                List<ItemRepo> itemRepoList = inventoryClient.createItemRepo(idUser).orElse(null);
+                if (itemRepoList == null) {
+                    return 3;
+                }
+                for (ItemRepo itemRepo : itemRepoList) {
+                    System.out.println(itemRepo);
+                }
             }
-            return isSaved != null;
+            return 1;
         } catch (Exception e) {
             System.err.println("Failed to create player: " + e.getMessage());
-            return false;
+            return 2;
         }
     }
 

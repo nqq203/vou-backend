@@ -6,7 +6,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -21,8 +20,10 @@ public class InventoryClient {
     public InventoryClient(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
+
     public Optional<List<ItemRepo>> createItemRepo(Long idPlayer) {
         try {
+            System.out.println("Create item repo with user id: " + idPlayer);
             ResponseEntity<List<ItemRepo>> response = restTemplate.exchange(
                     INVENTORY_URL + "/" + idPlayer,
                     HttpMethod.POST,

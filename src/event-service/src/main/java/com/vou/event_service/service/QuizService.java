@@ -4,12 +4,9 @@ import com.vou.event_service.dto.GameInfoDTO;
 import com.vou.event_service.dto.QuizDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -20,7 +17,7 @@ public class QuizService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String QUIZ_SERVICE_URL = "http://localhost:8086/api/v1/game/quiz/create";
+    private final String QUIZ_SERVICE_URL = "http://streaming-service:8086/api/v1/game/quiz/create";
 
     public void createQuiz(GameInfoDTO gameInfoDTO) {
         HttpHeaders headers = new HttpHeaders();
@@ -45,7 +42,7 @@ public class QuizService {
         }
     }
     public GameInfoDTO getGameInfo(Long eventId) {
-        String url = "http://localhost:8086/api/v1/game/game-info?eventId=" + eventId;
+        String url = "http://streaming-service:8086/api/v1/game/game-info?eventId=" + eventId;
 
         // Make the GET request
         ResponseEntity<GameInfoDTO> response = restTemplate.getForEntity(url, GameInfoDTO.class);
@@ -54,7 +51,7 @@ public class QuizService {
         return response.getBody();
     }
     public GameInfoDTO updateGameInfo(GameInfoDTO gameInfoDTO) {
-        String url = "http://localhost:8086/api/v1/game/game-info?eventId=" + gameInfoDTO.getEventId();
+        String url = "http://streaming-service:8086/api/v1/game/game-info?eventId=" + gameInfoDTO.getEventId();
 
         // Make a PUT request to the updateGameInfo endpoint
         ResponseEntity<GameInfoDTO> response = restTemplate.exchange(
@@ -65,5 +62,15 @@ public class QuizService {
         );
 
         return response.getBody(); // Return the updated GameInfoDTO
+    }
+
+    public Integer getTurns(Long idPlayer, Long idGame) {
+        String url = "http://streaming-service:8086/api/v1/game/" + idGame + "/players/" + idPlayer + "/turns";
+
+        ResponseEntity<Integer> response = restTemplate.getForEntity(url, Integer.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody();
+        }
+        return null;
     }
 }

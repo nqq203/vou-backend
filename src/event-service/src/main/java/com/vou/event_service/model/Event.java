@@ -21,12 +21,24 @@ public class Event {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "share_count")
+    private Long shareCount;
+
     @Column(name = "number_of_vouchers")
     private Integer numberOfVouchers;
+
+    @Column(name = "remaining_vouchers")
+    private Integer remainingVouchers;
 
     @Column(name = "start_date", nullable = false)
     private Timestamp startDate;
 
     @Column(name = "end_date", nullable = false)
     private Timestamp endDate;
+
+    @Column(name = "deleted_date")
+    private Timestamp deletedDate;
+
+    @Column(name = "created_by")
+    private Long createdBy;
 }

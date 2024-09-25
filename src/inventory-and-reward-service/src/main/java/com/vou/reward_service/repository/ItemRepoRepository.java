@@ -9,9 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ItemRepoRepository extends JpaRepository<ItemRepo, Long> {
-    boolean existsItemRepoByIdItemAndAmountIsGreaterThan(Long idItem, Long amount);
+    boolean existsItemRepoByIdItemAndIdPlayerAndAmountIsLessThanEqual(Long idItem, Long idPlayer, Long amount);
 
-    ItemRepo findItemRepoByIdItem(Long idItem);
+    boolean existsItemRepoByIdItemAndIdPlayerAndAmountGreaterThanEqual(Long idItem, Long idPlayer, Long amount);
+
+    ItemRepo findItemRepoByIdItemAndIdPlayer(Long idItem, Long idPlayer);
 
     List<ItemRepo> findItemReposByIdPlayer(Long idPlayer);
 

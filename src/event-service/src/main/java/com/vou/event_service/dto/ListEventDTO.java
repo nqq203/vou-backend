@@ -1,9 +1,7 @@
 package com.vou.event_service.dto;
 
 import com.vou.event_service.model.Event;
-import jakarta.persistence.Entity;
 import lombok.Data;
-import org.bouncycastle.util.Times;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -18,8 +16,9 @@ public class ListEventDTO {
     private Timestamp startDate;
     private Timestamp endDate;
     private String status;
+    String brandLogo;
 
-    public ListEventDTO(Event event) {
+    public ListEventDTO(Event event, String brandLogo) {
         this.idEvent = event.getIdEvent();
         this.eventName = event.getEventName();
         this.imageUrl = event.getImageUrl();
@@ -27,6 +26,7 @@ public class ListEventDTO {
         this.startDate = event.getStartDate();
         this.endDate = event.getEndDate();
         this.status = determineStatus();
+        this.brandLogo = brandLogo;
     }
     private String determineStatus() {
         Timestamp now = Timestamp.from(Instant.now());

@@ -18,7 +18,7 @@ public class AdminController {
         this.userService = userService;
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Boolean> createAdmin(@RequestBody Admin admin) {
         try {
             Admin savedAdmin = userService.createAdmin(admin);

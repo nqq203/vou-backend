@@ -62,6 +62,6 @@ public class Voucher {
     @Column(name = "id_event")
     Long idEvent;
 
-
-
+    @Column(name = "status")
+    String status;
 }

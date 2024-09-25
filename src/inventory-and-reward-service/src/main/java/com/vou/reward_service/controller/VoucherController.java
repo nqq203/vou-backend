@@ -4,6 +4,7 @@ import com.vou.reward_service.dto.InventoryDTO;
 import com.vou.reward_service.common.*;
 import com.vou.reward_service.dto.*;
 import com.vou.reward_service.entity.CreateVoucherRequest;
+import com.vou.reward_service.entity.RewardVouchersForWinnersRequest;
 import com.vou.reward_service.entity.UserVoucher;
 import com.vou.reward_service.model.Item;
 import com.vou.reward_service.model.Voucher;
@@ -18,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,8 +40,22 @@ public class VoucherController {
     private StorageService storageService;
 
     @GetMapping("")
-    public ResponseEntity<List<Voucher>> getVouchers() {
-        return ResponseEntity.status(HttpStatus.OK).body(voucherService.getAllVouchers());
+    public ResponseEntity<ApiResponse> getVouchers(@RequestParam("type") String type) {
+        if (!Arrays.asList("online", "offline").contains(type)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequest("Không tồn tại loại voucher"));
+        }
+        try {
+            List<Voucher> vouchers = voucherService.getListOnlineOrOfflineVoucher(type);
+            if (vouchers == null) {
+                return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi tìm danh sách voucher bằng " + type));
+            }
+            if (vouchers.toArray().length == 0) {
+                return ResponseEntity.ok(new SuccessResponse("Hiện không có vouchers " + type + " nào", HttpStatus.OK, null));
+            }
+            return ResponseEntity.ok(new SuccessResponse("Truy cập danh sách voucher " + type, HttpStatus.OK, vouchers));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi truy cập danh sách voucher " + type));
+        }
     }
 
     @PostMapping("")
@@ -87,32 +99,56 @@ public class VoucherController {
     }
 
     @GetMapping("/{code}")
-    public ResponseEntity<HashMap<String, Object>> getVoucher(@PathVariable("code") String code) {
+    public ResponseEntity<ApiResponse> getVoucher(@PathVariable("code") String code) {
+        if (code == null) {
+            return ResponseEntity.badRequest().body(new BadRequest("Voucher code không hợp lệ"));
+        }
         try {
             Voucher voucher = voucherService.findVoucherByCode(code);
-            HashMap<String, Object> response = new HashMap<>();
             if (voucher == null) {
-                response.put("status", HttpStatus.NOT_FOUND);
-                response.put("description", "Voucher not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy voucher với code tương ứng"));
             }
-            else {
-                response.put("status", HttpStatus.OK);
-                response.put("description", "Voucher details");
-                response.put("content", voucher);
-            }
-            return ResponseEntity.status((int) response.get("status")).body(response);
-        } catch (Exception e) {
-            HashMap<String, Object> response = new HashMap<>();
-            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR);
-            response.put("description", "Internal server error");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(new SuccessResponse("Truy cập thông tin voucher thành công!" , HttpStatus.OK, voucher));
+        } catch(Exception e) {
+            return ResponseEntity.internalServerError().body(new InternalServerError("Lỗi hệ thống khi cố gắng truy cập thông tin voucher!"));
         }
     }
 
-    @PutMapping("/{code}")
-    public ResponseEntity<ApiResponse> updateVoucherById(@PathVariable String code, @RequestBody CreateVoucherRequest request) {
+    @PutMapping("/info")
+    public ResponseEntity<ApiResponse> updateVoucher(@RequestBody InventoryDTO inventoryDTO, @RequestParam String code) {
         try {
+            CreateVoucherRequest request;
+            if (inventoryDTO.getGameType().equals("shake-game")) {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getItems(),
+                        inventoryDTO.getAim_coin(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+            else {
+                request = new CreateVoucherRequest(
+                        inventoryDTO.getVoucher_code(),
+                        null,
+                        inventoryDTO.getVoucher_name(),
+                        null,
+                        inventoryDTO.getExpiration_date(),
+                        inventoryDTO.getVoucher_price(),
+                        inventoryDTO.getVoucher_description(),
+                        inventoryDTO.getVoucher_type(),
+                        inventoryDTO.getEvent_id()
+                );
+            }
+
             Integer result = voucherService.updateVoucherByCode(code, request);
+
             ApiResponse response = new SuccessResponse("Cập nhật voucher thành công", 200);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -132,10 +168,13 @@ public class VoucherController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<ApiResponse> getUserVouchers(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse> getUserVouchers(@PathVariable Long id, @RequestParam String type) {
+        if (type == null || !Arrays.asList("online", "offline").contains(type)) {
+            return ResponseEntity.badRequest().body(new BadRequest("Loại voucher không hợp lệ!"));
+        }
         try {
-            List<UserVoucher> userVouchers = voucherService.getVouchersByUserId(id);
-            ApiResponse response = new SuccessResponse("Tất cả voucher của người dùng", HttpStatus.OK, userVouchers);
+            List<UserVoucher> userVouchers = voucherService.getVouchersByUserId(id, type);
+            ApiResponse response = new SuccessResponse("Truy cập danh sách vouchers " + type + " thành công!", HttpStatus.OK, userVouchers);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (NotFoundException notFoundE) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new NotFoundResponse("Không tìm thấy voucher nào của người dùng"));
@@ -229,4 +268,21 @@ public class VoucherController {
    private boolean isImageFile(MultipartFile file) {
        return file != null && file.getContentType() != null && file.getContentType().startsWith("image/");
    }
+
+    @GetMapping("/exists/{voucherCode}")
+    public ResponseEntity<Boolean> checkVoucherExists(@PathVariable String voucherCode) {
+        // Check if the voucher exists in the repository
+        boolean exists = voucherRepository.existsByCode(voucherCode.toUpperCase());
+        return ResponseEntity.ok(exists);
+    }
+
+    @PostMapping("/gifts")
+    public ResponseEntity<ApiResponse> rewardVouchersForWinners(@RequestBody RewardVouchersForWinnersRequest request) {
+        try {
+            voucherRepoService.rewardVoucherQuizGame(request.getWinnerIds(), request.getVoucherCode());
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse("Đã gửi phần thưởng vào kho voucher của người chơi", 200));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InternalServerError(e.getMessage()));
+        }
+    }
 }

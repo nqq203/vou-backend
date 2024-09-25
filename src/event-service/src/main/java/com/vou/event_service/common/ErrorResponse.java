@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse {
+public class ErrorResponse implements ApiResponse{
     private boolean success = false;
     private int code;
     private String message;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,17 +16,18 @@ public class GameInfoDTO {
     private String name;
     private String gameType;
     private Long eventId;
-    private Timestamp statedAt;
+    private Timestamp startedAt;
     private List<QuizDTO> quiz;
 
 
-    public GameInfoDTO(Long gameId, String name, String gameType,Timestamp statedAt, Long eventId, List<QuizDTO> quiz) {
+    public GameInfoDTO(Long gameId, String name, String gameType,Timestamp startedAt, Long eventId, List<QuizDTO> quiz) {
         this.gameId = gameId;
         this.name = name;
         this.gameType = gameType;
-        this.statedAt = statedAt;
+        this.startedAt = startedAt;
         this.eventId = eventId;
         this.quiz =quiz;
     }
+
 
 }

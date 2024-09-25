@@ -19,25 +19,27 @@ public class AdminRegistration implements IRegistration {
 
 
     @Override
-    public boolean register(User user) {
-        Optional<User> existingUserByUsername = client.getUserByIdentifier(user.getUsername());
-        Optional<User> existingUserByEmail = client.getUserByIdentifier(user.getEmail());
+    public byte register(User user) {
+        try {
+            User existUser = client.getUserByUsernameAndEmail(user.getUsername(), user.getEmail()).orElse(null);
+            if (existUser != null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 2;
+        }
 
-        if (existingUserByUsername.isPresent()) {
-            return false;
-        }
-        if (existingUserByEmail.isPresent()) {
-            return false;
-        }
 
         String password = passwordEncoder.encode(user.getPassword());
         Admin admin = new Admin(user, password);
-        // Set other specific fields for Admin
         try {
-            return client.createAdmin(admin);
+            if(client.createAdmin(admin)) {
+                return 1;
+            }
+            return 2;
         } catch (Exception e) {
             System.err.println("Failed to create admin: " + e.getMessage());
-            return false;
+            return 2;
         }
     }
 

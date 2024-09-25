@@ -51,11 +51,16 @@ public class RewardService {
 
     public RewardDTO incrementAmountByIdItemRepo(Long idItemRepo, Long updatedAmount) {
         try {
-            HttpEntity<Long> requestEntity = new HttpEntity<>(updatedAmount);
+            String url;
+            if (updatedAmount == null) {
+                url = ITEM_REPOS_URL + "/" + idItemRepo;
+            } else {
+                url = ITEM_REPOS_URL + "/" + idItemRepo + "?amount" + updatedAmount;
+            }
             ResponseEntity<RewardDTO> response = restTemplate.exchange(
-                    ITEM_REPOS_URL + "/" + idItemRepo,
+                    url,
                     HttpMethod.PUT,
-                    requestEntity,
+                    null,
                     RewardDTO.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();

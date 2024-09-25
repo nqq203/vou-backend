@@ -16,7 +16,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/register",
             "/api/v1/auth/verify-otp/**",
             "/api/v1/auth/resend-otp",
-            "/api/v1/auth/validate-token"
+            "/api/v1/auth/validate-token",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+
     );
 
     @Override
@@ -64,9 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("In JWT config: " + username + " " + isValidToken);
                 if (username == null) {
                     System.out.println("In JWT config: username null");
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    String jsonResponse = "{\"message\":\"Internal server error when validate token\", \"code\":500}";
+                    String jsonResponse = "{\"message\":\"Token không hợp lệ hoặc hết hiệu lực!\", \"code\":401}";
                     response.getWriter().write(jsonResponse);
                     response.getWriter().flush();
                     return;
@@ -83,19 +86,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();  // Clear any existing security context
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    String jsonResponse = "{\"message\":\"Invalid or expired token\", \"code\":401}";
+                    String jsonResponse = "{\"message\":\"Token không hợp lệ hoặc đã hết hiệu lực!\", \"code\":401}";
                     response.getWriter().write(jsonResponse);
                     response.getWriter().flush();
                     return;
                 }
             } else {
                 // Handle missing token
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                String jsonResponse = "{\"error\":\"Access denied\", \"message\": \"Not found endpoint\", \"code\":400}";
+                String jsonResponse = "{\"error\":\"Yêu cầu bị từ chối\", \"message\": \"Yêu cầu chưa được xác thực!\", \"code\":401}";
                 response.getWriter().write(jsonResponse);
                 response.getWriter().flush();
-                return; // Stop filter chain, do not continue to other filters
+                return;
             }
 
             filterChain.doFilter(request, response);

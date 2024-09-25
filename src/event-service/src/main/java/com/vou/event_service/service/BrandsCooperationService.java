@@ -1,7 +1,7 @@
 package com.vou.event_service.service;
 
-import com.vou.event_service.common.BadRequestException;
 import com.vou.event_service.common.NotFoundException;
+import com.vou.event_service.dto.BrandDTO;
 import com.vou.event_service.entity.CreateBrandsCooperationRequest;
 import com.vou.event_service.model.BrandsCooperation;
 import com.vou.event_service.repository.BrandsCooperationRepository;
@@ -16,6 +16,8 @@ import java.util.Optional;
 public class BrandsCooperationService {
     @Autowired
     private BrandsCooperationRepository brandsCooperationRepository;
+    @Autowired
+    private BrandClient brandClient;
 
     public List<BrandsCooperation> getAllBrandsCooperation() throws Exception {
         try {
@@ -73,10 +75,15 @@ public class BrandsCooperationService {
     public BrandsCooperation createBrandsCooperation(CreateBrandsCooperationRequest request) throws Exception {
         BrandsCooperation newBrandsCooperation = new BrandsCooperation();
         if (request.getIdBrand() == null || request.getIdEvent() == null) {
-            throw new BadRequestException("Invalid input");
+            throw new Exception("Invalid input");
+        }
+        BrandDTO brand = brandClient.getBrandByIdBrand(request.getIdBrand()).orElse(null);
+        if (brand == null) {
+            throw new Exception("Error when finding brand");
         }
         newBrandsCooperation.setIdBrand(request.getIdBrand());
         newBrandsCooperation.setIdEvent(request.getIdEvent());
+        newBrandsCooperation.setNameBrand(brand.getFullName());
         try {
             brandsCooperationRepository.save(newBrandsCooperation);
             return newBrandsCooperation;

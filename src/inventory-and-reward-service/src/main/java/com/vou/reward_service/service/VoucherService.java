@@ -69,24 +69,21 @@ public class VoucherService {
 
     public Integer updateVoucherByCode(String code, CreateVoucherRequest request) {
         try {
-            Voucher voucherFound = voucherRepository.findByCode(code.toUpperCase());
+            Voucher voucherFound = voucherRepository.findByCode(code);
             if (voucherFound == null) {
                 return HttpStatus.NOT_FOUND;
             } else {
-                if (request.getQrCode() != null) {
-                    voucherFound.setQrCode(request.getQrCode());
-                }
                 if (request.getVoucherName() != null) {
                     voucherFound.setVoucherName(request.getVoucherName());
-                }
-                if (request.getImageUrl() != null) {
-                    voucherFound.setImageUrl(request.getImageUrl());
                 }
                 if (request.getDescription() != null) {
                     voucherFound.setDescription(request.getDescription());
                 }
                 if (request.getExpirationDate() != null) {
                     voucherFound.setExpirationDate(request.getExpirationDate());
+                }
+                if (request.getVoucherPrice() != null){
+                    voucherFound.setVoucherPrice(request.getVoucherPrice());
                 }
                 if (request.getType() != null) {
                     voucherFound.setType(request.getType());
@@ -134,13 +131,9 @@ public class VoucherService {
         }
     }
 
-    public List<UserVoucher> getVouchersByUserId(Long id) throws Exception{
+    public List<UserVoucher> getVouchersByUserId(Long id, String type) throws Exception{
         try {
-            List<UserVoucher> vouchersFound = voucherRepoRepository.findVouchersByUserId(id);
-            if (vouchersFound == null || vouchersFound.isEmpty()) {
-                throw new NotFoundException("Not found any vouchers of this user");
-            }
-            return vouchersFound;
+            return voucherRepoRepository.findVouchersByUserId(id, type);
         } catch (NotFoundException notFoundException) {
             throw notFoundException;
         } catch (Exception e) {
@@ -156,6 +149,14 @@ public class VoucherService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public List<Voucher> getListOnlineOrOfflineVoucher(String type) {
+        try {
+            return voucherRepository.findVouchersByTypeIs(type);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

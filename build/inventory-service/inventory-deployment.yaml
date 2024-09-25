@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-and-reward-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-and-reward-service
+  template:
+    metadata:
+      labels:
+        app: inventory-and-reward-service
+    spec:
+      containers:
+      - name: inventory-and-reward-service
+        image: inventory-and-reward-service:latest
+        ports:
+        - containerPort: 8087
+        env:
+        - name: SPRING_APPLICATION_NAME
+          value: "inventory-and-reward-service"
+        - name: SERVER_PORT
+          value: "8087"
+        - name: SPRING_CLOUD_KUBERNETES_DISCOVERY_ENABLED
+          value: "true"
