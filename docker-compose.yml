@@ -36,8 +36,11 @@ services:
     networks:
       - microservices-network
 
-  api-gateway:
+  nginx:
     image: nginx:latest
+    build:
+      context: ./src/nginx
+      dockerfile: dockerfile
     ports:
       - "8080:80"
       - "443:443"
@@ -48,6 +51,8 @@ services:
       - statistics-service
       - streaming-service
       - inventory-and-reward-service
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - microservices-network
 
@@ -70,7 +75,6 @@ services:
     image: user-service:latest
     build:
       context: ./src/user-service
-      dockerfile: dockerfile
     volumes:
       - user-service-data:/var/user-service
       - maven-repo:/root/.m2
